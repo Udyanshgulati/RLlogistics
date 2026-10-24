@@ -1,5 +1,7 @@
 /** Top-down truck heading down the screen (cab at the bottom). Local box: 0..60 × 0..200. */
-export function TruckTop({ className }: { className?: string }) {
+export function TruckTop({ className, src }: { className?: string; src?: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  if (src) return <img src={src} alt="" aria-hidden className={className} />;
   return (
     <svg viewBox="0 0 60 200" className={className} aria-hidden>
       <rect x="2" y="4" width="56" height="196" rx="6" fill="#0a0d14" opacity="0.18" transform="translate(3 3)" />

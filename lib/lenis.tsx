@@ -2,7 +2,7 @@
 
 import Lenis from "lenis";
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 const LenisContext = createContext<Lenis | null>(null);
@@ -34,7 +34,11 @@ export function LenisProvider({ children }: { children: ReactNode }) {
 
   // New page: jump to the top (or the hash target) and re-measure every trigger.
   const pathname = usePathname();
+  const lastPath = useRef(pathname);
   useEffect(() => {
+    // First load: ScrollTrigger already measures as the scenes mount; only re-measure on navigation.
+    if (lastPath.current === pathname) return;
+    lastPath.current = pathname;
     const hash = window.location.hash;
     const target = hash ? document.querySelector<HTMLElement>(hash) : null;
     if (target) lenis?.scrollTo(target, { immediate: true });

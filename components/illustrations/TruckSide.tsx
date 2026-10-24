@@ -9,10 +9,15 @@ export const TRUCK = { deckY: -118, slotX: 235, length: 660, wheelR: 30 };
 const trailerWheels = [64, 126, 188];
 const tractorWheels = [478, 612];
 
-export function TruckSide() {
+/** Override PNG art box (local units): x 0..660 · y −280..0, facing right, without wheels. */
+export function TruckSide({ img }: { img?: string }) {
   return (
     <g data-part="truck">
       <ellipse cx={330} cy={2} rx={350} ry={9} fill="#0a0d14" opacity={0.14} />
+      {img ? (
+        <image href={img} x={0} y={-280} width={660} height={280} preserveAspectRatio="xMidYMax meet" />
+      ) : (
+        <>
       {/* trailer */}
       <rect x={0} y={-118} width={490} height={18} fill="#2a2f37" />
       <rect x={0} y={-100} width={490} height={10} fill="#16191f" />
@@ -34,6 +39,8 @@ export function TruckSide() {
       <text x={545} y={-130} fontSize={12} fontFamily="var(--font-mono), monospace" fill="#8d929b" letterSpacing={2}>
         RL
       </text>
+        </>
+      )}
       {[...trailerWheels, ...tractorWheels].map((x) => (
         <g key={x} transform={`translate(${x} ${-TRUCK.wheelR})`}>
           <Wheel r={TRUCK.wheelR} part="truck-wheel" />

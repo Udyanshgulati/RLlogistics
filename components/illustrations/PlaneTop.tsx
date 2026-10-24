@@ -1,5 +1,7 @@
 /** Top-down cargo plane, nose pointing right. viewBox 0..1000 × 0..800. */
-export function PlaneTop({ className }: { className?: string }) {
+export function PlaneTop({ className, src }: { className?: string; src?: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  if (src) return <img src={src} alt="" aria-hidden className={className} />;
   return (
     <svg viewBox="0 0 1000 800" className={className} aria-hidden>
       <defs>

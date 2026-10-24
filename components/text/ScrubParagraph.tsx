@@ -19,7 +19,7 @@ type Props = {
 
 /** Words start at steel @25% and turn to full ink one by one. */
 export function buildScrubTl(el: HTMLElement, tone: "light" | "dark" = "light") {
-  const split = SplitText.create(el, { type: "words" });
+  const split = SplitText.create(el, { type: "words", tag: "span", aria: "none" });
   const tl = gsap.timeline();
   tl.fromTo(
     split.words,

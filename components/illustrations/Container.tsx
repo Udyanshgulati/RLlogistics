@@ -1,8 +1,14 @@
-type Props = { w: number; h: number; color: string; rib: string; label?: string; x?: number; y?: number; part?: string };
+type Props = { w: number; h: number; color: string; rib: string; label?: string; x?: number; y?: number; part?: string; img?: string };
 
 /** Side-view ISO container: corrugated panel, top/bottom rails, corner castings and door end. */
-export function Container({ w, h, color, rib, label, x = 0, y = 0, part }: Props) {
+export function Container({ w, h, color, rib, label, x = 0, y = 0, part, img }: Props) {
   const ribs = Math.round(w / 14);
+  if (img)
+    return (
+      <g data-part={part} transform={`translate(${x} ${y})`}>
+        <image href={img} width={w} height={h} preserveAspectRatio="none" />
+      </g>
+    );
   return (
     <g data-part={part} transform={`translate(${x} ${y})`}>
       <rect width={w} height={h} fill={color} />

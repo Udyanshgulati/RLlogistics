@@ -17,11 +17,16 @@ export const STACKER = {
   cylinderAt: 250,
 };
 
-export function ReachStacker() {
+/** Art boxes for override PNGs (local units): body x 0..480 · y −250..0 (no wheels); boom x −40..580 · y −30..30, pivot at 0,0. */
+export function ReachStacker({ bodyImg, boomImg }: { bodyImg?: string; boomImg?: string }) {
   const { pivot, boomLength: L, spreaderWidth: SW } = STACKER;
   return (
     <g data-part="stacker">
       <ellipse cx={250} cy={2} rx={290} ry={9} fill="#0a0d14" opacity={0.12} />
+      {bodyImg ? (
+        <image href={bodyImg} x={0} y={-250} width={480} height={250} preserveAspectRatio="xMidYMax meet" />
+      ) : (
+        <>
       {/* chassis */}
       <path d="M10 -64 H480 L470 -128 H210 L190 -150 H10 Z" fill="#1E8FB8" />
       <path d="M10 -64 H480 L476 -86 H10 Z" fill="#14709a" />
@@ -35,6 +40,8 @@ export function ReachStacker() {
         <path d="M250 -156 V-218 H286 V-156 Z" fill="#8fc3dc" opacity={0.35} />
         <rect x={226} y={-246} width={110} height={8} rx={2} fill="#0f5d80" />
       </g>
+        </>
+      )}
       {/* lift cylinder (endpoints set at runtime) */}
       <line data-part="cylinder" x1={300} y1={-112} x2={360} y2={-220} stroke="#b6bcc6" strokeWidth={16} strokeLinecap="round" />
       {/* boom */}
@@ -47,11 +54,17 @@ export function ReachStacker() {
             <circle r={6} fill="#b6bcc6" />
           </g>
         </g>
+        {boomImg ? (
+          <image href={boomImg} x={-40} y={-30} width={620} height={60} preserveAspectRatio="none" />
+        ) : (
+          <>
         <rect x={-40} y={-24} width={540} height={48} rx={4} fill="#1d2430" />
         <rect x={-40} y={-24} width={540} height={10} fill="#323b4a" />
         <text x={120} y={6} fontSize={14} fontFamily="var(--font-mono), monospace" fill="#9fb7c9" letterSpacing={3}>
           RL · 45T
         </text>
+          </>
+        )}
         <circle r={14} fill="#b6bcc6" />
         <circle r={6} fill="#1d2430" />
       </g>

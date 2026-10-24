@@ -6,24 +6,28 @@ import { ocean } from "@/content/home";
 import { GhostHeading, buildGhostTl } from "@/components/text/GhostHeading";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { ShipTop } from "@/components/illustrations/ShipTop";
-import { cloudTexture, wakeTexture, waterTexture } from "@/lib/textures";
+import { cloudTexture, wakeTexture, waterTexture, whenNear } from "@/lib/textures";
 import { cn } from "@/lib/cn";
+import type { AssetOverrides } from "@/lib/asset-slots";
 
 /**
  * SCENE 6 — the ocean. Opens extremely close on the ship's container rows, then the camera climbs
  * (scale 3 → 0.35) while the ship travels up the frame. Heading, then four features around the ship,
  * then cloud banks roll in from the edges until the frame is white-blue sky (handed to Scene 7).
  */
-export function Scene6Ocean() {
+export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
       const el = root.current!;
-      // Paint the procedural textures once.
-      el.querySelectorAll<HTMLElement>("[data-water]").forEach((w) => (w.style.backgroundImage = `url(${waterTexture()})`));
-      el.querySelector<HTMLImageElement>("[data-wake]")!.src = wakeTexture();
-      el.querySelectorAll<HTMLImageElement>("[data-cloud]").forEach((c, i) => (c.src = cloudTexture(11 + i * 7)));
+      // Paint the procedural textures once, in idle time, as the scene approaches.
+      const clouds = [assets.cloud1, assets.cloud2, assets.cloud3];
+      const stopNear = whenNear(el, () => {
+        el.querySelectorAll<HTMLElement>("[data-water]").forEach((w) => (w.style.backgroundImage = `url(${waterTexture()})`));
+        el.querySelector<HTMLImageElement>("[data-wake]")!.src = wakeTexture();
+        el.querySelectorAll<HTMLImageElement>("[data-cloud]").forEach((c, i) => (c.src = clouds[i] ?? cloudTexture(11 + i * 7)));
+      });
 
       const mm = gsap.matchMedia();
       mm.add({ motion: MQ.motion, mobile: MQ.mobile }, (ctx) => {
@@ -62,10 +66,13 @@ export function Scene6Ocean() {
           .fromTo("[data-cloud='0']", { autoAlpha: 0, xPercent: -80, yPercent: -30, scale: 1.4 }, { autoAlpha: 0.95, xPercent: -10, yPercent: -10, scale: 1, duration: 2.6, ease: "power1.out" }, 7.2)
           .fromTo("[data-cloud='1']", { autoAlpha: 0, xPercent: 80, yPercent: 20, scale: 1.4 }, { autoAlpha: 0.95, xPercent: 5, yPercent: 0, scale: 1, duration: 2.6, ease: "power1.out" }, 7.4)
           .fromTo("[data-cloud='2']", { autoAlpha: 0, yPercent: 90, scale: 1.6 }, { autoAlpha: 0.95, yPercent: 10, scale: 1.1, duration: 2.6, ease: "power1.out" }, 7.6)
-          .fromTo("[data-sky]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.6 }, 8.6);
+          .fromTo("[data-sky]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.6 }, 8.6)
+          // Hold on sky so scrub lag never shows a seam at the hand-off to the plane.
+          .to({}, { duration: 1 });
 
         return () => ghost.restore();
       });
+      return stopNear;
     },
     { scope: root },
   );
@@ -79,8 +86,11 @@ export function Scene6Ocean() {
       aria-labelledby="ocean-title"
     >
       {/* Water: two drifting layers at different scales for depth */}
-      <div data-water-far data-water className="absolute -inset-1/2 animate-[drift_60s_linear_infinite] bg-[length:1024px] opacity-70" />
-      <div data-water-near data-water className="absolute -inset-1/2 animate-[drift_40s_linear_infinite_reverse] bg-[length:760px] opacity-40" />
+      {assets.ocean && (
+        <video src={assets.ocean} autoPlay muted loop playsInline aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+      )}
+      <div data-water-far data-water className={cn("absolute -inset-1/2 animate-[drift_60s_linear_infinite] bg-[length:1024px] bg-[#0a3a9e] opacity-70", assets.ocean && "hidden")} />
+      <div data-water-near data-water className={cn("absolute -inset-1/2 animate-[drift_40s_linear_infinite_reverse] bg-[length:760px] opacity-40", assets.ocean && "hidden")} />
       <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(3,20,70,0.55)_100%)]" />
 
       {/* Ship + wake */}
@@ -88,7 +98,7 @@ export function Scene6Ocean() {
         <div data-ship-cam className="relative w-[clamp(84px,15vw,230px)] will-change-transform">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img data-wake alt="" className="absolute left-1/2 top-[-6%] w-[250%] max-w-none -translate-x-1/2" />
-          <ShipTop className="relative h-auto w-full drop-shadow-[0_18px_30px_rgba(0,10,40,0.45)]" />
+          <ShipTop src={assets.shipTop} className="relative h-auto w-full drop-shadow-[0_18px_30px_rgba(0,10,40,0.45)]" />
         </div>
       </div>
 

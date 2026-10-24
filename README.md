@@ -58,9 +58,22 @@ node scripts/build-globe-points.mjs
 
 The header changes colour to match the section underneath it. Any section can set `data-nav-theme="dark" | "light"`.
 
-### Asset slots
+### Asset overrides
 
-All vehicles, ship, plane, clouds and water are drawn in code (SVG or canvas), so no image files are needed. When real artwork arrives, these are the planned file names to swap in under `/public/assets/`: `yard/reach-stacker-body.png`, `yard/reach-stacker-boom.png`, `yard/container-white.png`, `truck-side.png`, `truck-top.png`, `ship-top.png`, `plane-top.png`, `clouds-1.png`…`clouds-3.png`, `ocean.mp4`, `hero-road.jpg`.
+All vehicles, the ship, plane, clouds and water are drawn in code (SVG or canvas), so the site needs no image files. To use real artwork, drop a file with one of these names into `/public/assets/` and rebuild. `lib/assets.ts` checks at build time and the matching scene switches to the file automatically (slots are listed in `lib/asset-slots.ts`).
+
+| File | Replaces | Art box / notes |
+|---|---|---|
+| `hero-road.jpg` | Scene 2 image card | 2:1 landscape photo |
+| `yard/reach-stacker-body.png` | Reach-stacker body | Side view facing right, 480 × 250, ground on the bottom edge, **no wheels** (the coded wheels keep spinning) |
+| `yard/reach-stacker-boom.png` | Telescopic boom | 620 × 60, pivot 40 px from the left edge, vertically centred |
+| `yard/container-white.png` | The 40 ft container that gets lifted | 410 × 160 side view |
+| `truck-side.png` | Side-view truck + trailer | 660 × 280 facing right, **no wheels** |
+| `truck-top.png` | Top-down truck on the road | 60 × 200 portrait, cab at the bottom |
+| `ship-top.png` | Top-down container ship | 240 × 1000 portrait, bow at the top, transparent background |
+| `plane-top.png` | Top-down cargo plane | 1000 × 800, nose pointing right, transparent background |
+| `clouds-1.png` … `clouds-3.png` | Cloud banks (Scenes 6 and 7) | Wide transparent PNGs, about 1400 × 700 |
+| `ocean.mp4` | Animated water | Looping top-down sea, muted |
 
 ## Accessibility & motion
 

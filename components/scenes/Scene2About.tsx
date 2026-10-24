@@ -10,13 +10,14 @@ import { ScrubParagraph } from "@/components/text/ScrubParagraph";
 import { Counter } from "@/components/text/Counter";
 import { AerialRoad } from "@/components/illustrations/AerialRoad";
 import { Arrow } from "@/components/ui/Button";
+import type { AssetOverrides } from "@/lib/asset-slots";
 
 /**
  * SCENE 2 — "We move freight. We own the outcome."
  * Paper section that receives the dive's white haze. The left column (image card + headline) stays sticky
  * while the copy and counters scroll past on the right; the image card parallaxes at its own speed.
  */
-export function Scene2About() {
+export function Scene2About({ assets = {} }: { assets?: AssetOverrides }) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -49,7 +50,12 @@ export function Scene2About() {
       <div className="grid gap-16 px-gutter pb-[18vh] pt-[14vh] md:grid-cols-12 md:pl-[clamp(140px,13vw,220px)]">
         <div className="md:sticky md:top-0 md:col-span-7 md:flex md:h-screen md:flex-col md:justify-between md:py-[12vh]">
           <div data-about-card className="relative aspect-[2/1] w-[min(340px,70%)] overflow-hidden rounded-[2px]">
-            <AerialRoad className="h-full w-full" />
+            {assets.heroRoad ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={assets.heroRoad} alt={about.imageAlt} className="h-full w-full object-cover" />
+            ) : (
+              <AerialRoad className="h-full w-full" />
+            )}
             <span className="ui-label absolute bottom-2 left-2 text-paper/80">NH-48 · Gurugram</span>
           </div>
           <div className="mt-16 md:mt-0">

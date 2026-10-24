@@ -1,7 +1,9 @@
 const COLORS = ["#d8343a", "#2f9e4f", "#1f4fb4", "#e8467c", "#f2f2f0", "#f08a24", "#2a8fd6", "#d8343a", "#f2f2f0", "#1f4fb4"];
 
 /** Top-down container ship, bow up. viewBox 0..240 × 0..1000. */
-export function ShipTop({ className }: { className?: string }) {
+export function ShipTop({ className, src }: { className?: string; src?: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  if (src) return <img src={src} alt="" aria-hidden className={className} />;
   const bays = 11;
   const cols = 6;
   return (

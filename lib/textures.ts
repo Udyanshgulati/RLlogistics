@@ -20,12 +20,13 @@ function rng(seed: number) {
 /** Deep-water surface: soft swell bands + scattered white caustic glints. Tileable-ish, 1024². */
 export function waterTexture() {
   if (cache.has("water")) return cache.get("water")!;
-  const [c, g] = canvas(1024, 1024);
+  const S = 512;
+  const [c, g] = canvas(S, S);
   const r = rng(7);
   g.fillStyle = "#0a3a9e";
-  g.fillRect(0, 0, 1024, 1024);
-  for (let i = 0; i < 70; i++) {
-    const x = r() * 1024, y = r() * 1024, rad = 120 + r() * 260;
+  g.fillRect(0, 0, S, S);
+  for (let i = 0; i < 40; i++) {
+    const x = r() * S, y = r() * S, rad = 60 + r() * 130;
     const grd = g.createRadialGradient(x, y, 0, x, y, rad);
     const dark = r() > 0.5;
     grd.addColorStop(0, dark ? "rgba(4,30,110,0.5)" : "rgba(40,110,230,0.35)");
@@ -34,9 +35,9 @@ export function waterTexture() {
     g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
   }
   g.strokeStyle = "rgba(255,255,255,0.10)";
-  for (let i = 0; i < 900; i++) {
-    const x = r() * 1024, y = r() * 1024, len = 6 + r() * 26;
-    g.lineWidth = 0.6 + r() * 1.4;
+  for (let i = 0; i < 450; i++) {
+    const x = r() * S, y = r() * S, len = 3 + r() * 13;
+    g.lineWidth = 0.5 + r() * 0.8;
     g.beginPath();
     g.moveTo(x, y);
     g.quadraticCurveTo(x + len / 2, y - 3 - r() * 4, x + len, y);
@@ -48,15 +49,15 @@ export function waterTexture() {
 }
 
 /** A soft cloud bank built from layered radial puffs on a transparent canvas. */
-export function cloudTexture(seed: number, w = 1400, h = 700) {
+export function cloudTexture(seed: number, w = 900, h = 450) {
   const key = `cloud-${seed}-${w}x${h}`;
   if (cache.has(key)) return cache.get(key)!;
   const [c, g] = canvas(w, h);
   const r = rng(seed);
-  for (let i = 0; i < 160; i++) {
+  for (let i = 0; i < 90; i++) {
     const x = w * (0.08 + r() * 0.84);
     const y = h * (0.3 + r() * 0.45) - Math.sin((x / w) * Math.PI) * h * 0.12;
-    const rad = 50 + r() * 150;
+    const rad = (50 + r() * 150) * (w / 1400);
     const grd = g.createRadialGradient(x, y - rad * 0.2, 0, x, y, rad);
     grd.addColorStop(0, "rgba(255,255,255,0.95)");
     grd.addColorStop(0.55, "rgba(246,249,253,0.65)");
@@ -108,4 +109,30 @@ export function wakeTexture() {
   const url = c.toDataURL("image/png");
   cache.set("wake", url);
   return url;
+}
+
+/**
+ * Runs `cb` once, in idle time, when `el` comes within ~2 screens of the viewport.
+ * Keeps texture painting out of the initial page load.
+ */
+export function whenNear(el: Element, cb: () => void) {
+  let done = false;
+  const run = () => {
+    if (done) return;
+    done = true;
+    const ric = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    if (ric) ric(cb, { timeout: 600 });
+    else setTimeout(cb, 1);
+  };
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        io.disconnect();
+        run();
+      }
+    },
+    { rootMargin: "200% 0px" },
+  );
+  io.observe(el);
+  return () => io.disconnect();
 }

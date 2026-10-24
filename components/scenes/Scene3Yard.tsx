@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { ReachStacker, STACKER } from "@/components/illustrations/ReachStacker";
 import { TruckSide, TRUCK } from "@/components/illustrations/TruckSide";
 import { Container } from "@/components/illustrations/Container";
+import type { AssetOverrides } from "@/lib/asset-slots";
 
 /**
  * SCENES 3 + 4 — the container yard handing off to services.
@@ -68,7 +69,7 @@ type Rig = {
   dock: number; // 0 = ground where it is, 1 = ground on the dark panel's top edge
 };
 
-export function Scene3Yard() {
+export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -223,7 +224,9 @@ export function Scene3Yard() {
           // exit · truck accelerates off, panel takes the whole screen
           .to(rig, { tx: 2600, duration: 1.6, ease: "power3.in" }, 16)
           .to("[data-panel]", { clipPath: "inset(0% 0 0 0)", duration: 1.4 }, 16.3)
-          .to("[data-panel-content]", { autoAlpha: 0, y: -40, duration: 0.8 }, 16.6);
+          .to("[data-panel-content]", { autoAlpha: 0, y: -40, duration: 0.8 }, 16.6)
+          // Hold on full dark so scrub lag never shows a seam at the hand-off to the road.
+          .to({}, { duration: 1.2 });
 
         render();
         return () => ghost.restore();
@@ -278,9 +281,9 @@ export function Scene3Yard() {
             <Container w={C20.w} h={C20.h} color="#e85d24" rib="#c2481a" label="RLWU 377051" x={STACK_X + C20.w + 5} y={GROUND - C20.h} />
             <Container w={C20.w} h={C20.h} color="#128080" rib="#0d6464" label="RLWU 118602" x={STACK_X + 2 * (C20.w + 5) + 40} y={GROUND - C20.h} />
             </g>
-            <ReachStacker />
-            <TruckSide />
-            <Container part="white" w={C40.w} h={C40.h} color="#e9ebee" rib="#c3c8cf" label="RLWU 540227 · 40'" />
+            <ReachStacker bodyImg={assets.stackerBody} boomImg={assets.stackerBoom} />
+            <TruckSide img={assets.truckSide} />
+            <Container part="white" img={assets.containerWhite} w={C40.w} h={C40.h} color="#e9ebee" rib="#c3c8cf" label="RLWU 540227 · 40'" />
           </g>
         </svg>
       </div>

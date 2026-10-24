@@ -6,21 +6,25 @@ import { trust } from "@/content/home";
 import { testimonials, clientLogos } from "@/content/testimonials";
 import { RevealHeading, buildRevealTl } from "@/components/text/RevealHeading";
 import { PlaneTop } from "@/components/illustrations/PlaneTop";
-import { cloudTexture } from "@/lib/textures";
+import { cloudTexture, whenNear } from "@/lib/textures";
 import { tokenColor } from "@/lib/tokens";
 import { cn } from "@/lib/cn";
+import type { AssetOverrides } from "@/lib/asset-slots";
 
 /**
  * SCENE 7 — through the clouds, a cargo plane crosses the frame and clears the sky to paper. Then a pinned
  * testimonial list: the active quote reads steel → ink word by word while the others rest at 20%.
  */
-export function Scene7Trust() {
+export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
       const el = root.current!;
-      el.querySelectorAll<HTMLImageElement>("[data-cloud]").forEach((c, i) => (c.src = cloudTexture(11 + i * 7)));
+      const clouds = [assets.cloud1, assets.cloud2, assets.cloud3];
+      const stopNear = whenNear(el, () =>
+        el.querySelectorAll<HTMLImageElement>("[data-cloud]").forEach((c, i) => (c.src = clouds[i] ?? cloudTexture(11 + i * 7))),
+      );
 
       const mm = gsap.matchMedia();
       mm.add({ motion: MQ.motion, mobile: MQ.mobile }, (ctx) => {
@@ -28,7 +32,7 @@ export function Scene7Trust() {
         const heading = buildRevealTl(el.querySelector<HTMLElement>("[data-trust-heading] [data-reveal]")!);
         heading.tl.pause(0);
         const items = gsap.utils.toArray<HTMLElement>("[data-testimonial]");
-        const quotes = items.map((it) => SplitText.create(it.querySelector("[data-quote]")!, { type: "words" }));
+        const quotes = items.map((it) => SplitText.create(it.querySelector("[data-quote]")!, { type: "words", tag: "span", aria: "none" }));
         const list = el.querySelector<HTMLElement>("[data-list]")!;
 
         const tl = gsap.timeline({
@@ -68,6 +72,7 @@ export function Scene7Trust() {
       });
 
       mm.add(MQ.reduced, () => el.classList.add("is-static"));
+      return stopNear;
     },
     { scope: root },
   );
@@ -82,7 +87,7 @@ export function Scene7Trust() {
     >
       {/* Plane — keeps its tail parked at the right edge afterwards */}
       <div data-plane className="pointer-events-none invisible absolute left-0 top-[6%] z-30 w-[115vw] max-w-none group-[.is-static]/trust:hidden md:top-[-4%]">
-        <PlaneTop className="h-auto w-full" />
+        <PlaneTop src={assets.planeTop} className="h-auto w-full" />
       </div>
 
       <div className="relative z-10 grid h-full gap-10 px-gutter pb-[8vh] pt-[16vh] md:grid-cols-12 md:pl-[clamp(140px,13vw,220px)]">

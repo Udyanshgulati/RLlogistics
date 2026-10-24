@@ -103,7 +103,9 @@ export function Scene1Hero() {
           .set("[data-hero-globe]", { filter: "none" }, 0.75)
           .fromTo("[data-atmos]", { autoAlpha: 0, scale: 1.15 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "power1.inOut" }, 0.42)
           // 0.7 → 1: haze whitens into paper
-          .fromTo("[data-haze]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.28, ease: "power1.inOut" }, 0.72);
+          .fromTo("[data-haze]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.24, ease: "power1.inOut" }, 0.72)
+          // Hold on paper so scrub lag never shows a seam at the hand-off.
+          .to({}, { duration: 0.1 });
       });
     },
     { scope: root },

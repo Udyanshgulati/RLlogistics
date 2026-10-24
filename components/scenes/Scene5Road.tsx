@@ -7,6 +7,7 @@ import { GhostHeading, buildGhostTl } from "@/components/text/GhostHeading";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { TruckTop } from "@/components/illustrations/TruckTop";
 import { cn } from "@/lib/cn";
+import type { AssetOverrides } from "@/lib/asset-slots";
 
 /**
  * SCENE 5 — the road. Starts as a giant black S-curve that fills the screen (continuing Scene 4's dark panel),
@@ -26,7 +27,7 @@ const SLOTS = [
 /** On phones the heading takes the top third, so milestones are squeezed into the space below it. */
 const slotY = (y: number, mobile: boolean) => (mobile ? 0.36 + (y - 0.24) * 0.95 : y);
 
-export function Scene5Road() {
+export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -117,6 +118,8 @@ export function Scene5Road() {
           { yPercent: 0, duration: 1.6, ease: "power2.in" },
           9.4,
         );
+        // Hold on full blue so scrub lag never shows a seam at the hand-off to the ocean.
+        tl.to({}, { duration: 1 });
 
         render();
         return () => ghost.restore();
@@ -149,7 +152,7 @@ export function Scene5Road() {
       </svg>
 
       <div data-truck className="absolute left-0 top-0 z-10 will-change-transform">
-        <TruckTop className="h-auto w-full" />
+        <TruckTop src={assets.truckTop} className="h-auto w-full" />
       </div>
 
       <div data-heading-wrap className="absolute left-[calc(var(--road-x)+var(--road-w)/2+20px)] top-[14vh] z-10 md:left-[clamp(140px,13vw,220px)]">
