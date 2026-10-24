@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description:
     "Warehousing, road transport, freight forwarding and customs clearance — run by one accountable team out of Delhi, moving cargo across India.",
   openGraph: { type: "website", locale: "en_IN", siteName: "RL Logistics & Warehousing" },
+  ...(process.env.NEXT_PUBLIC_NOINDEX === "1" ? { robots: { index: false, follow: false } } : {}),
   twitter: { card: "summary_large_image" },
 };
 

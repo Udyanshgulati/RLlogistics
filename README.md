@@ -39,6 +39,21 @@ The site is a standard Next.js app, so the simplest host is **Vercel**:
 3. Under **Settings → Domains**, add `rllogistics.in` and follow the DNS instructions.
 
 Any Node host also works: `npm ci && npm run build && npm start` (port 3000).
+
+### Staging on `rllogistics.thodalogic.com`
+
+**With Coolify (recommended, the server already runs it):** New Resource → Private Repository (GitHub App) → `Udyanshgulati/RLlogistics`, branch `claude/new-session-jlvwbz` → Build Pack **Dockerfile** → Ports Exposes `80` → Domains `https://rllogistics.thodalogic.com` → Deploy. The `Dockerfile` builds the static export (staging URL, noindex) and serves it with nginx; Coolify's proxy handles HTTPS. Every push redeploys if auto-deploy is on.
+
+**Without Coolify (plain nginx):**
+
+The client preview runs as a plain static site on the Thoda Logic server (`200.141.13.226`), next to the other client subdomains.
+
+1. **Cloudflare DNS** (thodalogic.com → DNS → Records → Add record): Type `A`, Name `rllogistics`, IPv4 `200.141.13.226`, Proxy on (orange cloud), TTL Auto.
+2. **Server, once:** copy `deploy/nginx-rllogistics.thodalogic.com.conf` into nginx (commands are in the file header), and create `/var/www/rllogistics`.
+3. **Deploy (every update):** `SERVER=user@200.141.13.226 ./deploy/deploy.sh`. This builds with `npm run export:subdomain` and rsyncs `out/` to the server.
+4. **HTTPS:** with the Cloudflare proxy on, set SSL/TLS mode to *Full* and either run `certbot --nginx -d rllogistics.thodalogic.com` on the server or install a Cloudflare Origin certificate.
+
+The subdomain build sets `NEXT_PUBLIC_SITE_URL=https://rllogistics.thodalogic.com` and `NEXT_PUBLIC_NOINDEX=1`: canonical URLs point at the subdomain, and robots.txt plus a `noindex` meta keep search engines away until the real launch on rllogistics.in. Production builds omit both variables, so they default to `https://rllogistics.in` and indexable.
 CI (`.github/workflows/ci.yml`) runs typecheck, lint and build on every push.
 
 ## Where things live

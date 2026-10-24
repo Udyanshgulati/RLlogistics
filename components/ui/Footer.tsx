@@ -98,6 +98,24 @@ export function Footer() {
           Back to top
         </button>
       </div>
+
+      {/* Studio credit: faint outlined watermark with a small readable link on top */}
+      <div className="relative -mx-gutter mt-10 overflow-hidden border-t border-paper/10 px-gutter md:-ml-[clamp(140px,13vw,220px)] md:pl-[clamp(140px,13vw,220px)]">
+        <p
+          aria-hidden
+          className="display text-outline pointer-events-none select-none whitespace-nowrap py-4 text-center text-[clamp(2.6rem,9vw,8.5rem)] leading-none tracking-[-0.02em] text-paper/[0.18]"
+        >
+          Thoda Logic
+        </p>
+        <a
+          href="https://thodalogic.com"
+          target="_blank"
+          rel="noreferrer"
+          className="ui-label absolute inset-0 flex items-center justify-center gap-2 text-paper/55 transition-colors hover:text-brand"
+        >
+          Website by <span className="text-paper/85">Thoda Logic</span> ↗
+        </a>
+      </div>
     </footer>
   );
 }

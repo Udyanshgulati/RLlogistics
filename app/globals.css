@@ -58,7 +58,8 @@
 }
 
 @layer utilities {
-  .text-outline { -webkit-text-stroke: 1px currentColor; color: transparent; }
+  /* Hollow letters: keep `color` for the stroke, make only the fill transparent. */
+  .text-outline { -webkit-text-stroke: 1px currentColor; -webkit-text-fill-color: transparent; }
   [data-nav-theme="light"] .text-steel:not([data-nav-theme="dark"] *) { color: rgb(var(--steel-on-paper)); }
 }
 

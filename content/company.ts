@@ -17,5 +17,6 @@ export const company = {
     postalCode: "110053",
     country: "IN",
   },
-  url: "https://rllogistics.in",
+  // Canonical address for SEO (sitemap, OG, JSON-LD). Override per deployment with NEXT_PUBLIC_SITE_URL.
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://rllogistics.in",
 } as const;
