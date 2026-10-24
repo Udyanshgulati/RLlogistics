@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap, useGSAP, EXPO, MQ } from "@/lib/gsap";
 import { useLoader } from "@/lib/loader";
 import { hero } from "@/content/home";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import type { GlobeProgress } from "@/components/globe/Globe";
 
 const Globe = dynamic(() => import("@/components/globe/Globe"), { ssr: false });
+const GlobeFlat = dynamic(() => import("@/components/globe/GlobeFlat"), { ssr: false });
 
 /**
  * SCENE 1 — hero + globe dive.
@@ -23,6 +24,7 @@ export function Scene1Hero() {
   const [inView, setInView] = useState(true);
   const [submerged, setSubmerged] = useState(false);
   const [offsetX, setOffsetX] = useState(1.02);
+  const [flat, setFlat] = useState<boolean | null>(null);
 
   // The loader waits for the globe's first rendered frame.
   const readyRef = useRef<() => void>(() => {});
@@ -30,12 +32,16 @@ export function Scene1Hero() {
     track(new Promise<void>((resolve) => (readyRef.current = resolve)));
   }, [track]);
 
+  const onGlobeReady = useCallback(() => readyRef.current(), []);
+
   // Pause the WebGL loop when the hero is off-screen or fully covered by the haze.
   useEffect(() => {
     const el = root.current;
     if (!el) return;
     const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { rootMargin: "100px" });
     io.observe(el);
+    // Phones get the lightweight 2D canvas globe; decided once so the canvas isn't swapped mid-scroll.
+    setFlat(window.innerWidth < 768);
     const onResize = () => setOffsetX(window.innerWidth < 768 ? 0 : window.innerWidth < 1100 ? 0.8 : 1.02);
     onResize();
     window.addEventListener("resize", onResize);
@@ -107,7 +113,8 @@ export function Scene1Hero() {
     <section ref={root} data-scene="hero" data-nav-theme="dark" className="relative h-[100svh] overflow-hidden bg-ink text-paper" aria-label="Introduction">
       {/* Globe */}
       <div data-hero-globe className="absolute inset-0">
-        <Globe progress={progress} active={inView && !submerged} offsetX={offsetX} onReady={() => readyRef.current()} />
+        {flat === true && <GlobeFlat progress={progress} active={inView && !submerged} onReady={onGlobeReady} />}
+        {flat === false && <Globe progress={progress} active={inView && !submerged} offsetX={offsetX} onReady={onGlobeReady} />}
       </div>
       {/* Legibility gradient behind copy on small screens */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink via-ink/70 to-transparent md:hidden" />

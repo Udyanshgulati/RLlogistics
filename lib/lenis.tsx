@@ -1,6 +1,7 @@
 "use client";
 
 import Lenis from "lenis";
+import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
@@ -30,6 +31,17 @@ export function LenisProvider({ children }: { children: ReactNode }) {
       setLenis(null);
     };
   }, []);
+
+  // New page: jump to the top (or the hash target) and re-measure every trigger.
+  const pathname = usePathname();
+  useEffect(() => {
+    const hash = window.location.hash;
+    const target = hash ? document.querySelector<HTMLElement>(hash) : null;
+    if (target) lenis?.scrollTo(target, { immediate: true });
+    else lenis?.scrollTo(0, { immediate: true });
+    const id = requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => cancelAnimationFrame(id);
+  }, [pathname, lenis]);
 
   return <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>;
 }

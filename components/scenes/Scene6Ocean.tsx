@@ -85,7 +85,7 @@ export function Scene6Ocean() {
 
       {/* Ship + wake */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div data-ship-cam className="relative w-[clamp(120px,15vw,230px)] will-change-transform">
+        <div data-ship-cam className="relative w-[clamp(84px,15vw,230px)] will-change-transform">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img data-wake alt="" className="absolute left-1/2 top-[-6%] w-[250%] max-w-none -translate-x-1/2" />
           <ShipTop className="relative h-auto w-full drop-shadow-[0_18px_30px_rgba(0,10,40,0.45)]" />
@@ -93,7 +93,7 @@ export function Scene6Ocean() {
       </div>
 
       {/* Heading */}
-      <div data-ocean-heading className="absolute inset-x-0 top-[38%] z-10 flex justify-center px-gutter text-center">
+      <div data-ocean-heading className="absolute inset-x-0 top-[38%] z-10 motion-reduce:top-[12%] flex justify-center px-gutter text-center">
         <GhostHeading
           as="h2"
           lines={ocean.headline}
@@ -106,7 +106,7 @@ export function Scene6Ocean() {
       </div>
 
       {/* Features: two left, two right of the ship */}
-      <div className="absolute inset-0 z-10 grid grid-cols-2 content-center gap-x-[min(34vw,520px)] gap-y-[14vh] px-gutter max-md:gap-x-6 max-md:content-end max-md:pb-[10vh]">
+      <div className="absolute inset-0 z-10 grid grid-cols-2 content-center gap-x-[min(34vw,520px)] gap-y-[14vh] px-gutter max-md:gap-x-[96px] max-md:content-end max-md:pb-[8vh]">
         {ocean.features.map((f, i) => (
           <div key={f.title} data-feature className={cn("relative max-w-[28ch] opacity-0 motion-reduce:opacity-100", i % 2 === 0 ? "justify-self-end text-right" : "justify-self-start")}>
             <div className={cn("relative mb-3 inline-block", i % 2 === 0 && "ml-auto")}>

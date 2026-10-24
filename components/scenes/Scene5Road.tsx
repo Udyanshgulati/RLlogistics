@@ -23,6 +23,9 @@ const SLOTS = [
   { y: 0.85, side: "right" },
 ] as const;
 
+/** On phones the heading takes the top third, so milestones are squeezed into the space below it. */
+const slotY = (y: number, mobile: boolean) => (mobile ? 0.36 + (y - 0.24) * 0.95 : y);
+
 export function Scene5Road() {
   const root = useRef<HTMLElement>(null);
 
@@ -100,7 +103,7 @@ export function Scene5Road() {
 
         // Each milestone reveals as the truck passes its y.
         SLOTS.forEach((slot, i) => {
-          const at = 2.4 + ((slot.y + 0.3 - 0.12) / 1.22) * 7;
+          const at = 2.4 + ((slotY(slot.y, !!ctx.conditions?.mobile) + 0.3 - 0.12) / 1.22) * 7;
           const item = el.querySelector(`[data-milestone="${i}"]`);
           tl.fromTo(item!.querySelector("[data-connector]"), { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, at)
             .fromTo(item!.querySelector("[data-dot]"), { scale: 0 }, { scale: 1, duration: 0.2 }, at)
@@ -165,14 +168,14 @@ export function Scene5Road() {
             key={m.title}
             data-milestone={i}
             className={cn(
-              "absolute z-10 flex items-start",
+              "absolute top-[calc(var(--y-m)-10px)] z-10 flex items-start md:top-[calc(var(--y-d)-10px)]",
               // mobile: everything sits to the right of a road hugging the left edge
               "left-[calc(var(--road-x)+var(--road-w)/2)] right-gutter",
               right
                 ? "md:left-[calc(var(--road-x)+var(--road-w)/2)] md:right-auto"
                 : "md:left-auto md:right-[calc(100%-var(--road-x)+var(--road-w)/2)] md:flex-row-reverse",
             )}
-            style={{ top: `calc(${slot.y * 100}% - 10px)` }}
+            style={{ "--y-d": `${slot.y * 100}%`, "--y-m": `${slotY(slot.y, true) * 100}%` } as React.CSSProperties}
           >
             <span data-dot className="relative z-10 -ml-1 mt-[7px] h-2 w-2 shrink-0 rounded-full bg-brand md:-mr-1 md:ml-0" />
             <span data-connector className={cn("mt-[10px] h-px w-6 shrink-0 bg-ink/40 md:w-16", right ? "origin-left" : "origin-left md:origin-right")} />

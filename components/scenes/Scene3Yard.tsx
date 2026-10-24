@@ -52,6 +52,9 @@ const P_LOWER = ik(SX_CARRY, TIP_CARRY_X, DECK_TOP - C40.h - STACKER.hang);
 const P_RELEASE = ik(SX_CARRY, TIP_CARRY_X, DECK_TOP - C40.h - STACKER.hang - 90);
 const TRUCK_X_LOAD = TIP_CARRY_X - TRUCK.slotX;
 
+/** Where the dark panel's top edge sits (fraction of the screen) — higher on phones to fit the services row. */
+const panelTop = () => (typeof window !== "undefined" && window.innerWidth < 768 ? 0.3 : 0.4);
+
 type Rig = {
   sx: number;
   a: number;
@@ -97,7 +100,7 @@ export function Scene3Yard() {
         const ctm = svg.getScreenCTM();
         const rect = svg.getBoundingClientRect();
         if (!ctm) return;
-        const targetView = (rect.top + rect.height * 0.4 - ctm.f) / ctm.d;
+        const targetView = (rect.top + rect.height * panelTop() - ctm.f) / ctm.d;
         dockShift = targetView - GROUND;
       };
 
@@ -203,7 +206,7 @@ export function Scene3Yard() {
           .to(rig, { zoom: 1, focus: 0, duration: 1.4 }, 8.9)
           .to(rig, { dock: 1, duration: 1.4 }, 9.6)
           .to("[data-stack]", { autoAlpha: 0, duration: 0.8 }, 9.4)
-          .fromTo("[data-panel]", { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(40% 0 0 0)", duration: 1.4 }, 9.6)
+          .fromTo("[data-panel]", { clipPath: "inset(100% 0 0 0)" }, { clipPath: () => `inset(${panelTop() * 100}% 0 0 0)`, duration: 1.4 }, 9.6)
           // SCENE 4 · services inside the panel; truck creeps right
           .to(rig, { tx: TRUCK_X_LOAD + 260, duration: 5, ease: "none" }, 11)
           .fromTo("[data-panel] [data-track]", { xPercent: 0 }, { xPercent: -18, duration: 7, ease: "none" }, 10)
@@ -289,7 +292,7 @@ export function Scene3Yard() {
         className="absolute inset-0 bg-ink text-paper group-[.is-static]/yard:relative"
         style={{ clipPath: "inset(100% 0 0 0)" }}
       >
-        <div data-panel-content className="absolute inset-x-0 bottom-0 top-[40%] flex flex-col justify-center gap-[3.5vh] px-gutter py-[4vh] group-[.is-static]/yard:relative group-[.is-static]/yard:top-0 group-[.is-static]/yard:py-24 md:pl-[clamp(140px,13vw,220px)]">
+        <div data-panel-content className="absolute inset-x-0 bottom-0 top-[30%] flex flex-col justify-center gap-[3vh] md:top-[40%] md:gap-[3.5vh] px-gutter py-[4vh] group-[.is-static]/yard:relative group-[.is-static]/yard:top-0 group-[.is-static]/yard:py-24 md:pl-[clamp(140px,13vw,220px)]">
           <Marquee text={servicesSection.watermark} drive="external" className="absolute inset-x-0 top-[8%] text-paper/[0.05]" />
           <div className="relative grid items-end gap-6 md:grid-cols-12">
             <div className="md:col-span-7">
@@ -299,15 +302,17 @@ export function Scene3Yard() {
                 lines={servicesSection.headline}
                 mutedLines={[2]}
                 mode="external"
-                className="text-[clamp(1.9rem,3.6vw,3.6rem)] leading-[0.92]"
+                className="text-[clamp(1.45rem,3.6vw,3.6rem)] leading-[0.92]"
               />
               <span id="services-title" className="sr-only">
                 {servicesSection.headline.join(" ")}
               </span>
             </div>
             <div data-services-copy className="flex max-w-[44ch] flex-col gap-3 text-[14px] leading-relaxed text-paper/65 md:col-span-5">
-              {servicesSection.paragraphs.map((p) => (
-                <p key={p}>{p}</p>
+              {servicesSection.paragraphs.map((p, i) => (
+                <p key={p} className={i > 0 ? "max-md:hidden" : undefined}>
+                  {p}
+                </p>
               ))}
             </div>
           </div>

@@ -30,7 +30,7 @@ type Props = {
  * SplitText keeps an aria-label with the full sentence and hides the fragments from AT.
  */
 export function buildRevealTl(el: HTMLElement, opts: { stagger?: number; duration?: number } = {}) {
-  const split = SplitText.create(el, { type: "lines,chars", mask: "lines", linesClass: "split-line" });
+  const split = SplitText.create(el, { type: "lines,words,chars", mask: "lines", linesClass: "split-line" });
   const tl = gsap.timeline();
   tl.fromTo(
     split.chars,

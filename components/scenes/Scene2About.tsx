@@ -55,7 +55,7 @@ export function Scene2About() {
           <div className="mt-16 md:mt-0">
             <p className="eyebrow mb-5 text-steel">{about.eyebrow}</p>
             <div data-about-heading id="about-title">
-              <RevealHeading lines={about.headline} className="whitespace-nowrap text-[clamp(2.3rem,5.2vw,5.4rem)] leading-[0.9] tracking-[-0.02em]" />
+              <RevealHeading lines={about.headline} className="text-[clamp(2.3rem,4.6vw,5.2rem)] leading-[0.9] tracking-[-0.02em]" />
             </div>
           </div>
         </div>
