@@ -39,12 +39,19 @@ export function Nav() {
       const t = hit?.closest("[data-nav-theme]")?.getAttribute("data-nav-theme");
       setTheme(t === "dark" ? "dark" : "light");
     };
-    const onScroll = () => (raf ||= requestAnimationFrame(probe));
+    // Scrubbed scenes keep animating ~1s after the last scroll event, so probe again once they settle.
+    let settle = 0;
+    const onScroll = () => {
+      raf ||= requestAnimationFrame(probe);
+      clearTimeout(settle);
+      settle = window.setTimeout(() => (raf ||= requestAnimationFrame(probe)), 1200);
+    };
     probe();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(settle);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };

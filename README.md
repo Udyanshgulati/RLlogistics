@@ -30,6 +30,17 @@ Routes: `/` (the scroll journey), `/about`, `/services`, `/services/[slug]` (6 s
 
 `./scripts/export-preview.sh` writes a static copy to `out/`, with Next's assets under `/rl/_next`. It is only used for the hosted preview; deploy normally with `npm run build && npm start`, or on Vercel.
 
+## Deploy
+
+The site is a standard Next.js app, so the simplest host is **Vercel**:
+
+1. Push this repo to GitHub (already done) and sign in at vercel.com with GitHub.
+2. Choose **Add New → Project**, pick the repo, keep the defaults (framework: Next.js) and click **Deploy**.
+3. Under **Settings → Domains**, add `rllogistics.in` and follow the DNS instructions.
+
+Any Node host also works: `npm ci && npm run build && npm start` (port 3000).
+CI (`.github/workflows/ci.yml`) runs typecheck, lint and build on every push.
+
 ## Where things live
 
 | Path | What |
