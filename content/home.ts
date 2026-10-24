@@ -33,3 +33,48 @@ export const about = {
   link: { label: "Learn more about us", href: "/about" },
   imageAlt: "Aerial view of a highway interchange",
 };
+
+export const servicesSection = {
+  eyebrow: "02 — What we do",
+  headline: ["Everything your", "freight needs.", "Under one roof."],
+  paragraphs: [
+    "From the bonded warehouse in Tughlakabad to the last doorstep in Gurugram, every leg runs on our own processes, our own control tower and our own people.",
+    "One contract, one tracker and one invoice, whether the cargo moves by truck, vessel or freighter.",
+  ],
+  watermark: "Our services",
+  cta: { label: "All services", href: "/services" },
+};
+
+export const road = {
+  eyebrow: "03 — How we deliver",
+  headline: ["Reliability", "at every", "milestone."],
+  milestones: [
+    { icon: "gps", title: "Real-time GPS tracking", body: "Every vehicle pings the control tower every 60 seconds. You see what we see." },
+    { icon: "user", title: "Dedicated account manager", body: "One named person who knows your SKUs, your docks and your deadlines." },
+    { icon: "tower", title: "24×7 control tower", body: "Exceptions get flagged and fixed at 3 a.m., long before they reach your inbox." },
+    { icon: "pod", title: "Proof of delivery in minutes", body: "Geo-tagged photo POD and e-signature are pushed to you as the truck pulls away." },
+    { icon: "thermo", title: "Temperature-controlled options", body: "Reefer trucks and 2–8 °C storage for pharma and perishables, with data loggers." },
+  ],
+} as const;
+
+export const ocean = {
+  headline: ["Logistics that works", "as hard as you do."],
+  features: [
+    { icon: "contact", title: "One point of contact", body: "No call-centre roulette. One team owns your account across every mode." },
+    { icon: "eye", title: "Full supply-chain visibility", body: "PO to POD on one dashboard: container, truck, shelf and doorstep." },
+    { icon: "shield", title: "Compliance you can trust", body: "Licensed CHA, ICEGATE filings and audit-ready paperwork, every time." },
+    { icon: "rupee", title: "Transparent, competitive pricing", body: "All-in quotes with no surprise detention, demurrage or 'misc' lines." },
+  ],
+} as const;
+
+export const trust = {
+  eyebrow: "04 — Clients",
+  headline: ["Trusted", "by businesses", "across India"],
+  intro: "From first-time importers to national retail chains, our clients stay because we treat their cargo like our own.",
+};
+
+export const cta = {
+  headline: ["Let's move", "something."],
+  sub: "Tell us what you're shipping, where it's going and when it needs to get there. We'll come back with a plan and an all-in quote within one working day.",
+  button: { label: "Get a quote", href: "/contact#quote" },
+};

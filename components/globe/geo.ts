@@ -30,10 +30,13 @@ export function arcPoints(a: THREE.Vector3, b: THREE.Vector3, segments = 64) {
   return pts;
 }
 
-/** Loads the pre-baked land points (Int16 lat*100, lng*100 pairs). */
-export async function loadLandPoints(url = "/globe/land-points.bin") {
-  const buf = await fetch(url).then((r) => r.arrayBuffer());
-  return new Int16Array(buf);
+/** Loads the pre-baked land points (base64 Int16 lat*100, lng*100 pairs). */
+export async function loadLandPoints(url = "/globe/land-points.json") {
+  const { b64 } = (await fetch(url).then((r) => r.json())) as { b64: string };
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Int16Array(bytes.buffer);
 }
 
 export const smoothstep = (e0: number, e1: number, x: number) => {

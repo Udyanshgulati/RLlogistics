@@ -1,23 +1,22 @@
 import { Scene1Hero } from "@/components/scenes/Scene1Hero";
-import { about } from "@/content/home";
+import { Scene2About } from "@/components/scenes/Scene2About";
+import { Scene3Yard } from "@/components/scenes/Scene3Yard";
+import { Scene5Road } from "@/components/scenes/Scene5Road";
+import { Scene6Ocean } from "@/components/scenes/Scene6Ocean";
+import { Scene7Trust } from "@/components/scenes/Scene7Trust";
+import { Scene8Cta } from "@/components/scenes/Scene8Cta";
 
 export default function HomePage() {
   return (
     <>
       <Scene1Hero />
-      {/* Scene 2 lands here next — this paper block receives the dive's white haze. */}
-      <section data-nav-theme="light" className="relative flex min-h-screen items-end bg-paper px-gutter pb-24 md:pl-[clamp(140px,13vw,220px)]">
-        <div>
-          <p className="eyebrow mb-4 text-steel">{about.eyebrow} · Scene 2 in progress</p>
-          <h2 className="display text-display-lg text-steel/40">
-            {about.headline.map((l) => (
-              <span key={l} className="block">
-                {l}
-              </span>
-            ))}
-          </h2>
-        </div>
-      </section>
+      <Scene2About />
+      {/* Scene 3 (yard) also carries Scene 4 (services) inside its dark panel. */}
+      <Scene3Yard />
+      <Scene5Road />
+      <Scene6Ocean />
+      <Scene7Trust />
+      <Scene8Cta />
     </>
   );
 }

@@ -64,6 +64,16 @@
   60%, 100% { transform: translateY(200%); }
 }
 
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-12%, -18%, 0); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 @media (pointer: fine) {
   html.has-cursor, html.has-cursor * { cursor: none !important; }
 }

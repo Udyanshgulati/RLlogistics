@@ -6,6 +6,7 @@ import { LoaderProvider } from "@/lib/loader";
 import { Loader } from "@/components/ui/Loader";
 import { Cursor } from "@/components/ui/Cursor";
 import { Nav } from "@/components/ui/Nav";
+import { Footer } from "@/components/ui/Footer";
 import { company } from "@/content/company";
 
 const display = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-display", display: "swap" });
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Cursor />
             <Nav />
             <main id="main">{children}</main>
+            <Footer />
           </LenisProvider>
         </LoaderProvider>
       </body>

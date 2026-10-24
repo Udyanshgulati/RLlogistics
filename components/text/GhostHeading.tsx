@@ -36,6 +36,8 @@ export function buildGhostTl(el: HTMLElement, opts: { duration?: number } = {}) 
   const ghosts = gsap.utils.toArray<HTMLElement>(el.querySelectorAll("[data-ghost]"));
   const lines = gsap.utils.toArray<HTMLElement>(el.querySelectorAll("[data-main] [data-line]"));
   const tl = gsap.timeline();
+  // Hidden until the effect starts, so a paused timeline at 0 shows nothing (not the offset copies).
+  tl.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12, ease: "none" }, 0);
 
   ghosts.forEach((g, i) => {
     const o = OFFSETS[i % OFFSETS.length];

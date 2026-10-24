@@ -32,7 +32,7 @@ Routes so far: `/` (Scene 1 — hero, globe and dive) and `/playground` (the fiv
 
 ### Globe land data
 
-`public/globe/land-points.bin` holds about 16.8k land points (Int16 lat/lng pairs), sampled from `world-atlas` land-50m. To regenerate it:
+`public/globe/land-points.json` holds about 16.8k land points (base64 Int16 lat/lng pairs), sampled from `world-atlas` land-50m. To regenerate it:
 
 ```bash
 node scripts/build-globe-points.mjs

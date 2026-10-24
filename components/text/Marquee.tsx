@@ -14,16 +14,27 @@ type Props = {
   start?: string;
   end?: string;
   outline?: boolean;
+  /** "external": a scene timeline moves [data-track] itself (needed inside pinned stages). */
+  drive?: "self" | "external";
 };
 
 /** Giant faint watermark text that drifts sideways with scroll. Purely decorative. */
-export function Marquee({ text, className, speed = 0.3, trigger, start = "top bottom", end = "bottom top", outline = true }: Props) {
+export function Marquee({
+  text,
+  className,
+  speed = 0.3,
+  trigger,
+  start = "top bottom",
+  end = "bottom top",
+  outline = true,
+  drive = "self",
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       const el = ref.current;
-      if (!el) return;
+      if (!el || drive === "external") return;
       const track = el.querySelector("[data-track]");
       const mm = gsap.matchMedia();
       mm.add(MQ.motion, () => {

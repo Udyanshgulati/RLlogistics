@@ -1,5 +1,5 @@
-// Samples land points on a lat-row grid and writes them as Int16 pairs (lat*100, lng*100).
-// Run: node scripts/build-globe-points.mjs  → public/globe/land-points.bin
+// Samples land points on a lat-row grid and writes them as base64 Int16 pairs (lat*100, lng*100).
+// Run: node scripts/build-globe-points.mjs  → public/globe/land-points.json
 import { readFileSync, writeFileSync } from "node:fs";
 import { feature } from "topojson-client";
 
@@ -46,5 +46,6 @@ for (let lat = -58; lat <= 82; lat += STEP) {
     if (onLand(lng, lat)) out.push(Math.round(lat * 100), Math.round(lng * 100));
   }
 }
-writeFileSync(new URL("../public/globe/land-points.bin", import.meta.url), Buffer.from(new Int16Array(out).buffer));
+const b64 = Buffer.from(new Int16Array(out).buffer).toString("base64");
+writeFileSync(new URL("../public/globe/land-points.json", import.meta.url), JSON.stringify({ format: "int16-latlng-x100", b64 }));
 console.log(`${out.length / 2} land points`);
