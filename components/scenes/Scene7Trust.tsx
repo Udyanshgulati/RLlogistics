@@ -22,8 +22,12 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
     () => {
       const el = root.current!;
       const clouds = [assets.cloud1, assets.cloud2, assets.cloud3];
-      const stopNear = whenNear(el, () =>
-        el.querySelectorAll<HTMLImageElement>("[data-cloud]").forEach((c, i) => (c.src = clouds[i] ?? cloudTexture(11 + i * 7))),
+      const stopNear = whenNear(
+        el,
+        [0, 1, 2].map((i) => () => {
+          const img = el.querySelector<HTMLImageElement>(`[data-cloud='${i}']`);
+          if (img) img.src = clouds[i] ?? cloudTexture(11 + i * 7);
+        }),
       );
 
       const mm = gsap.matchMedia();
@@ -49,11 +53,13 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
         });
 
         // Plane crosses; clouds part; sky clears to paper.
-        tl.fromTo("[data-plane]", { autoAlpha: 1, xPercent: -130, yPercent: 10, rotate: -7 }, { autoAlpha: 1, xPercent: 64, yPercent: -36, scale: 0.55, rotate: -14, duration: 3, ease: "power1.inOut" }, 0)
-          .to("[data-cloud='0']", { xPercent: -70, yPercent: -20, autoAlpha: 0, duration: 2.4, ease: "power1.in" }, 0.6)
-          .to("[data-cloud='1']", { xPercent: 70, autoAlpha: 0, duration: 2.4, ease: "power1.in" }, 0.7)
-          .to("[data-cloud='2']", { yPercent: 80, autoAlpha: 0, duration: 2.4, ease: "power1.in" }, 0.8)
-          .to("[data-sky]", { autoAlpha: 0, duration: 1.8 }, 1)
+        // Plane crosses (banking slightly), then parks with only its tail at the top-right edge (ref 19).
+        tl.fromTo("[data-plane]", { autoAlpha: 1, xPercent: -130, yPercent: 10, scale: 1, rotate: -7 }, { autoAlpha: 1, xPercent: 18, yPercent: -12, scale: 0.8, rotate: -2, duration: 2, ease: "power1.inOut" }, 0)
+          .to("[data-plane]", { xPercent: 45, yPercent: -37, scale: 0.4, rotate: -14, duration: 1.4, ease: "power2.inOut" }, 2)
+          .to("[data-cloud='0']", { xPercent: -70, yPercent: -20, autoAlpha: 0, duration: 1.8, ease: "power1.in" }, 0.3)
+          .to("[data-cloud='1']", { xPercent: 70, autoAlpha: 0, duration: 1.8, ease: "power1.in" }, 0.4)
+          .to("[data-cloud='2']", { yPercent: 80, autoAlpha: 0, duration: 1.8, ease: "power1.in" }, 0.5)
+          .to("[data-sky]", { autoAlpha: 0, duration: 1.4 }, 0.6)
           .add(heading.tl.tweenFromTo(0, heading.tl.duration(), { duration: 1 }), 2.2)
           .fromTo("[data-trust-intro], [data-list-wrap]", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.2 }, 2.8);
 
@@ -102,7 +108,7 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
         </div>
 
         <div data-list-wrap className="relative overflow-hidden md:col-span-6 md:mt-[12vh] max-md:h-[46vh] group-[.is-static]/trust:h-auto group-[.is-static]/trust:overflow-visible">
-          <ul data-list className="flex flex-col gap-14 will-change-transform">
+          <ul data-list className="flex flex-col gap-14">
             {testimonials.map((t) => (
               <li key={t.name} data-testimonial className="grid gap-5 sm:grid-cols-[150px_1fr]">
                 <div className="flex items-center gap-3 sm:flex-col sm:items-start">
