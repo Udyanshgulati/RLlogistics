@@ -5,6 +5,7 @@ import { gsap, SplitText, useGSAP, MQ } from "@/lib/gsap";
 import { trust } from "@/content/home";
 import { testimonials, clientLogos } from "@/content/testimonials";
 import { RevealHeading, buildRevealTl } from "@/components/text/RevealHeading";
+import { Avatar } from "@/components/ui/Avatar";
 import { PlaneTop } from "@/components/illustrations/PlaneTop";
 import { cloudTexture, whenNear } from "@/lib/textures";
 import { tokenColor } from "@/lib/tokens";
@@ -133,12 +134,7 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
             {testimonials.map((t) => (
               <li key={t.name} data-testimonial className="grid content-start gap-5 max-lg:min-w-[86%] max-lg:snap-start sm:grid-cols-[150px_1fr] sm:max-lg:min-w-[70%]">
                 <div className="flex items-center gap-3 sm:flex-col sm:items-start">
-                  <span
-                    aria-hidden
-                    className="flex h-14 w-14 items-center justify-center rounded-[2px] bg-[linear-gradient(135deg,#d9dadd,#b9bcc3)] font-mono text-[13px] tracking-widest text-ink/70 sm:h-[110px] sm:w-[110px] sm:text-[18px]"
-                  >
-                    {t.initials}
-                  </span>
+                  <Avatar look={t.avatar} className="h-14 w-14 shrink-0 rounded-[2px] sm:h-[110px] sm:w-[110px]" />
                   <div>
                     <p className="display text-[14px] leading-tight lg:text-[13px]">{t.name}</p>
                     <p className="text-[14px] leading-snug text-ink/60 lg:text-[12px] lg:leading-[inherit] lg:text-ink/55">
