@@ -6,7 +6,7 @@ import { company } from "@/content/company";
 import { enquiryMailto, isEmail, isPhone } from "@/lib/enquiry";
 import { cn } from "@/lib/cn";
 
-const field = "w-full border-b border-ink/20 bg-transparent py-3 text-[15px] outline-none transition-colors placeholder:text-ink/35 focus:border-brand";
+const field = "w-full border-b border-ink/20 bg-transparent py-3 text-[16px] lg:text-[15px] outline-none transition-colors placeholder:text-ink/35 focus:border-brand";
 
 /** Enquiry form — front-end only for now; shows a success state instead of sending. */
 export function ContactForm() {
@@ -95,7 +95,7 @@ export function ContactForm() {
         <textarea id="cf-message" name="message" rows={4} placeholder="Cargo, volumes, lanes, timelines…" className={cn(field, "resize-none")} />
       </label>
       <div className="sm:col-span-2">
-        <button type="submit" className="inline-flex h-12 items-center gap-3 rounded-full bg-ink px-6 text-[14px] font-medium text-paper transition-colors hover:bg-brand hover:text-ink">
+        <button type="submit" className="inline-flex h-12 items-center max-sm:w-full max-sm:justify-center gap-3 rounded-full bg-ink px-6 text-[14px] font-medium text-paper transition-colors hover:bg-brand hover:text-ink">
           Send enquiry
         </button>
       </div>

@@ -6,7 +6,7 @@ import { enquiryMailto, isEmail, isPhone } from "@/lib/enquiry";
 import { cn } from "@/lib/cn";
 
 const field =
-  "w-full border-b border-paper/25 bg-transparent py-3 text-[15px] text-paper outline-none transition-colors placeholder:text-paper/35 focus:border-brand";
+  "w-full border-b border-paper/25 bg-transparent py-3 text-[16px] lg:text-[15px] text-paper outline-none transition-colors placeholder:text-paper/35 focus:border-brand";
 
 const MODES = ["Road · Full truckload", "Road · Part truckload", "Air freight", "Ocean · FCL", "Ocean · LCL", "Not sure yet"];
 const CARGO = ["General cargo", "FMCG", "Pharma (2–8 °C)", "E-commerce parcels", "Machinery / over-dimensional", "Hazardous (DG)"];
@@ -117,7 +117,7 @@ export function QuoteRequestForm() {
         <textarea id="q-notes" name="notes" rows={3} placeholder="Dimensions, packaging, frequency, special handling…" className={cn(field, "resize-none")} />
       </label>
       <div className="sm:col-span-2">
-        <button type="submit" className="inline-flex h-12 items-center rounded-full bg-brand px-6 text-[14px] font-medium text-ink transition-colors hover:bg-paper">
+        <button type="submit" className="inline-flex h-12 items-center max-sm:w-full max-sm:justify-center rounded-full bg-brand px-6 text-[14px] font-medium text-ink transition-colors hover:bg-paper">
           Request a quote
         </button>
       </div>
