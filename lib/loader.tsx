@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 
 type LoaderState = {
-  /** True once the intro loader has finished wiping away. */
+  /** The intro loader screen was removed: the site starts "done" and the hero plays in immediately. */
   done: boolean;
   markDone: () => void;
   /** Register work the loader should wait for (e.g. the globe's first frame). */
@@ -14,7 +14,7 @@ type LoaderState = {
 const LoaderContext = createContext<LoaderState | null>(null);
 
 export function LoaderProvider({ children }: { children: ReactNode }) {
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState(true);
   const tasks = useRef<Promise<unknown>[]>([]);
   const track = useCallback((p: Promise<unknown>) => void tasks.current.push(p), []);
   const pending = useCallback(() => tasks.current, []);

@@ -3,7 +3,6 @@ import { Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/lib/lenis";
 import { LoaderProvider } from "@/lib/loader";
-import { Loader } from "@/components/ui/Loader";
 import { Cursor } from "@/components/ui/Cursor";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
@@ -36,7 +35,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <LoaderProvider>
           <LenisProvider>
-            <Loader />
             <Cursor />
             <Nav />
             <main id="main">{children}</main>

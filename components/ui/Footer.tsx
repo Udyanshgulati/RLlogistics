@@ -103,15 +103,15 @@ export function Footer() {
       </div>
 
       {/* Studio credit */}
-      <div className="-mx-gutter mt-10 border-t border-paper/10 px-gutter pt-8 text-center md:-ml-[clamp(140px,13vw,220px)] md:pl-[clamp(140px,13vw,220px)]">
+      <div className="-mx-gutter mt-10 border-t border-paper/10 px-gutter pb-1 pt-7 text-center md:-ml-[clamp(140px,13vw,220px)] md:pl-[clamp(140px,13vw,220px)]">
         <a
           href="https://thodalogic.com"
           target="_blank"
           rel="noreferrer"
-          className="group inline-block font-sans text-[12px] font-medium uppercase tracking-[0.24em] text-paper/45 transition-colors hover:text-paper/70 sm:text-[13px]"
+          className="group inline-block font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-paper/45 transition-colors hover:text-paper/70 sm:text-[11px]"
         >
           Designed and developed by{" "}
-          <span className="font-semibold text-paper transition-colors group-hover:text-brand">Thoda Logic</span>
+          <span className="font-bold text-paper transition-colors group-hover:text-brand">Thoda Logic</span>
         </a>
       </div>
     </footer>
