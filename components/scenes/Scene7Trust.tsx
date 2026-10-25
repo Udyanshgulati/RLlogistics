@@ -52,10 +52,25 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
           },
         });
 
-        // Plane crosses; clouds part; sky clears to paper.
-        // Plane crosses (banking slightly), then parks with only its tail at the top-right edge (ref 19).
-        tl.fromTo("[data-plane]", { autoAlpha: 1, xPercent: -130, yPercent: 10, scale: 1, rotate: -7 }, { autoAlpha: 1, xPercent: 18, yPercent: -12, scale: 0.8, rotate: -2, duration: 2, ease: "power1.inOut" }, 0)
-          .to("[data-plane]", { xPercent: 45, yPercent: -37, scale: 0.4, rotate: -14, duration: 1.4, ease: "power2.inOut" }, 2)
+        // Plane climbs diagonally from the bottom-left corner and leaves through the top-right corner,
+        // nose aligned with its path; clouds part and the sky clears to paper behind it.
+        const plane = el.querySelector<HTMLElement>("[data-plane]")!;
+        const path = () => {
+          const w = plane.offsetWidth, h = plane.offsetHeight;
+          const W = window.innerWidth, H = window.innerHeight;
+          return { x0: -w * 1.05, y0: H + h * 0.15, x1: W + w * 0.1, y1: -h * 1.2 };
+        };
+        const angle = () => {
+          const p = path();
+          return (Math.atan2(p.y1 - p.y0, p.x1 - p.x0) * 180) / Math.PI;
+        };
+        tl.fromTo(
+          plane,
+          { autoAlpha: 1, x: () => path().x0, y: () => path().y0, rotate: angle, scale: 1 },
+          { autoAlpha: 1, x: () => path().x1, y: () => path().y1, rotate: angle, scale: 0.8, duration: 2.6, ease: "power1.in" },
+          0,
+        )
+          .set(plane, { autoAlpha: 0 }, 2.6)
           .to("[data-cloud='0']", { xPercent: -70, yPercent: -20, autoAlpha: 0, duration: 1.8, ease: "power1.in" }, 0.3)
           .to("[data-cloud='1']", { xPercent: 70, autoAlpha: 0, duration: 1.8, ease: "power1.in" }, 0.4)
           .to("[data-cloud='2']", { yPercent: 80, autoAlpha: 0, duration: 1.8, ease: "power1.in" }, 0.5)
@@ -91,8 +106,8 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
       className="group/trust relative h-[100svh] overflow-hidden bg-paper text-ink [&.is-static]:h-auto"
       aria-labelledby="trust-title"
     >
-      {/* Plane — keeps its tail parked at the right edge afterwards */}
-      <div data-plane className="pointer-events-none invisible absolute left-0 top-[6%] z-30 w-[115vw] max-w-none group-[.is-static]/trust:hidden md:top-[-4%]">
+      {/* Plane — flies bottom-left → top-right and exits the frame */}
+      <div data-plane className="pointer-events-none invisible absolute left-0 top-0 z-30 w-[120vw] max-w-none origin-center group-[.is-static]/trust:hidden md:w-[62vw]">
         <PlaneTop src={assets.planeTop} className="h-auto w-full" />
       </div>
 
