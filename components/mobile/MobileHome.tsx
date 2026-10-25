@@ -186,7 +186,12 @@ function Hero() {
 
 function About({ heroRoad }: { heroRoad?: string }) {
   return (
-    <section data-nav-theme="light" aria-labelledby="m-about" className="bg-paper px-5 py-24 text-ink">
+    // Rises into the hero's white haze (no full blank screen after the dive); transparent at the top so the blue shows through.
+    <section
+      data-nav-theme="light"
+      aria-labelledby="m-about"
+      className="relative z-30 -mt-[50svh] bg-[linear-gradient(to_bottom,rgb(var(--paper)/0),rgb(var(--paper))_30svh)] px-5 pb-24 pt-[30svh] text-ink motion-reduce:mt-0 motion-reduce:bg-paper motion-reduce:pt-24"
+    >
       <div data-m-reveal className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-ink/10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={heroRoad ?? "/assets/hero-road.jpg"} alt={about.imageAlt} loading="lazy" className="h-full w-full object-cover" />

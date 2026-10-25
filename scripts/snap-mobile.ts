@@ -42,6 +42,8 @@ const args = process.argv.slice(2);
 const only = args.find((a) => a.startsWith("--only="))?.split("=")[1]?.split(",");
 const pagePath = args.find((a) => a.startsWith("--path="))?.split("=")[1] ?? "/";
 const withVideo = !args.includes("--no-video");
+// --dpr=2 caps the device pixel ratio (3x shots of a long page can exhaust a CPU-only browser).
+const dprCap = Number(args.find((a) => a.startsWith("--dpr="))?.split("=")[1] ?? Infinity);
 const slug = pagePath === "/" ? "" : pagePath.replace(/\//g, "_");
 const OUT = path.resolve("snaps", "mobile" + slug);
 
@@ -163,7 +165,7 @@ async function open(browser: Browser, d: Device, video?: string) {
   const ctx = await browser.newContext({
     viewport: { width: d.width, height: d.height },
     screen: { width: d.width, height: d.height },
-    deviceScaleFactor: d.dpr,
+    deviceScaleFactor: Math.min(d.dpr, dprCap),
     isMobile: true,
     hasTouch: true,
     userAgent: d.ua,
