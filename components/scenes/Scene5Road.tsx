@@ -40,7 +40,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
       const group = el.querySelector<SVGGElement>("[data-road-group]")!;
       const truck = el.querySelector<HTMLElement>("[data-truck]")!;
 
-      const state = { curve: 1, scale: 9, dash: 0, truckY: -0.3 };
+      const state = { curve: 1, scale: 4, dash: 0, truckY: -0.3 };
       let W = 0, H = 0, cx = 0, RW = 0, mobile = false;
 
       const measure = () => {
@@ -52,7 +52,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
         svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
         asphalt.setAttribute("stroke-width", String(RW));
         edges.forEach((e) => e.setAttribute("stroke-width", String(RW + 6)));
-        truck.style.width = `${RW * 0.34}px`;
+        truck.style.width = `${RW * 0.4}px`;
         el.style.setProperty("--road-x", `${cx}px`);
         el.style.setProperty("--road-w", `${RW}px`);
       };
@@ -63,9 +63,12 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
         asphalt.setAttribute("d", d);
         lane.setAttribute("d", d);
         edges.forEach((e) => e.setAttribute("d", d));
-        lane.style.strokeDashoffset = String(state.dash);
+        // Keep lane markings at road scale while the camera is zoomed in (otherwise they become giant white bars).
+        lane.setAttribute("stroke-width", String(3 / state.scale));
+        lane.setAttribute("stroke-dasharray", `${34 / state.scale} ${46 / state.scale}`);
+        lane.style.strokeDashoffset = String(state.dash / state.scale);
         group.setAttribute("transform", `translate(${cx} ${H / 2}) scale(${state.scale}) translate(${-cx} ${-H / 2})`);
-        truck.style.transform = `translate3d(${cx + RW * 0.2 - (RW * 0.34) / 2}px, ${state.truckY * H}px, 0)`;
+        truck.style.transform = `translate3d(${cx + RW * 0.2 - (RW * 0.4) / 2}px, ${state.truckY * H}px, 0)`;
         truck.style.opacity = state.scale > 1.6 ? "0" : "1";
       };
 
@@ -95,7 +98,8 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
         });
 
         // Transition: giant curve → straight vertical strip.
-        tl.to(state, { scale: 1, duration: 2, ease: "power2.inOut" }, 0)
+        tl.to(state, { scale: 1, duration: 2, ease: "power3.out" }, 0)
+          .fromTo("[data-heading-wrap]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 1.7)
           .to(state, { curve: 0, duration: 2.2, ease: "power2.inOut" }, 0.3)
           .add(ghost.tl.tweenFromTo(0, ghost.tl.duration(), { duration: 1.2, ease: "none" }), 1.8)
           // Drive: truck moves down, lane dashes stream up.
@@ -114,12 +118,12 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
         // Exit: blue rises from the bottom.
         tl.to("[data-heading-wrap]", { autoAlpha: 0, y: -40, duration: 0.8 }, 9.2).fromTo(
           "[data-tint]",
-          { yPercent: 100 },
-          { yPercent: 0, duration: 1.6, ease: "power2.in" },
+          { autoAlpha: 1, yPercent: 100 },
+          { autoAlpha: 1, yPercent: 0, duration: 1.6, ease: "power2.in" },
           9.4,
         );
-        // Hold on full blue so scrub lag never shows a seam at the hand-off to the ocean.
-        tl.to({}, { duration: 1 });
+        // Short hold on full blue so scrub lag never shows a seam at the hand-off to the ocean.
+        tl.to({}, { duration: 0.4 });
 
         render();
         return () => ghost.restore();
@@ -151,13 +155,13 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
         </g>
       </svg>
 
-      <div data-truck className="absolute left-0 top-0 z-10 will-change-transform">
+      <div data-truck className="absolute left-0 top-0 z-10">
         <TruckTop src={assets.truckTop} className="h-auto w-full" />
       </div>
 
       <div data-heading-wrap className="absolute left-[calc(var(--road-x)+var(--road-w)/2+20px)] top-[14vh] z-10 md:left-[clamp(140px,13vw,220px)]">
         <p className="eyebrow mb-4 text-steel">{road.eyebrow}</p>
-        <GhostHeading as="h2" lines={road.headline} mutedLines={[2]} mode="external" className="text-[clamp(1.9rem,3.5vw,3.8rem)] leading-[0.92]" />
+        <GhostHeading as="h2" lines={road.headline} mutedLines={[2]} mode="external" className="text-[clamp(1.4rem,3.5vw,3.8rem)] leading-[0.92]" />
         <span id="road-title" className="sr-only">
           {road.headline.join(" ")}
         </span>
@@ -189,7 +193,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
               <h3 data-ms-in className="display text-[15px] leading-tight">
                 {m.title}
               </h3>
-              <p data-ms-in className="mt-1.5 text-[13px] leading-snug text-ink/60">
+              <p data-ms-in className="mt-1.5 text-[13px] leading-snug text-ink/60 max-md:hidden">
                 {m.body}
               </p>
             </div>
@@ -200,7 +204,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
       <div
         data-tint
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-[-60%] z-20 h-[160%] translate-y-full"
+        className="pointer-events-none invisible absolute inset-x-0 top-[-60%] z-20 h-[160%]"
         style={{ background: "linear-gradient(to top, #0a3a9e 63%, rgba(10,58,158,0.55) 80%, rgba(10,58,158,0))" }}
       />
     </section>
