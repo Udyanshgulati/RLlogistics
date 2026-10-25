@@ -13,7 +13,7 @@ export const mobileHeadlines = {
   services: ["All your", "freight.", "One roof."],
   road: ["Reliability", "at every", "milestone."],
   ocean: ["Logistics", "that works", "as hard as", "you do."],
-  trust: ["Trusted by", "businesses", "across India."],
+  trust: ["Trusted by", "businesses", "across", "India."],
   cta: ["Let's move", "something."],
 };
 

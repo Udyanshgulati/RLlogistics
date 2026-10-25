@@ -76,6 +76,8 @@ export function MobileHome({ assets = {} }: { assets?: AssetOverrides }) {
               pin: true,
               scrub: 1,
               anticipatePin: 1,
+              // Pins must be measured top-down: the hero's spacer shifts everything below it, including the yard pin.
+              refreshPriority: 2,
               onUpdate: (self) => hero.setAttribute("data-nav-theme", self.progress > 0.75 ? "light" : "dark"),
             },
           })
@@ -106,6 +108,8 @@ export function MobileHome({ assets = {} }: { assets?: AssetOverrides }) {
         );
 
         // Debug aid for the mobile harness: only mobile triggers should exist here.
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
         (window as Window & { __M_TRIGGERS__?: () => number }).__M_TRIGGERS__ = () => ScrollTrigger.getAll().length;
       });
 
@@ -200,13 +204,14 @@ function About({ heroRoad }: { heroRoad?: string }) {
         {stats.map((s) => (
           <div key={s.label} data-m-reveal className="flex items-center gap-5 border-b border-ink/10 py-5">
             <dt className="sr-only">{s.label}</dt>
-            <dd className="display w-[42%] shrink-0 text-[48px] leading-none">
+            {/* Tabular sans digits: the wide display face would push "2,500+" into the label on a 360px screen. */}
+            <dd className="shrink-0 text-[48px] font-semibold leading-none tracking-[-0.03em] [font-variant-numeric:tabular-nums]">
               <span data-m-count data-value={s.value} data-decimals={s.decimals ?? 0}>
                 {fmt(s.value, s.decimals)}
               </span>
               <span className="text-brand">{s.suffix}</span>
             </dd>
-            <dd className="min-w-0">
+            <dd className="min-w-0 flex-1">
               <span className="block text-[16px] font-medium leading-snug">{s.label}</span>
               <span className="mt-1 block text-[14px] leading-snug text-ink/60">{s.sub}</span>
             </dd>
@@ -320,7 +325,7 @@ function Testimonials() {
     <section data-nav-theme="light" aria-labelledby="m-trust" className="bg-paper py-24 text-ink">
       <div className="px-5">
         <MEyebrow className="text-steel">{trust.eyebrow}</MEyebrow>
-        <MHeading id="m-trust" lines={mobileHeadlines.trust} muted={[2]} className="mt-5" />
+        <MHeading id="m-trust" lines={mobileHeadlines.trust} muted={[2, 3]} className="mt-5" />
         <p data-m-reveal className="mt-5 text-[16px] leading-[1.55] text-ink/70">
           {trust.intro}
         </p>

@@ -107,7 +107,7 @@ export function Footer() {
         </div>
       </div>
 
-      <p data-wordmark aria-hidden className="display select-none whitespace-nowrap pt-10 text-[clamp(2.4rem,8.6vw,12rem)] leading-[0.85] tracking-[-0.03em] text-paper">
+      <p data-wordmark aria-hidden className="display select-none whitespace-nowrap pt-10 text-[clamp(2.4rem,8.6vw,12rem)] max-lg:text-[clamp(28px,8.4vw,72px)] leading-[0.85] tracking-[-0.03em] text-paper">
         RL Logistics
       </p>
 

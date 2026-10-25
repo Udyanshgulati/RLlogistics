@@ -109,7 +109,7 @@ export function MobileYard({ assets = {} }: { assets?: { stackerBody?: string; s
         const tl = gsap.timeline({
           defaults: { ease: "power1.inOut" },
           onUpdate: render,
-          scrollTrigger: { trigger: el, start: "top top", end: "+=200%", pin: true, scrub: 1, anticipatePin: 1 },
+          scrollTrigger: { trigger: el, start: "top top", end: "+=200%", pin: true, scrub: 1, anticipatePin: 1, refreshPriority: 1 },
         });
         tl.to(rig, { sx: SX, duration: 1, ease: "power2.out" }, 0)
           .to(rig, { a: P_GROUND.a, ext: P_GROUND.ext, duration: 0.6 }, 0.9)

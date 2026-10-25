@@ -64,7 +64,8 @@ const CHECK = `(() => {
   const clipped = (el) => {
     for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
       const cs = getComputedStyle(p);
-      if (/(hidden|clip)/.test(cs.overflowX) || /(hidden|clip)/.test(cs.overflow)) {
+      // Clipped or inside a horizontal scroller (a swipe carousel's peeking card is intentional).
+      if (/(hidden|clip|auto|scroll)/.test(cs.overflowX) || /(hidden|clip)/.test(cs.overflow)) {
         const r = p.getBoundingClientRect();
         if (r.left >= -1 && r.right <= W + 1) return true;
       }
@@ -85,7 +86,9 @@ const CHECK = `(() => {
   ).slice(0, 10).map((el) => desc(el) + " (" + el.scrollWidth + " > " + el.clientWidth + ")");
 
   // Overlaps between text blocks / buttons / images that aren't nested in each other.
-  const blocks = [...document.querySelectorAll("h1,h2,h3,p,a,button,img,[data-feature],li")].filter((el) => visible(el) && inView(el.getBoundingClientRect()));
+  // Content blocks only: the fixed header floats over content by design, so it is left out.
+  const inFixed = (el) => { for (let p = el; p && p !== document.body; p = p.parentElement) if (getComputedStyle(p).position === "fixed") return true; return false; };
+  const blocks = [...document.querySelectorAll("h1,h2,h3,p,a,button,img,[data-feature],li")].filter((el) => visible(el) && inView(el.getBoundingClientRect()) && !inFixed(el));
   const overlaps = [];
   for (let i = 0; i < blocks.length; i++) for (let j = i + 1; j < blocks.length; j++) {
     const a = blocks[i], b = blocks[j];
