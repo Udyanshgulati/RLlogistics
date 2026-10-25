@@ -194,7 +194,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
               <h3 data-ms-in className="display text-[16px] leading-tight lg:text-[15px]">
                 {m.title}
               </h3>
-              <p data-ms-in className="mt-1.5 text-[14px] leading-snug text-ink/65 lg:text-[13px] lg:text-ink/60 [@media(max-height:720px)_and_(max-width:1023px)]:hidden">
+              <p data-ms-in className="mt-1.5 text-[14px] leading-snug text-ink/65 lg:text-[13px] lg:text-ink/60 max-lg:hidden">
                 {m.body}
               </p>
             </div>
