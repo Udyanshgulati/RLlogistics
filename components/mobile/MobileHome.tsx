@@ -98,12 +98,14 @@ export function MobileHome({ assets = {} }: { assets?: AssetOverrides }) {
           },
         );
 
-        // Ocean: ship glides up through the frame; plane crosses the sky band diagonally.
-        // Port: trucks run the lane, crane trolleys shuttle, the route to Delhi draws in, all tied to scroll.
-        const port = { trigger: "[data-m-ocean]", start: "top bottom", end: "bottom top", scrub: 0.6 };
-        gsap.fromTo("[data-m-ocean] [data-truck]", { x: -200 }, { x: 260, ease: "none", stagger: 0.05, scrollTrigger: port });
-        gsap.fromTo("[data-m-ocean] [data-trolley]", { y: 0 }, { y: 250, ease: "sine.inOut", stagger: 0.15, scrollTrigger: port });
-        gsap.fromTo("[data-m-ocean] [data-route]", { strokeDashoffset: 1 }, { strokeDashoffset: 0, ease: "none", scrollTrigger: port });
+        // Port: one composited camera move over the terminal. (Animating parts *inside* the big SVG re-rasterises
+        // ~1,500 shapes every frame, which is what made phones stutter after the road.)
+        gsap.fromTo(
+          "[data-m-port-cam]",
+          { scale: 1.18, yPercent: 4 },
+          { scale: 1, yPercent: -4, ease: "none", scrollTrigger: { trigger: "[data-m-ocean]", start: "top bottom", end: "bottom top", scrub: true } },
+        );
+        // Plane crosses the sky band diagonally.
         gsap.fromTo(
           "[data-m-plane]",
           { xPercent: -120, yPercent: 60, rotate: -28 },
@@ -128,7 +130,7 @@ export function MobileHome({ assets = {} }: { assets?: AssetOverrides }) {
       <Road truckTop={assets.truckTop} />
       <Ocean />
       <section data-m-sky aria-hidden className="relative h-[60svh] overflow-hidden bg-[linear-gradient(to_bottom,#0a2a7a,#7ea2e6_45%,rgb(var(--paper)))]">
-        <div data-m-plane className="absolute left-0 top-1/2 w-[78vw]">
+        <div data-m-plane className="absolute left-0 top-1/2 w-[78vw] will-change-transform">
           <PlaneTop src={assets.planeTop} className="h-auto w-full" />
         </div>
       </section>
@@ -272,8 +274,9 @@ function Road({ truckTop }: { truckTop?: string }) {
       <div data-m-road className="relative mt-10">
         {/* Road strip: 48px wide, lane dashes scroll with CSS. */}
         <div aria-hidden className="absolute bottom-0 left-0 top-0 w-12 overflow-hidden rounded-full bg-[#0e1117]">
-          <div className="absolute inset-y-0 left-1/2 w-[3px] -translate-x-1/2 animate-[roaddash_0.9s_linear_infinite] bg-[repeating-linear-gradient(to_bottom,#f4f7fb_0_18px,transparent_18px_40px)] motion-reduce:animate-none" />
-          <div data-m-truck className="absolute left-1/2 top-2 w-[26px] -translate-x-1/2">
+          {/* Lane dashes move by transform (GPU), not background-position (which repaints every frame). */}
+          <div className="absolute -top-10 bottom-0 left-[calc(50%-1.5px)] w-[3px] animate-[roadlane_0.9s_linear_infinite] bg-[repeating-linear-gradient(to_bottom,#f4f7fb_0_18px,transparent_18px_40px)] will-change-transform motion-reduce:animate-none" />
+          <div data-m-truck className="absolute left-[calc(50%-13px)] top-2 w-[26px] will-change-transform">
             <TruckTop src={truckTop} className="h-auto w-full" />
           </div>
         </div>
@@ -296,7 +299,9 @@ function Ocean() {
     <section data-m-ocean data-nav-theme="dark" aria-labelledby="m-ocean" className="bg-ink text-paper">
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#0b3aa8]">
         {/* Terminal from above, cropped to the cranes and the berth. */}
-        <PortTerminal className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" />
+        <div data-m-port-cam className="absolute inset-0 will-change-transform">
+          <PortTerminal className="h-full w-full" preserveAspectRatio="xMidYMid slice" />
+        </div>
         <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-[linear-gradient(to_top,rgb(var(--ink)),transparent)]" />
         {/* Headline over the water, on a navy gradient for contrast. */}
         <div className="absolute inset-x-0 top-0 bg-[linear-gradient(to_bottom,rgba(11,31,77,0.92),rgba(11,31,77,0.7)_65%,transparent)] px-5 pb-16 pt-24">

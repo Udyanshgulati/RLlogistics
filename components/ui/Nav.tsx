@@ -138,7 +138,8 @@ export function Nav() {
         className={cn(
           "fixed inset-x-0 top-0 z-50 flex h-[calc(64px+var(--safe-t))] items-end transition-colors duration-300 lg:hidden",
           fg,
-          scrolled && !open && (theme === "dark" ? "bg-ink/80 backdrop-blur-md" : "bg-paper/85 backdrop-blur-md shadow-[0_1px_0_rgba(11,31,77,0.06)]"),
+          // Solid tint, no backdrop-filter: blurring whatever scrolls underneath costs a full repaint per frame on phones.
+          scrolled && !open && (theme === "dark" ? "bg-ink/95" : "bg-paper/95 shadow-[0_1px_0_rgba(11,31,77,0.06)]"),
         )}
       >
         {/* Route progress: an amber lane marking that fills along the bottom edge as you travel the page. */}

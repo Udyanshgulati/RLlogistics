@@ -102,10 +102,10 @@
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
-/* Phone road: lane dashes stream down the strip. */
-@keyframes roaddash {
-  from { background-position: 0 0; }
-  to { background-position: 0 40px; }
+/* Phone road: lane dashes stream down the strip (transform only, one dash period = 40px). */
+@keyframes roadlane {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, 40px, 0); }
 }
 
 /* Container corner castings: amber L-marks on two opposite corners of a card (RL motif). */
