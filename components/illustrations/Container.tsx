@@ -27,12 +27,22 @@ export function Container({ w, h, color, rib, label, x = 0, y = 0, part, img }: 
       ].map(([cx, cy], i) => (
         <rect key={i} x={cx} y={cy} width={14} height={12} fill="#2b2f36" opacity={0.55} />
       ))}
+      {/* door end: locking bars + handles */}
+      {[0.82, 0.86, 0.9, 0.94].map((f) => (
+        <rect key={f} x={w * f} y={6} width={2.5} height={h - 12} fill="#2b2f36" opacity={0.45} />
+      ))}
+      {[0.84, 0.92].map((f) => (
+        <rect key={f} x={w * f - 3} y={h * 0.55} width={8} height={3} rx={1} fill="#2b2f36" opacity={0.6} />
+      ))}
+      {/* weathering along the bottom rail */}
+      <rect y={h * 0.72} width={w} height={h * 0.28} fill="url(#ctr-dirt)" />
       {label && (
         <text x={w - 28} y={30} textAnchor="end" fontSize={11} fontFamily="monospace" fill={rib} opacity={0.9}>
           {label}
         </text>
       )}
-      <rect width={w} height={h} fill="url(#ctr-shade)" />
+      <rect width={w} height={h} fill="url(#sh-panel)" />
+      <rect width={w} height={1.2} fill="#fff" opacity={0.35} />
     </g>
   );
 }

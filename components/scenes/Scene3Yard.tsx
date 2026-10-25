@@ -10,6 +10,7 @@ import { Marquee } from "@/components/text/Marquee";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { ReachStacker, STACKER } from "@/components/illustrations/ReachStacker";
+import { ShadingDefs } from "@/components/illustrations/Shading";
 import { TruckSide, TRUCK } from "@/components/illustrations/TruckSide";
 import { Container } from "@/components/illustrations/Container";
 import type { AssetOverrides } from "@/lib/asset-slots";
@@ -24,33 +25,38 @@ import type { AssetOverrides } from "@/lib/asset-slots";
 // World (SVG viewBox) geometry
 const VB = { w: 1600, h: 900 };
 const GROUND = 760;
-const C40 = { w: 410, h: 160 };
-const C20 = { w: 200, h: 160 };
+// Real proportions at 34 px/m: 40 ft = 12.2 × 2.59 m, 20 ft = 6.06 × 2.59 m.
+const C40 = { w: 410, h: 88 };
+const C20 = { w: 206, h: 88 };
 const STACK_X = 1040;
-const WHITE_REST = { x: STACK_X - 3, y: GROUND - C20.h - C40.h }; // top-left of the white 40ft on the stack
+const WHITE_REST = { x: STACK_X - 1, y: GROUND - C20.h - C40.h }; // top-left of the white 40ft on the stack
 
 type Pose = { a: number; ext: number };
 const DEG = Math.PI / 180;
+const S = STACKER.scale; // stacker local units → world
+const HANG = STACKER.hang * S;
 
-/** Boom angle/extension that puts the boom tip at (tx, ty) for a stacker at x = sx. */
+/** Boom angle and (local) extension that put the boom tip at world (tx, ty) for a stacker at x = sx. */
 function ik(sx: number, tx: number, ty: number): Pose {
-  const px = sx + STACKER.pivot.x;
-  const py = GROUND + STACKER.pivot.y;
+  const px = sx + STACKER.pivot.x * S;
+  const py = GROUND + STACKER.pivot.y * S;
   const dx = tx - px;
   const dy = py - ty;
-  return { a: Math.atan2(dy, dx) / DEG, ext: Math.hypot(dx, dy) - STACKER.boomLength };
+  return { a: Math.atan2(dy, dx) / DEG, ext: Math.hypot(dx, dy) / S - STACKER.boomLength };
 }
 
-const SX_LOCK = 380;
-const SX_CARRY = -70;
+const SX_LOCK = 700;
+const SX_CARRY = 200;
 const P_REST: Pose = { a: 30, ext: 0 };
-const P_LOCK = ik(SX_LOCK, WHITE_REST.x + C40.w / 2, WHITE_REST.y - STACKER.hang);
-const P_LIFT = ik(SX_LOCK, 1100, 225);
+const P_LOCK = ik(SX_LOCK, WHITE_REST.x + C40.w / 2, WHITE_REST.y - HANG);
+// Lift high enough that the container clears the cab's roof fairing when the truck reverses underneath.
+const LIFT_TIP = { x: 1250, y: 455 };
+const P_LIFT = ik(SX_LOCK, LIFT_TIP.x, LIFT_TIP.y);
 const P_CARRY = { ...P_LIFT };
-const TIP_CARRY_X = 1100 - (SX_LOCK - SX_CARRY);
+const TIP_CARRY_X = LIFT_TIP.x - (SX_LOCK - SX_CARRY);
 const DECK_TOP = GROUND + TRUCK.deckY;
-const P_LOWER = ik(SX_CARRY, TIP_CARRY_X, DECK_TOP - C40.h - STACKER.hang);
-const P_RELEASE = ik(SX_CARRY, TIP_CARRY_X, DECK_TOP - C40.h - STACKER.hang - 90);
+const P_LOWER = ik(SX_CARRY, TIP_CARRY_X, DECK_TOP - C40.h - HANG);
+const P_RELEASE = ik(SX_CARRY, TIP_CARRY_X, DECK_TOP - C40.h - HANG - 45);
 const TRUCK_X_LOAD = TIP_CARRY_X - TRUCK.slotX;
 
 /** Where the dark panel's top edge sits (fraction of the screen) — higher on phones to fit the services row. */
@@ -67,6 +73,7 @@ type Rig = {
   zoom: number;
   focus: number; // 0 = scene centre, 1 = follow the white container
   dock: number; // 0 = ground where it is, 1 = ground on the dark panel's top edge
+  squash: number; // trailer suspension compression when the container lands (px)
 };
 
 export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
@@ -83,6 +90,7 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
         boom: q("boom"),
         inner: q("inner"),
         cylinder: q("cylinder") as unknown as SVGLineElement,
+        barrel: q("cylinder-barrel") as unknown as SVGLineElement,
         spreader: q("spreader"),
         white: q("white"),
         truck: q("truck"),
@@ -90,14 +98,17 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
         truckWheels: [...el.querySelectorAll<SVGGElement>('[data-part="truck-wheel"]')],
       };
 
-      const rig: Rig = { sx: -760, ...P_REST, attach: 0, tilt: 0, click: 0, tx: 1900, zoom: 1, focus: 0, dock: 0 };
+      const rig: Rig = { sx: -760, ...P_REST, attach: 0, tilt: 0, click: 0, tx: 1900, zoom: 1, focus: 0, dock: 0, squash: 0 };
       let baseZoom = 1;
+      let restFocusX = VB.w / 2;
       let dockShift = 0;
 
       // Where (in viewBox units) the ground must sit so it lines up with the panel edge at 40% of the screen.
       const measure = () => {
         const aspect = window.innerWidth / window.innerHeight;
-        baseZoom = aspect < 0.9 ? 2.2 : aspect < 1.3 ? 1.35 : 1;
+        baseZoom = aspect < 0.9 ? 2 : aspect < 1.3 ? 1.3 : 1;
+        // Portrait screens frame the stack + stacker instead of the empty left of the yard.
+        restFocusX = aspect < 0.9 ? 1020 : VB.w / 2;
         const ctm = svg.getScreenCTM();
         const rect = svg.getBoundingClientRect();
         if (!ctm) return;
@@ -107,23 +118,31 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
 
       const render = () => {
         const { sx, a, ext } = rig;
-        const L = STACKER.boomLength + ext;
-        const px = sx + STACKER.pivot.x;
-        const py = GROUND + STACKER.pivot.y;
+        const L = (STACKER.boomLength + ext) * S;
+        const px = sx + STACKER.pivot.x * S;
+        const py = GROUND + STACKER.pivot.y * S;
         const tipX = px + Math.cos(a * DEG) * L;
         const tipY = py - Math.sin(a * DEG) * L;
 
-        parts.stacker.setAttribute("transform", `translate(${sx} ${GROUND})`);
+        parts.stacker.setAttribute("transform", `translate(${sx} ${GROUND}) scale(${S})`);
         parts.boom.setAttribute("transform", `translate(${STACKER.pivot.x} ${STACKER.pivot.y}) rotate(${-a})`);
         parts.inner.setAttribute("transform", `translate(${ext} 0)`);
-        const cyl = STACKER.cylinderAt;
-        parts.cylinder.setAttribute("x2", String(STACKER.pivot.x + Math.cos(a * DEG) * cyl));
-        parts.cylinder.setAttribute("y2", String(STACKER.pivot.y - Math.sin(a * DEG) * cyl));
-        parts.spreader.setAttribute("transform", `translate(${tipX - sx} ${tipY - GROUND})`);
+        // Hydraulic cylinder: fixed base on the chassis, rod end on the boom — it lengthens as the boom rises.
+        const rodX = STACKER.pivot.x + Math.cos(a * DEG) * STACKER.cylinderAt;
+        const rodY = STACKER.pivot.y - Math.sin(a * DEG) * STACKER.cylinderAt;
+        parts.cylinder.setAttribute("x2", String(rodX));
+        parts.cylinder.setAttribute("y2", String(rodY));
+        const bx = STACKER.cylinderBase.x;
+        const by = STACKER.cylinderBase.y;
+        const len = Math.hypot(rodX - bx, rodY - by) || 1;
+        parts.barrel.setAttribute("x2", String(bx + ((rodX - bx) / len) * 70));
+        parts.barrel.setAttribute("y2", String(by + ((rodY - by) / len) * 70));
+        parts.spreader.setAttribute("transform", `translate(${(tipX - sx) / S} ${(tipY - GROUND) / S})`);
 
-        const wheelDeg = (sx / STACKER.wheelR[1]) * (180 / Math.PI);
+        // Wheels roll by distance travelled: angle = distance / radius.
+        const wheelDeg = (sx / (STACKER.wheelR[1] * S)) * (180 / Math.PI);
         parts.stackerWheels.forEach((w) => w.setAttribute("transform", `rotate(${wheelDeg})`));
-        parts.truck.setAttribute("transform", `translate(${rig.tx} ${GROUND})`);
+        parts.truck.setAttribute("transform", `translate(${rig.tx} ${GROUND + rig.squash})`);
         const truckDeg = (rig.tx / TRUCK.wheelR) * (180 / Math.PI);
         parts.truckWheels.forEach((w) => w.setAttribute("transform", `rotate(${truckDeg})`));
 
@@ -135,10 +154,10 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
           cy = WHITE_REST.y;
         } else if (rig.attach < 1.5) {
           cx = tipX - C40.w / 2;
-          cy = tipY + STACKER.hang;
+          cy = tipY + HANG;
         } else {
           cx = rig.tx + TRUCK.slotX - C40.w / 2;
-          cy = DECK_TOP - C40.h;
+          cy = DECK_TOP - C40.h + rig.squash;
         }
         const s = 1 + rig.click * 0.03;
         parts.white.setAttribute(
@@ -147,7 +166,7 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
         );
 
         // Camera: zoom around a focus that blends from scene centre to the container.
-        const fx = gsap.utils.interpolate(VB.w / 2, cx + C40.w / 2, rig.focus);
+        const fx = gsap.utils.interpolate(restFocusX, cx + C40.w / 2, rig.focus);
         const fy = gsap.utils.interpolate(VB.h / 2, cy + C40.h / 2, rig.focus);
         const z = baseZoom * rig.zoom;
         // Undocked: focus point at the viewBox centre. Docked: ground line pinned to the panel's top edge.
@@ -192,15 +211,23 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
           .to(rig, { click: 1, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out" }, 2.9)
           // 3 · lift, camera pushes in
           .to(rig, { a: P_LIFT.a, ext: P_LIFT.ext, duration: 1.4 }, 3.3)
-          .fromTo(rig, { tilt: 0 }, { tilt: -2.5, duration: 0.6, ease: "sine.out" }, 3.3)
-          .to(rig, { tilt: 0, duration: 0.8, ease: "sine.inOut" }, 3.9)
+          // Damped pendulum: the load lags the lift, overshoots, settles.
+          .fromTo(rig, { tilt: 0 }, { tilt: -2.2, duration: 0.45, ease: "sine.out" }, 3.3)
+          .to(rig, { tilt: 1.1, duration: 0.5, ease: "sine.inOut" }, 3.75)
+          .to(rig, { tilt: -0.4, duration: 0.45, ease: "sine.inOut" }, 4.25)
+          .to(rig, { tilt: 0, duration: 0.4, ease: "sine.inOut" }, 4.7)
           .to(rig, { zoom: 1.6, focus: 1, duration: 1.6 }, 3.4)
           .to("[data-yard-eyebrow]", { autoAlpha: 0, duration: 0.4 }, 3.4)
           // 4 · back off the stack, truck reverses in, lower, release, stacker leaves
           .to(rig, { sx: SX_CARRY, a: P_CARRY.a, ext: P_CARRY.ext, duration: 1.4 }, 5)
           .to(rig, { tx: TRUCK_X_LOAD, duration: 1.8, ease: "power2.out" }, 5.4)
+          // Stack recedes into the background so the truck reads in front of it.
+          .to("[data-stack]", { autoAlpha: 0.5, duration: 0.8 }, 5.4)
           .to(rig, { a: P_LOWER.a, ext: P_LOWER.ext, duration: 1 }, 7.2)
           .set(rig, { attach: 2 }, 8.2)
+          // Trailer suspension takes the weight: a 2 px compression that springs back.
+          .to(rig, { squash: 2, duration: 0.12, ease: "power2.out" }, 8.2)
+          .to(rig, { squash: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" }, 8.32)
           .to(rig, { a: P_RELEASE.a, ext: P_RELEASE.ext, duration: 0.6 }, 8.25)
           .to(rig, { sx: -1300, a: 38, ext: 0, duration: 1.6, ease: "power2.in" }, 8.8)
           // 5 · camera pulls back, dark panel rises; truck sits on its edge
@@ -226,7 +253,7 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
           .to("[data-panel]", { clipPath: "inset(0% 0 0 0)", duration: 1.4 }, 16.3)
           .to("[data-panel-content]", { autoAlpha: 0, y: -40, duration: 0.8 }, 16.6)
           // Hold on full dark so scrub lag never shows a seam at the hand-off to the road.
-          .to({}, { duration: 1.2 });
+          .to({}, { duration: 0.25 });
 
         render();
         return () => ghost.restore();
@@ -269,7 +296,12 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
               <stop offset="0" stopColor="#fff" stopOpacity="0.12" />
               <stop offset="1" stopColor="#000" stopOpacity="0.14" />
             </linearGradient>
+            <linearGradient id="ctr-dirt" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0.55" stopColor="#5a4632" stopOpacity="0" />
+              <stop offset="1" stopColor="#5a4632" stopOpacity="0.18" />
+            </linearGradient>
           </defs>
+          <ShadingDefs />
           <g data-cam>
             <line x1={-4000} x2={5600} y1={GROUND} y2={GROUND} stroke="#0a0d14" strokeOpacity={0.18} strokeWidth={1.5} />
             {[...Array(40)].map((_, i) => (
