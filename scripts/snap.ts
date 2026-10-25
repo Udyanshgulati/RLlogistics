@@ -16,7 +16,7 @@ import path from "node:path";
 
 const BASE = process.env.BASE ?? "http://localhost:3000";
 const SETTLE = Number(process.env.SETTLE ?? 1200);
-const OUT = path.resolve("snaps");
+const OUT = path.resolve(process.env.SNAP_OUT ?? "snaps");
 const STEPS = 20; // 0%, 5%, … 100%
 
 const VIEWPORTS = [
