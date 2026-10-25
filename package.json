@@ -9,7 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "export:subdomain": "SITE_EXPORT=1 NEXT_PUBLIC_SITE_URL=https://rllogistics.thodalogic.com NEXT_PUBLIC_NOINDEX=1 next build",
-    "snap": "tsx scripts/snap.ts"
+    "snap": "tsx scripts/snap.ts",
+    "snap:mobile": "tsx scripts/snap-mobile.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
