@@ -99,21 +99,16 @@ export function Footer() {
         </button>
       </div>
 
-      {/* Studio credit: faint outlined watermark with a small readable link on top */}
-      <div className="relative -mx-gutter mt-10 overflow-hidden border-t border-paper/10 px-gutter md:-ml-[clamp(140px,13vw,220px)] md:pl-[clamp(140px,13vw,220px)]">
-        <p
-          aria-hidden
-          className="display text-outline pointer-events-none select-none whitespace-nowrap py-4 text-center text-[clamp(2.6rem,9vw,8.5rem)] leading-none tracking-[-0.02em] text-paper/[0.18]"
-        >
-          Thoda Logic
-        </p>
+      {/* Studio credit */}
+      <div className="-mx-gutter mt-10 border-t border-paper/10 px-gutter pt-8 text-center md:-ml-[clamp(140px,13vw,220px)] md:pl-[clamp(140px,13vw,220px)]">
         <a
           href="https://thodalogic.com"
           target="_blank"
           rel="noreferrer"
-          className="ui-label absolute inset-0 flex items-center justify-center gap-2 text-paper/55 transition-colors hover:text-brand"
+          className="group inline-block font-sans text-[12px] font-medium uppercase tracking-[0.24em] text-paper/45 transition-colors hover:text-paper/70 sm:text-[13px]"
         >
-          Website by <span className="text-paper/85">Thoda Logic</span> ↗
+          Designed and developed by{" "}
+          <span className="font-semibold text-paper transition-colors group-hover:text-brand">Thoda Logic</span>
         </a>
       </div>
     </footer>
