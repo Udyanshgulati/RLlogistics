@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { gsap, useGSAP, MQ } from "@/lib/gsap";
 import { servicesSection } from "@/content/home";
 import { homeServices } from "@/content/services";
@@ -60,7 +60,7 @@ const P_RELEASE = ik(SX_CARRY, TIP_CARRY_X, DECK_TOP - C40.h - HANG - 45);
 const TRUCK_X_LOAD = TIP_CARRY_X - TRUCK.slotX;
 
 /** Where the dark panel's top edge sits (fraction of the screen) — higher on phones to fit the services row. */
-const panelTop = () => (typeof window !== "undefined" && window.innerWidth < 768 ? 0.3 : 0.4);
+const panelTop = () => (typeof window !== "undefined" && window.innerWidth < 1024 ? 0.3 : 0.4);
 
 type Rig = {
   sx: number;
@@ -78,6 +78,7 @@ type Rig = {
 
 export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
   const root = useRef<HTMLElement>(null);
+  const [active, setActive] = useState(0);
 
   useGSAP(
     () => {
@@ -106,9 +107,9 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
       // Where (in viewBox units) the ground must sit so it lines up with the panel edge at 40% of the screen.
       const measure = () => {
         const aspect = window.innerWidth / window.innerHeight;
-        baseZoom = aspect < 0.9 ? 2 : aspect < 1.3 ? 1.3 : 1;
-        // Portrait screens frame the stack + stacker instead of the empty left of the yard.
-        restFocusX = aspect < 0.9 ? 1020 : VB.w / 2;
+        // Portrait: frame stacker + stack (x ≈ 700–1500) so the vehicles fill ~90% of the screen width.
+        baseZoom = aspect < 0.9 ? 1.8 : aspect < 1.3 ? 1.3 : 1;
+        restFocusX = aspect < 0.9 ? 1100 : VB.w / 2;
         const ctm = svg.getScreenCTM();
         const rect = svg.getBoundingClientRect();
         if (!ctm) return;
@@ -190,7 +191,8 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
           scrollTrigger: {
             trigger: el,
             start: "top top",
-            end: ctx.conditions.mobile ? "+=520%" : "+=720%",
+            // Mobile pin ≈ 55% of desktop.
+            end: ctx.conditions.mobile ? "+=400%" : "+=720%",
             pin: true,
             scrub: 1,
             anticipatePin: 1,
@@ -216,7 +218,8 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
           .to(rig, { tilt: 1.1, duration: 0.5, ease: "sine.inOut" }, 3.75)
           .to(rig, { tilt: -0.4, duration: 0.45, ease: "sine.inOut" }, 4.25)
           .to(rig, { tilt: 0, duration: 0.4, ease: "sine.inOut" }, 4.7)
-          .to(rig, { zoom: 1.6, focus: 1, duration: 1.6 }, 3.4)
+          // Phones already start zoomed in, so the push-in is gentler there.
+          .to(rig, { zoom: ctx.conditions.mobile ? 1.25 : 1.6, focus: 1, duration: 1.6 }, 3.4)
           .to("[data-yard-eyebrow]", { autoAlpha: 0, duration: 0.4 }, 3.4)
           // 4 · back off the stack, truck reverses in, lower, release, stacker leaves
           .to(rig, { sx: SX_CARRY, a: P_CARRY.a, ext: P_CARRY.ext, duration: 1.4 }, 5)
@@ -281,7 +284,7 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
     >
       {/* Yard stage */}
       <div className="absolute inset-0 group-[.is-static]/yard:relative group-[.is-static]/yard:h-[60vh]">
-        <p data-yard-eyebrow className="eyebrow absolute left-gutter top-[22%] z-10 text-steel opacity-0 md:left-[clamp(140px,13vw,220px)]">
+        <p data-yard-eyebrow className="eyebrow absolute left-gutter top-[22%] z-10 text-steel opacity-0 lg:left-[clamp(140px,13vw,220px)]">
           Container yard · ICD Tughlakabad
         </p>
         <svg
@@ -327,34 +330,41 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
         className="absolute inset-0 bg-ink text-paper group-[.is-static]/yard:relative"
         style={{ clipPath: "inset(100% 0 0 0)" }}
       >
-        <div data-panel-content className="absolute inset-x-0 bottom-0 top-[30%] flex flex-col justify-center gap-[3vh] md:top-[40%] md:gap-[3.5vh] px-gutter py-[4vh] group-[.is-static]/yard:relative group-[.is-static]/yard:top-0 group-[.is-static]/yard:py-24 md:pl-[clamp(140px,13vw,220px)]">
-          <Marquee text={servicesSection.watermark} drive="external" className="absolute inset-x-0 top-[8%] text-paper/[0.05]" />
-          <div className="relative grid items-end gap-6 md:grid-cols-12">
-            <div className="md:col-span-7">
+        <div data-panel-content className="absolute inset-x-0 bottom-0 top-[30%] flex flex-col justify-center gap-[3vh] lg:top-[40%] lg:gap-[3.5vh] px-gutter py-[4vh] group-[.is-static]/yard:relative group-[.is-static]/yard:top-0 group-[.is-static]/yard:py-24 lg:pl-[clamp(140px,13vw,220px)]">
+          <Marquee text={servicesSection.watermark} drive="external" className="absolute inset-x-0 top-[8%] text-paper/[0.05] max-lg:[&_.display]:text-[3.5rem]" />
+          <div className="relative grid items-end gap-6 lg:grid-cols-12">
+            <div className="lg:col-span-7">
               <p className="eyebrow mb-4 text-brand">{servicesSection.eyebrow}</p>
               <GhostHeading
                 as="h2"
                 lines={servicesSection.headline}
                 mutedLines={[2]}
                 mode="external"
-                className="text-[clamp(1.45rem,3.6vw,3.6rem)] leading-[0.92]"
+                className="text-[clamp(1.75rem,8vw,3rem)] leading-[0.95] lg:text-[clamp(1.45rem,3.6vw,3.6rem)] lg:leading-[0.92]"
               />
               <span id="services-title" className="sr-only">
                 {servicesSection.headline.join(" ")}
               </span>
             </div>
-            <div data-services-copy className="flex max-w-[44ch] flex-col gap-3 text-[14px] leading-relaxed text-paper/65 md:col-span-5">
+            <div data-services-copy className="flex max-w-[44ch] flex-col gap-3 text-[14px] leading-relaxed text-paper/65 lg:col-span-5">
               {servicesSection.paragraphs.map((p, i) => (
-                <p key={p} className={i > 0 ? "max-md:hidden" : undefined}>
+                <p key={p} className={i > 0 ? "max-lg:hidden" : undefined}>
                   {p}
                 </p>
               ))}
             </div>
           </div>
 
-          <ul className="relative -mx-gutter flex snap-x snap-mandatory gap-px overflow-x-auto px-gutter pb-2 md:mx-0 md:grid md:grid-cols-6 md:overflow-visible md:px-0">
+          <ul
+            onScroll={(e) => {
+              const ul = e.currentTarget;
+              const w = ul.firstElementChild?.getBoundingClientRect().width || 1;
+              setActive(Math.round(ul.scrollLeft / w));
+            }}
+            className="relative -mx-gutter flex snap-x snap-mandatory scroll-px-gutter gap-3 overflow-x-auto overscroll-x-contain px-gutter pb-2 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-6 lg:gap-px lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden"
+          >
             {homeServices.map((s, i) => (
-              <li key={s.title} data-service-col className="min-w-[68%] snap-start border-t border-paper/15 pt-4 sm:min-w-[40%] md:min-w-0">
+              <li key={s.title} data-service-col className="min-w-[80%] snap-start border-t border-paper/15 pt-4 sm:min-w-[44%] lg:min-w-0">
                 <Link href={s.href} className="group relative block pr-4">
                   <span className="ui-label mb-3 block text-steel">{String(i + 1).padStart(2, "0")}</span>
                   <span className="relative mb-3 block h-7 w-7">
@@ -364,12 +374,18 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
                     </span>
                   </span>
                   <span className="display block text-[15px] leading-[1.05]">{s.title}</span>
-                  <span className="mt-2 block text-[12.5px] leading-snug text-paper/55">{s.body}</span>
+                  <span className="mt-2 block text-[14px] leading-snug text-paper/60 lg:text-[12.5px] lg:text-paper/55">{s.body}</span>
                   <span aria-hidden className="mt-3 block h-px w-0 bg-brand transition-all duration-500 ease-expo group-hover:w-10" />
                 </Link>
               </li>
             ))}
           </ul>
+          {/* Swipe position (phones/tablets) */}
+          <div aria-hidden className="flex gap-1.5 lg:hidden">
+            {homeServices.map((s, i) => (
+              <span key={s.title} className={`h-1.5 rounded-full transition-all duration-300 ${i === active ? "w-5 bg-brand" : "w-1.5 bg-paper/30"}`} />
+            ))}
+          </div>
           <div data-services-cta className="relative">
             <Button href={servicesSection.cta.href} variant="ghost" tone="dark">
               {servicesSection.cta.label}
