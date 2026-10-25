@@ -37,7 +37,7 @@ export function Footer() {
   );
 
   const cols = [
-    { title: "Company", links: primaryNav.filter((l) => ["/about", "/network", "/careers", "/contact"].includes(l.href)) },
+    { title: "Company", links: primaryNav.filter((l) => ["/about", "/network", "/insights", "/contact"].includes(l.href)) },
     { title: "Services", links: services.map((s) => ({ label: s.title, href: `/services/${s.slug}` })) },
     { title: "Industries", links: industries.map((i) => ({ label: i.title, href: `/industries#${i.slug}` })) },
   ];
@@ -50,10 +50,13 @@ export function Footer() {
           <p className="mt-6 max-w-[34ch] text-[14px] leading-relaxed text-paper/60">
             Warehousing, road transport, freight forwarding and customs, run by one accountable team out of Delhi since 2018.
           </p>
-          <a href={`mailto:${company.email}`} className="mt-6 inline-block text-[15px] underline decoration-paper/30 underline-offset-4 hover:text-brand">
-            {company.email}
+          <a href={`mailto:${company.emailGeneral}`} className="mt-6 inline-block text-[15px] underline decoration-paper/30 underline-offset-4 hover:text-brand">
+            {company.emailGeneral}
           </a>
-          <p className="mt-2 text-[14px] text-paper/60">{company.phone}</p>
+          <a href={company.phoneHref} className="mt-2 block text-[14px] text-paper/60 hover:text-brand">
+            {company.phone}
+          </a>
+          <p className="mt-1 text-[12px] text-paper/45">{company.hours}</p>
         </div>
         {cols.map((c) => (
           <nav key={c.title} aria-label={c.title} className="md:col-span-2">

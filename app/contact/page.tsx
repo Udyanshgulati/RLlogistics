@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/ui/PageHero";
 import { ContactForm } from "@/components/contact/ContactForm";
-import { QuoteCalculator } from "@/components/contact/QuoteCalculator";
-import { TrackShipment } from "@/components/contact/TrackShipment";
+import { QuoteRequestForm } from "@/components/contact/QuoteRequestForm";
 import { company } from "@/content/company";
 
 export const metadata: Metadata = {
@@ -28,16 +27,24 @@ export default function ContactPage() {
         <aside className="flex flex-col gap-10 md:col-span-4 md:col-start-9">
           <div>
             <p className="ui-label mb-3 text-steel">Email</p>
-            <a href={`mailto:${company.email}`} className="select-all text-[18px] underline decoration-ink/25 underline-offset-4 hover:text-brand">
+            <a href={`mailto:${company.emailGeneral}`} className="select-all text-[18px] underline decoration-ink/25 underline-offset-4 hover:text-brand">
+              {company.emailGeneral}
+            </a>
+            <a href={`mailto:${company.email}`} className="mt-1 block select-all text-[15px] text-ink/70 hover:text-brand">
               {company.email}
             </a>
           </div>
           <div>
             <p className="ui-label mb-3 text-steel">Phone</p>
-            <p className="text-[18px]">{company.phone}</p>
+            <a href={company.phoneHref} className="select-all text-[18px] hover:text-brand">
+              {company.phone}
+            </a>
+            <p className="ui-label mt-3 text-steel">{company.hours}</p>
           </div>
           <div>
-            <p className="ui-label mb-3 text-steel">Registered office</p>
+            <p className="ui-label mb-3 text-steel">Corporate office</p>
+            <p className="leading-relaxed text-ink/75">{company.corporateOffice}</p>
+            <p className="ui-label mb-3 mt-6 text-steel">Registered office</p>
             <address className="not-italic leading-relaxed text-ink/75">
               {company.legalName}
               {company.address.lines.map((l) => (
@@ -48,9 +55,15 @@ export default function ContactPage() {
             </address>
             <p className="ui-label mt-3 text-steel">CIN {company.cin}</p>
           </div>
-          <div id="track" className="scroll-mt-28">
-            <p className="ui-label mb-3 text-steel">Track a shipment</p>
-            <TrackShipment />
+          <div>
+            <p className="ui-label mb-3 text-steel">Branches</p>
+            <ul className="flex flex-col gap-2 text-[14px] leading-snug text-ink/75">
+              {company.branches.map((b) => (
+                <li key={b.city}>
+                  <span className="font-medium text-ink">{b.city}</span> · {b.area}
+                </li>
+              ))}
+            </ul>
           </div>
         </aside>
       </section>
@@ -59,11 +72,11 @@ export default function ContactPage() {
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-4">
             <p className="eyebrow mb-4 text-brand">Quick quote</p>
-            <h2 className="display text-[clamp(2rem,4vw,3.8rem)] leading-[0.92]">Ballpark it in ten seconds.</h2>
-            <p className="mt-5 max-w-[36ch] text-[14px] text-paper/60">Indicative ranges only. Your account manager confirms an all-in price after a quick call.</p>
+            <h2 className="display text-[clamp(2rem,4vw,3.8rem)] leading-[0.92]">Get an all-in quote.</h2>
+            <p className="mt-5 max-w-[36ch] text-[14px] text-paper/60">Share the lane and the cargo. You get a written, all-in price (no hidden detention or “misc” lines) within one working day.</p>
           </div>
           <div className="md:col-span-7 md:col-start-6">
-            <QuoteCalculator />
+            <QuoteRequestForm />
           </div>
         </div>
       </section>

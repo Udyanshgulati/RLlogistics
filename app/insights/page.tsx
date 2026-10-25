@@ -1,44 +1,47 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import { PageHero } from "@/components/ui/PageHero";
+import { Arrow } from "@/components/ui/Button";
 import { insights } from "@/content/insights";
+import { formatDate } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Insights",
-  description: "Practical notes from the RL Logistics floor on e-commerce peaks, customs clearance and cold-chain shipping in India.",
+  description: "Practical notes from the RL Logistics floor on e-commerce peaks, customs clearance, e-way bills and cold-chain shipping in India.",
 };
-
-const fmt = (d: string) => new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
 export default function InsightsPage() {
   return (
     <>
       <PageHero eyebrow="Insights" headline={["Notes from", "the floor."]} intro="What we've learned moving freight across India, written by the people who run the operation." />
       <section data-nav-theme="light" className="bg-paper px-gutter py-[12vh] md:pl-[clamp(140px,13vw,220px)]">
-        {insights.map((a) => (
-          <article key={a.slug} id={a.slug} className="grid scroll-mt-28 gap-6 border-t border-ink/15 py-14 md:grid-cols-12">
-            <div className="md:col-span-4">
-              <p className="ui-label text-brand">{a.tag}</p>
-              <p className="ui-label mt-2 text-steel">
-                <time dateTime={a.date}>{fmt(a.date)}</time> · {a.read} read
-              </p>
-            </div>
-            <div className="md:col-span-8">
-              <h2 className="display max-w-[24ch] text-[clamp(1.5rem,2.8vw,2.6rem)] leading-[0.98]">{a.title}</h2>
-              <p className="mt-4 max-w-[60ch] text-[16px] leading-relaxed text-ink/70">{a.excerpt}</p>
-              <details className="group mt-6 max-w-[64ch]">
-                <summary className="ui-label inline-flex cursor-pointer list-none items-center gap-2 border-b border-ink/25 pb-1 hover:border-brand hover:text-brand [&::-webkit-details-marker]:hidden">
-                  <span className="group-open:hidden">Read the article</span>
-                  <span className="hidden group-open:inline">Close</span>
-                </summary>
-                <div className="mt-6 flex flex-col gap-4 text-[16px] leading-relaxed text-ink/80">
-                  {a.body.map((p) => (
-                    <p key={p}>{p}</p>
-                  ))}
+        <ul className="grid gap-x-10 gap-y-16 md:grid-cols-2">
+          {insights.map((a) => (
+            <li key={a.slug}>
+              <Link href={`/insights/${a.slug}`} className="group block">
+                <div className="relative aspect-[16/10] overflow-hidden rounded-[2px] bg-ink/5">
+                  <Image
+                    src={a.cover.src}
+                    alt={a.cover.alt}
+                    fill
+                    sizes="(min-width: 768px) 40vw, 100vw"
+                    className="object-cover transition-transform duration-700 ease-expo group-hover:scale-[1.03]"
+                  />
                 </div>
-              </details>
-            </div>
-          </article>
-        ))}
+                <p className="ui-label mt-6 flex gap-3 text-steel">
+                  <span className="text-brand">{a.tag}</span>
+                  <time dateTime={a.date}>{formatDate(a.date)}</time>· {a.read} read
+                </p>
+                <h2 className="display mt-3 max-w-[26ch] text-[clamp(1.35rem,2.2vw,2rem)] leading-[1] transition-colors group-hover:text-brand">{a.title}</h2>
+                <p className="mt-3 max-w-[56ch] text-[15px] leading-relaxed text-ink/65">{a.excerpt}</p>
+                <span className="ui-label mt-5 inline-flex items-center gap-2 border-b border-ink/25 pb-1 group-hover:border-brand group-hover:text-brand">
+                  Read the article <Arrow className="transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
     </>
   );

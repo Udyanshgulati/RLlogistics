@@ -12,7 +12,7 @@ npm run dev        # http://localhost:3000
 npm run build      # production build (also type-checks + lints)
 ```
 
-Routes: `/` (the scroll journey), `/about`, `/services`, `/services/[slug]` (6 services), `/industries`, `/network`, `/careers`, `/contact`, a 404 page, and `/playground` (the five text effects on their own; noindex).
+Routes: `/` (the scroll journey), `/about`, `/services`, `/services/[slug]` (6 services), `/industries`, `/network`, `/insights` (+ article pages), `/contact`, a 404 page, and `/playground` (the five text effects on their own; noindex).
 
 ### Homepage scenes
 
@@ -105,5 +105,7 @@ All vehicles, the ship, plane, clouds and water are drawn in code (SVG or canvas
 
 - `prefers-reduced-motion`: pins and scrubbing are turned off, and each scene shows its final state as a static section.
 - SEO: per-page metadata, `opengraph-image`, `sitemap.xml`, `robots.txt`, and JSON-LD `Organization` + `LocalBusiness` with the registered address.
-- Copy marked `// DUMMY` (numbers, testimonials, openings, rates) is placeholder content to replace.
+- Copy marked `// DUMMY` (some numbers, testimonials) is placeholder content to replace. Contact details, branches, client names, mission/vision, fleet size and transit times come from the client's current site (rllogistics.in).
+- Photos in `public/photos` are CC0 (Openverse); sources in `public/photos/CREDITS.json`.
+- Visual test harness: `npm run snap` (see `scripts/snap.ts`), audit in `AUDIT.md`.
 - SplitText keeps an accessible label for the full sentence. Decorative layers use `aria-hidden`.

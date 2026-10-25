@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { PageHero } from "@/components/ui/PageHero";
 import { RevealHeading } from "@/components/text/RevealHeading";
 import { ScrubParagraph } from "@/components/text/ScrubParagraph";
@@ -27,9 +28,20 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section data-nav-theme="light" aria-label="Our operations" className="grid gap-4 bg-paper px-gutter pb-[14vh] sm:grid-cols-5 md:pl-[clamp(140px,13vw,220px)]">
+        <figure className="relative aspect-[4/3] overflow-hidden rounded-[2px] bg-ink/5 sm:col-span-3">
+          <Image src="/photos/warehouse-floor.webp" alt="Warehouse floor seen from above" fill sizes="(min-width: 640px) 55vw, 100vw" className="object-cover" />
+        </figure>
+        <figure className="relative aspect-[4/3] overflow-hidden rounded-[2px] bg-ink/5 sm:col-span-2 sm:aspect-auto">
+          <Image src="/photos/office-planning.webp" alt="Team planning a shipment schedule at a desk" fill sizes="(min-width: 640px) 35vw, 100vw" className="object-cover" />
+        </figure>
+      </section>
+
       <section data-nav-theme="dark" className="bg-ink px-gutter py-[16vh] text-paper md:pl-[clamp(140px,13vw,220px)]">
         <p className="eyebrow mb-8 text-brand">Mission</p>
-        <p className="display max-w-[22ch] text-[clamp(2rem,4.6vw,4.8rem)] leading-[0.95]">{aboutPage.mission}</p>
+        <p className="display max-w-[26ch] text-[clamp(1.7rem,3.3vw,3.4rem)] leading-[1]">{aboutPage.mission}</p>
+        <p className="eyebrow mb-4 mt-16 text-steel">Vision</p>
+        <p className="max-w-[44ch] text-[clamp(1.1rem,1.6vw,1.5rem)] leading-snug text-paper/75">{aboutPage.vision}</p>
       </section>
 
       <section data-nav-theme="light" className="bg-paper px-gutter py-[16vh] md:pl-[clamp(140px,13vw,220px)]">

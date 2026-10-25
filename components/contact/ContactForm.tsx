@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { services } from "@/content/services";
 import { company } from "@/content/company";
+import { enquiryMailto, isEmail, isPhone } from "@/lib/enquiry";
 import { cn } from "@/lib/cn";
 
 const field = "w-full border-b border-ink/20 bg-transparent py-3 text-[15px] outline-none transition-colors placeholder:text-ink/35 focus:border-brand";
@@ -17,14 +18,16 @@ export function ContactForm() {
     const data = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const next: Record<string, string> = {};
     if (!data.name?.trim()) next.name = "Add your name so we know who to ask for.";
-    if (!/^\S+@\S+\.\S+$/.test(data.email ?? "")) next.email = "Enter an email like name@company.in.";
-    if ((data.phone ?? "").replace(/\D/g, "").length < 10) next.phone = "Enter a 10-digit mobile number.";
+    if (!isEmail(data.email)) next.email = "Enter an email like name@company.in.";
+    if (!isPhone(data.phone)) next.phone = "Enter a 10-digit mobile number.";
     setErrors(next);
     if (Object.keys(next).length === 0) {
-      // No backend yet: hand the enquiry to the visitor's mail app, addressed to the company.
-      const service = services.find((x) => x.slug === data.service)?.title ?? data.service ?? "—";
-      const body = [`Name: ${data.name}`, `Company: ${data.company || "—"}`, `Phone: ${data.phone}`, `Email: ${data.email}`, `Service: ${service}`, "", data.message || ""].join("\n");
-      const mailto = `mailto:${company.email}?subject=${encodeURIComponent(`Enquiry from ${data.company || data.name}`)}&body=${encodeURIComponent(body)}`;
+      const service = services.find((x) => x.slug === data.service)?.title ?? data.service;
+      const mailto = enquiryMailto(
+        `Enquiry from ${data.company || data.name}`,
+        { Name: data.name, Company: data.company, Phone: data.phone, Email: data.email, Service: service },
+        data.message,
+      );
       setSent({ first: data.name.split(" ")[0], mailto });
     }
   };

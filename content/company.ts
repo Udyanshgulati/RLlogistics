@@ -9,7 +9,18 @@ export const company = {
   roc: "RoC Delhi",
   directors: ["Randhir Kumar Jha", "Rekha Jha"],
   email: "randhir@rllogistics.in",
-  phone: "+91 98XXX XXXXX", // DUMMY placeholder
+  // From the current rllogistics.in site.
+  emailGeneral: "info@rllogistics.in",
+  phone: "+91 98102 62947",
+  phoneHref: "tel:+919810262947",
+  hours: "Office 9:00 AM – 6:00 PM · service 24 hours, 365 days a year",
+  corporateOffice: "D-114, Street No. 4, Bhajanpura, Delhi – 110053",
+  branches: [
+    { city: "Mumbai", area: "Temghar, Bhiwandi (MH) 421302" },
+    { city: "Pune", area: "Ranjangaon, Pune–Nagar Road (MH) 412209" },
+    { city: "Bengaluru", area: "Madanayakanahalli, Tumkur Road (KA) 562162" },
+    { city: "Kolkata", area: "Alampur, Howrah (WB) 711302" },
+  ],
   address: {
     lines: ["D-228, G/F, Kh. No. 448, Gali No. 7", "Bhajanpura, Near Kali Mata Mandir", "Delhi – 110053, India"],
     street: "D-228, G/F, Kh. No. 448, Gali No. 7, Bhajanpura, Near Kali Mata Mandir",

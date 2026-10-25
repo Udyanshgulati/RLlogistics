@@ -14,8 +14,11 @@ export function LenisProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Visual test harness (scripts/snap.ts) loads ?test=1 to scroll with exact, unsmoothed positions.
+    if (new URLSearchParams(window.location.search).has("test")) return;
 
     const instance = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
+    (window as Window & { __LENIS__?: Lenis }).__LENIS__ = instance;
     instance.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);

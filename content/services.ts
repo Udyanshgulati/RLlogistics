@@ -11,11 +11,13 @@ export type Service = {
   capabilities: { title: string; body: string }[];
   facts: { value: string; label: string }[]; // DUMMY figures
   lanes: string[];
+  photo: { src: string; alt: string };
 };
 
 export const services: Service[] = [
   {
     slug: "warehousing-3pl",
+    photo: { src: "/photos/warehouse.webp", alt: "Palletised stock in a warehouse" },
     index: "01",
     title: "Warehousing & 3PL",
     short: "Bonded and non-bonded space across Delhi NCR with WMS-led inventory, kitting and returns.",
@@ -27,17 +29,18 @@ export const services: Service[] = [
       { title: "Inbound & putaway", body: "Dock scheduling, quality checks and barcode putaway inside 24 hours of arrival." },
       { title: "Pick, pack & kitting", body: "Batch and wave picking, co-packing, promo kits and labelling for retail chains." },
       { title: "Bonded storage", body: "Defer duty on imported stock and clear it in tranches as demand lands." },
-      { title: "Reverse logistics", body: "Returns inspection, grading, refurbishment routing and vendor RTV." },
+      { title: "Inventory & materials management", body: "End-to-end replenishment planning, spares and materials control, and milk-run deliveries on fixed routes." },
     ],
     facts: [
-      { value: "1.2L sq ft", label: "Managed space, NCR" }, // DUMMY
-      { value: "99.7%", label: "Inventory accuracy" }, // DUMMY
+      { value: "7", label: "Cities with warehouse branches" },
+      { value: "99.6%", label: "Inventory accuracy (cycle counts)" }, // DUMMY
       { value: "24h", label: "Dock-to-stock" }, // DUMMY
     ],
-    lanes: ["Bhiwandi", "Kundli", "Farukhnagar", "Tughlakabad ICD"],
+    lanes: ["Delhi", "Mumbai", "Chennai", "Kolkata", "Ahmedabad", "Hyderabad", "Aurangabad"],
   },
   {
     slug: "road-transport",
+    photo: { src: "/photos/highway-truck.webp", alt: "Truck on a highway at night" },
     index: "02",
     title: "Road Transport (FTL/PTL)",
     short: "Full and part truckloads on every major corridor, GPS-tracked from dock to door.",
@@ -46,20 +49,21 @@ export const services: Service[] = [
     intro:
       "Our own and partner fleets run 14 ft to 40 ft containers, open bodies and reefers. Every vehicle reports to one control tower, and every exception is flagged before you have to ask.",
     capabilities: [
-      { title: "Full truckload", body: "Dedicated vehicles on Delhi–Mumbai, Delhi–Kolkata, Delhi–Chennai and Delhi–Bengaluru." },
-      { title: "Part truckload", body: "Consolidated loads with milk-runs across North India and fixed weekly departures." },
-      { title: "Container haulage", body: "Port and ICD drayage between JNPT, Mundra, Tughlakabad and Patparganj." },
-      { title: "Dedicated fleet", body: "Branded vehicles and drivers on contract for high-frequency lanes." },
+      { title: "Primary movement, FTL", body: "Dedicated, sealed vehicles with no transhipment on the way, GPS on every truck and MIS in the format you need." },
+      { title: "Secondary distribution", body: "Warehouse-to-dealer distribution on dedicated milk-run routes, so stock keeps flowing to every outlet." },
+      { title: "Express FTL", body: "Company-owned containerised vehicles moving non-stop: Delhi NCR to Mumbai in 36 hours, Kolkata in 60, Chennai in 72." },
+      { title: "Containers & ODC", body: "20 ft and 40 ft import/export containers, steel, refractories and over-dimensional loads, with a route survey first." },
     ],
     facts: [
-      { value: "650+", label: "Vehicles on network" }, // DUMMY
-      { value: "28", label: "States covered" }, // DUMMY
-      { value: "98.2%", label: "On-time delivery" }, // DUMMY
+      { value: "1000+", label: "Vehicles on the network" },
+      { value: "36 h", label: "Delhi NCR → Mumbai, express" },
+      { value: "60 h", label: "Delhi → Kolkata, express" },
     ],
-    lanes: ["Delhi → Mumbai", "Delhi → Kolkata", "Delhi → Chennai", "Delhi → Bengaluru"],
+    lanes: ["Delhi → Mumbai (NH-48)", "Delhi → Kolkata (NH-19)", "Delhi → Chennai", "Delhi → Bengaluru", "Delhi → Pune"],
   },
   {
     slug: "freight-forwarding",
+    photo: { src: "/photos/port-cranes.webp", alt: "Container ship under gantry cranes at a port" },
     index: "03",
     title: "Freight Forwarding",
     short: "Air and ocean freight with carrier contracts out of DEL, BOM, MAA, JNPT, Mundra and Chennai.",
@@ -74,14 +78,15 @@ export const services: Service[] = [
       { title: "DG & special cargo", body: "IATA DGR-certified handling for hazardous, oversized and high-value freight." },
     ],
     facts: [
-      { value: "40+", label: "Countries served" }, // DUMMY
-      { value: "1,800", label: "TEUs a year" }, // DUMMY
+      { value: "30+", label: "Countries served" }, // DUMMY
+      { value: "1,200+", label: "TEUs a year" }, // DUMMY
       { value: "6", label: "Gateway ports" }, // DUMMY
     ],
-    lanes: ["JNPT → Jebel Ali", "Mundra → Singapore", "DEL → FRA", "MAA → Port Klang"],
+    lanes: ["Nhava Sheva (JNPT) → Jebel Ali", "Mundra → Singapore", "Chennai → Port Klang", "DEL → FRA (air)", "DEL → DXB (air)"],
   },
   {
     slug: "customs-clearance",
+    photo: { src: "/photos/container-stack.webp", alt: "Stacked shipping containers" },
     index: "04",
     title: "Customs Clearance",
     short: "Licensed CHA filings, duty planning and ICEGATE compliance, so cargo doesn't wait at the gate.",
@@ -96,14 +101,15 @@ export const services: Service[] = [
       { title: "AEO facilitation", body: "Documentation and process support for AEO-T1/T2 accreditation." },
     ],
     facts: [
-      { value: "< 24h", label: "Average clearance" }, // DUMMY
-      { value: "12k+", label: "Filings a year" }, // DUMMY
-      { value: "0", label: "Penalties in FY25" }, // DUMMY
+      { value: "< 36h", label: "Average clearance, ICD" }, // DUMMY
+      { value: "4,500+", label: "Bills of entry & shipping bills a year" }, // DUMMY
+      { value: "0", label: "Penalties in FY 2024-25" }, // DUMMY
     ],
-    lanes: ["ICD Tughlakabad", "ICD Patparganj", "IGI Air Cargo", "JNPT / Nhava Sheva"],
+    lanes: ["ICD Tughlakabad", "ICD Patparganj", "ICD Dadri", "Air Cargo Complex, IGI Delhi", "Nhava Sheva (JNPT)"],
   },
   {
     slug: "last-mile-fulfilment",
+    photo: { src: "/photos/fulfilment.webp", alt: "Parcels moving through a fulfilment centre" },
     index: "05",
     title: "Last-Mile & E-commerce",
     short: "Same-day and next-day delivery across NCR with COD, live ETAs and photo proof of delivery.",
@@ -113,19 +119,20 @@ export const services: Service[] = [
       "Marketplace and D2C fulfilment that plugs straight into your storefront. Orders drop in, get picked inside the hour and leave for doorsteps across NCR the same day.",
     capabilities: [
       { title: "Marketplace integration", body: "Plug-and-play with major storefronts and OMS platforms through API or flat-file." },
-      { title: "Same / next day", body: "Hyperlocal riders in NCR and next-day coverage to 120+ cities." }, // DUMMY
+      { title: "Same / next day", body: "Own riders across Delhi NCR and next-day delivery to 60+ cities through partner networks." }, // DUMMY
       { title: "COD & reconciliation", body: "Cash remittance in T+2 with a ledger you can audit line by line." },
       { title: "Proof of delivery", body: "Geo-tagged photo POD and OTP confirmation pushed to you in minutes." },
     ],
     facts: [
-      { value: "18k", label: "Orders a day, peak" }, // DUMMY
-      { value: "4h", label: "NCR same-day window" }, // DUMMY
-      { value: "1.1%", label: "RTO rate" }, // DUMMY
+      { value: "6,000", label: "Orders a day at festive peak" }, // DUMMY
+      { value: "Same day", label: "Within Delhi NCR" }, // DUMMY
+      { value: "94%", label: "First-attempt delivery" }, // DUMMY
     ],
-    lanes: ["Delhi", "Gurugram", "Noida", "Faridabad"],
+    lanes: ["Delhi", "Gurugram", "Noida", "Ghaziabad", "Faridabad"],
   },
   {
     slug: "project-cargo",
+    photo: { src: "/photos/container-terminal.webp", alt: "Ship-to-shore cranes at a container terminal" },
     index: "06",
     title: "Project Cargo",
     short: "Oversized, heavy-lift and multi-modal moves engineered end to end, from route survey to final placement.",
@@ -134,24 +141,24 @@ export const services: Service[] = [
     intro:
       "Transformers, turbines, plant machinery. We survey the route, get the permits, plan the lift and escort the load. One project manager owns it from origin to foundation.",
     capabilities: [
-      { title: "Route engineering", body: "Route surveys, bridge load checks, utility lifts and escort planning." },
-      { title: "ODC transport", body: "Hydraulic axles, low-beds and multi-axle trailers up to 400 MT." }, // DUMMY
+      { title: "Route survey first", body: "Our technical team surveys the route and writes a feasibility report: weak bridges, overhead lines, turning radii and where extra pullers are needed." },
+      { title: "ODC transport", body: "Hydraulic axles, low-beds and multi-axle trailers for loads up to 120 MT." }, // DUMMY
       { title: "Lifting & rigging", body: "Crane selection, lift plans and certified riggers on site." },
       { title: "Breakbulk & charter", body: "Vessel chartering and breakbulk handling through Kandla and Mundra." },
     ],
     facts: [
-      { value: "400 MT", label: "Heaviest single lift" }, // DUMMY
-      { value: "60+", label: "Projects delivered" }, // DUMMY
+      { value: "120 MT", label: "Heaviest single move" }, // DUMMY
+      { value: "40+", label: "Projects delivered" }, // DUMMY
       { value: "0", label: "Lost-time incidents" }, // DUMMY
     ],
-    lanes: ["Kandla", "Mundra", "Vizag", "Haldia"],
+    lanes: ["Deendayal (Kandla)", "Mundra", "Visakhapatnam", "Haldia"],
   },
 ];
 
 /** The homepage services row — air and ocean are split out for the story. */
 export const homeServices: { title: string; body: string; icon: IconName; href: string }[] = [
   { title: "Warehousing & 3PL", body: "WMS-led storage, kitting and returns across Delhi NCR.", icon: "warehouse", href: "/services/warehousing-3pl" },
-  { title: "Road Transport", body: "FTL and PTL on every major corridor, GPS-tracked.", icon: "truck", href: "/services/road-transport" },
+  { title: "Road Transport", body: "FTL and PTL on every major corridor out of Delhi, GPS-tracked.", icon: "truck", href: "/services/road-transport" },
   { title: "Air Freight", body: "Express and deferred options out of IGI Delhi and BOM.", icon: "plane", href: "/services/freight-forwarding" },
   { title: "Ocean Freight", body: "FCL and LCL from JNPT, Mundra and Chennai.", icon: "ship", href: "/services/freight-forwarding" },
   { title: "Customs Clearance", body: "Licensed CHA filings and duty planning on ICEGATE.", icon: "customs", href: "/services/customs-clearance" },

@@ -155,10 +155,10 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
 function ClientStrip() {
   const row = [...clientLogos, ...clientLogos];
   return (
-    <div aria-label="Selected clients" className="absolute inset-x-0 bottom-0 z-10 overflow-hidden border-t border-ink/10 py-4 group-[.is-static]/trust:relative">
-      <ul className="flex w-max animate-[marquee_40s_linear_infinite] gap-16 motion-reduce:animate-none">
+    <div aria-label="Selected clients" className="absolute inset-x-0 bottom-0 z-10 overflow-hidden border-t border-ink/10 py-5 group-[.is-static]/trust:relative">
+      <ul className="flex w-max animate-[marquee_45s_linear_infinite] items-center gap-16 text-ink/35 motion-reduce:animate-none">
         {row.map((name, i) => (
-          <li key={i} aria-hidden={i >= clientLogos.length} className="display whitespace-nowrap text-[18px] text-ink/25">
+          <li key={i} aria-hidden={i >= clientLogos.length} className="display whitespace-nowrap text-[17px] tracking-[0.02em]">
             {name}
           </li>
         ))}

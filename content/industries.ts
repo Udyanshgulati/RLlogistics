@@ -43,4 +43,11 @@ export const industries: { slug: string; title: string; icon: IconName; body: st
     body: "Export consolidation for garment clusters in NCR, Panipat and Ludhiana, plus GOH handling for domestic retail.",
     points: ["LCL consolidation to EU / US", "Garment-on-hanger handling", "Season-launch DC operations"],
   },
+  {
+    slug: "government",
+    title: "Government of India",
+    icon: "shield",
+    body: "Special movements for Government of India departments from Patna, Mumbai, Jabalpur, Indore, Varanasi, Kanpur, Guwahati, Gwalior, Kolkata, Bhubaneswar and Bhopal.",
+    points: ["Sealed, GPS-tracked vehicles", "Documented chain of custody", "Pan-India dispatch from 11+ locations"],
+  },
 ];

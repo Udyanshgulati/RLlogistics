@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHero } from "@/components/ui/PageHero";
@@ -39,7 +40,13 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
         </div>
       </PageHero>
 
-      <section data-nav-theme="light" className="bg-paper px-gutter py-[14vh] md:pl-[clamp(140px,13vw,220px)]">
+      <div data-nav-theme="light" className="bg-paper px-gutter pt-[10vh] md:pl-[clamp(140px,13vw,220px)]">
+        <div className="relative aspect-[21/9] w-full max-w-[1100px] overflow-hidden rounded-[2px] bg-ink/5">
+          <Image src={s.photo.src} alt={s.photo.alt} fill sizes="(min-width: 1200px) 1100px, 100vw" className="object-cover" />
+        </div>
+      </div>
+
+      <section data-nav-theme="light" className="bg-paper px-gutter py-[12vh] md:pl-[clamp(140px,13vw,220px)]">
         <RevealHeading lines={["What's included"]} className="mb-12 text-[clamp(2rem,4.4vw,4.4rem)]" />
         <ul className="grid gap-x-10 gap-y-12 sm:grid-cols-2">
           {s.capabilities.map((c, i) => (

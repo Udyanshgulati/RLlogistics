@@ -34,4 +34,18 @@ export const testimonials = [
   },
 ];
 
-export const clientLogos = ["Kesari Foods", "Aravalli Auto", "Loomline", "Pebble & Pine", "Northstar Pharma", "Volta Electric", "Saffron Retail", "Indus Agro"]; // DUMMY wordmarks
+// Client names as listed on the current rllogistics.in site, shown as wordmarks.
+export const clientLogos: string[] = [
+  "Baxter India",
+  "Godrej & Boyce",
+  "Bacardi India",
+  "LG Electronics",
+  "BD India",
+  "Videocon",
+  "Onida",
+  "Lloyd Electronics",
+  "VIP Industries",
+  "Nippon Express",
+  "Maharaja Whiteline",
+  "Geep Batteries",
+];
