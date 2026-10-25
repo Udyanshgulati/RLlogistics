@@ -46,8 +46,8 @@ export function Scene2About({ assets = {} }: { assets?: AssetOverrides }) {
   );
 
   return (
-    <section ref={root} data-nav-theme="light" data-scene="about" className="relative bg-paper text-ink" aria-labelledby="about-title">
-      <div className="grid gap-16 px-gutter pb-[18vh] pt-[14vh] md:grid-cols-12 md:pl-[clamp(140px,13vw,220px)]">
+    <section ref={root} data-nav-theme="light" data-scene="about" className="relative z-10 -mt-[50svh] bg-[linear-gradient(to_bottom,rgb(var(--paper)/0),rgb(var(--paper))_25svh)] pt-[25svh] text-ink motion-reduce:mt-0 motion-reduce:bg-paper motion-reduce:pt-0" aria-labelledby="about-title">
+      <div className="grid gap-16 px-gutter pb-[18vh] pt-[4vh] md:grid-cols-12 md:pl-[clamp(140px,13vw,220px)]">
         <div className="md:sticky md:top-0 md:col-span-7 md:flex md:h-screen md:flex-col md:justify-between md:py-[12vh]">
           <div data-about-card className="relative aspect-[2/1] w-[min(340px,70%)] overflow-hidden rounded-[2px]">
             {assets.heroRoad ? (
