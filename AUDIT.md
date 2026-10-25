@@ -2,7 +2,7 @@
 
 Harness: `npm run snap` (scripts/snap.ts) against the production build on :3000 with `?test=1` (Lenis off), 21 frames per viewport in 5% steps, settle 1200 ms per step (the scene timelines use `scrub: 1`, so 300 ms would capture them mid catch-up). Snaps in `snaps/<viewport>/NN.png`, sheets in `snaps/contact-<viewport>.png`, motion in `snaps/scroll.webm`.
 
-Run: 2026-10-25, before any fixes. Reference: `reference-frames/01–19`.
+Run 1: 2026-10-25, before any fixes (kept locally in `snaps-before/`). Run 2: after the fix pass (`snaps/`). Reference: `reference-frames/01–19`. Fine-step probes (1–2 % apart) were used for the transitions, because a 5 % grid can miss them.
 
 ## Scene by scene
 
@@ -50,3 +50,51 @@ Run: 2026-10-25, before any fixes. Reference: `reference-frames/01–19`.
 ## Realism (Step 3.5) — the biggest gap
 
 The reference uses photo-real 3D renders and real drone footage for every vehicle. Ours are flat SVG (single fills, no shading, no contact shadows, simplified proportions). The SVG can be pushed a long way (shading, AO shadows, correct axles, dual wheels, parallax layers), but it will not become photo-real. For a reference-level match the vehicles should be rendered assets. The asset list and prompts come in Step 3.5, after you approve the before/after of the truck.
+
+## Status after the fix pass (run 2)
+
+Every "Fixed" below was checked on a run-2 snap or probe frame. Rows marked "Partly" or "Open" are not fixed, and the reason is given.
+
+| Scene / issue | Status | Proof (before → after) | Notes |
+|---|---|---|---|
+| Hero: square stars | Fixed | crop of 1440/00 | Round sprite texture, `dpr [1, 2]`. |
+| Hero: blur on the globe wrapper | Fixed | 1440/00–01 | Blur tween removed; the dots fade in their shader. Grain added on the atmosphere gradient. |
+| Dive: empty paper frame at 5 % | Fixed | 1440/01 (empty) → probe 5 % (card and copy rising) | Hero pin 180 % → 150 %. Scene 2 now overlaps the haze (`-mt-[50svh]` with a transparent-to-paper top). At 4 % it is one short haze frame, by design. |
+| Yard: truck proportions | Fixed | 1440/05 before → after | 17.6 m rig at 34 px/m: 13.6 m skeletal trailer, tri-axle bogie (1.31 m spacing), tandem drive (1.35 m), dual wheels, fuel tank, landing legs, side guard, mudguards, marker lights, contact shadows, one shared light (`lib/light.ts`). |
+| Yard: stacker and container scale | Fixed | 1440/03–04 | The stacker is drawn at 55 px/m and scaled to 34 px/m. 40 ft = 410 × 88, 20 ft = 206 × 88. IK is scale-aware. The hydraulic barrel and rod extend as the boom rises. |
+| Yard: truck in front of the stack | Fixed | 1440/05 | The stack fades to 50 % as the truck reverses in. |
+| Yard: motion realism | Fixed | `snaps/scroll.webm` | Damped load swing after the lift, 2 px trailer squash on landing. |
+| Services → Road: 100 % black frame at 35 % | Fixed | 1440/07 (black) → probes 34 % and 36 % | Yard end hold 1.2 → 0.25. The road starts at 4× instead of 9×, so its edges show at once. |
+| Road: giant lane bars | Fixed | 1440/08 | Dash width and pattern divided by the camera scale. |
+| Road: mobile heading overflow and milestone overlap | Fixed | 390/08–09 | Wrapping heading; milestone body hidden on mobile. |
+| Road → Ocean: hard horizontal cut | Fixed | 1440/11 (cut) → probes 52–56 % | The tint no longer has a CSS transform, so GSAP owns it. The ocean adds a matching blue blend at its top that fades out as the pin starts. |
+| Ocean: water tile seams (visible rectangles) | Fixed | crop of 1440/11 (run 2, first pass) → probe 56 % | The water blobs now wrap around the tile edges, so the 1024 px tile is seamless. |
+| Ocean: wake blur, permanent `will-change` | Fixed | crop of 1440/12 | Wake canvas 900 × 2400 at 1.5×; `will-change` removed everywhere. |
+| Ocean: mobile features over the ship | Fixed | 390/12 → mobile probes 58–64 % | On mobile the ship shrinks early and sits high; the cards sit below it. |
+| Clouds: rectangular edges | Fixed | crop of 1440/14 | Puffs are padded inside a 1600 × 800 canvas, an elliptical mask fades the edges to alpha 0 (border alpha checked = 0), and scale is capped at 1.15. |
+| Clouds: dead frames at 70–75 % | Partly | 1440/14–15 | Shortened. One 5 % frame is still clouds only; that is the reference's cloud pass. |
+| Plane never on screen | Fixed | 1440/16–18 | The plane gets ~20 % of the scene and parks its tail at the top-right like ref 19. |
+| CTA heading "missing" at 1280/19 | No bug | 1280/19–20 | False alarm: the heading sits just below the fold in that frame. |
+| Hero scramble overflow on mobile (mid-scramble only) | Open (minor) | probe 390 at 56 % | Lines are wider while scrambling and settle back to wrapped text. |
+| Long task of 13.9 s in the 390 snap run | Not reproducible | isolated mobile run: max 231 ms | Caused by the screenshot load at 3× under SwiftShader, not by the page. |
+| Intro loader | Removed | n/a | The site opens straight on the hero, as the client asked. |
+
+## Root cause of the "boxes"
+
+1. **Clipped raster edges.** Cloud puffs were cut off at the canvas border, so upscaling showed straight lines. The water tile did not wrap, so every tile boundary showed as a rectangle.
+2. **Upscaled rasters.** Clouds, wake and water were drawn small and stretched 2–3×.
+3. **Layer rasterisation.** Permanent `will-change: transform` and `filter: blur` on large wrappers made the browser cache them at one scale.
+4. **CSS transform vs GSAP transform** on the road tint (and earlier the plane): the element never reached the screen, which left a hard seam.
+
+## Assets that would take this to photo-real
+
+The SVG now has correct proportions and shading, but it will never look like the reference's 3D renders. Every slot is wired: drop the file into `/public/assets`, map it in `lib/asset-slots.ts`, and the vector version is swapped out. All renders should share the same light (key light from the top-left, 45°, soft shadow), use a transparent background, be at least 3000 px wide and contain no baked ground shadow.
+
+| File | Prompt |
+|---|---|
+| `truck-side.png` | Photoreal side elevation of a modern Indian-market tractor unit (dark graphite cab, roof fairing) with a 40 ft skeletal container trailer carrying a white 40 ft ISO container, tandem drive axle, tri-axle trailer bogie, dual wheels, orthographic side view, studio light from top-left, transparent background, 4000 px wide |
+| `yard/container-white.png` | Photoreal white 40 ft ISO shipping container, exact side elevation, light weathering and rust streaks at the bottom rail, corner castings visible, transparent background, top-left light |
+| `yard/reach-stacker-body.png` / `yard/reach-stacker-boom.png` | Photoreal blue reach stacker (Kalmar/Konecranes style), exact side elevation, body and telescopic boom rendered as separate layers with the boom horizontal, pivot centred, transparent background |
+| `ship-top.png` | Photoreal top-down drone view of a loaded container ship, colourful container rows, straight down, no water, transparent background, 4000 px long |
+| `plane-top.png` | Photoreal top-down white cargo freighter (777F style), straight down, transparent background |
+| `clouds-1..3.png` | Soft cumulus cloud banks seen from above, isolated on transparent background, edges fading to 0 alpha, 4000 px wide |
