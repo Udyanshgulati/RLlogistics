@@ -21,6 +21,10 @@ export function JsonLd() {
       telephone: company.phone,
       foundingDate: company.incorporated,
       founder: company.directors.map((name) => ({ "@type": "Person", name })),
+      contactPoint: [
+        { "@type": "ContactPoint", contactType: "sales", email: company.email, telephone: company.phone, areaServed: "IN" },
+        { "@type": "ContactPoint", contactType: "customer support", email: company.emailSupport, telephone: company.phone, areaServed: "IN" },
+      ],
       address,
     },
     {

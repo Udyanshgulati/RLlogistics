@@ -27,12 +27,25 @@ export default function ContactPage() {
         <aside className="flex flex-col gap-10 md:col-span-4 md:col-start-9">
           <div>
             <p className="ui-label mb-3 text-steel">Email</p>
-            <a href={`mailto:${company.emailGeneral}`} className="select-all text-[18px] underline decoration-ink/25 underline-offset-4 hover:text-brand">
-              {company.emailGeneral}
-            </a>
-            <a href={`mailto:${company.email}`} className="mt-1 block select-all text-[15px] text-ink/70 hover:text-brand">
-              {company.email}
-            </a>
+            <dl className="flex flex-col gap-4">
+              {[
+                { label: "Enquiries & quotes", email: company.email, big: true },
+                { label: "Shipment support (existing customers)", email: company.emailSupport },
+                { label: "Escalations · CEO's office", email: company.emailCeo },
+              ].map((m) => (
+                <div key={m.email}>
+                  <dt className="text-[13px] text-ink/55">{m.label}</dt>
+                  <dd>
+                    <a
+                      href={`mailto:${m.email}`}
+                      className={`inline-flex min-h-11 select-all items-center underline decoration-ink/25 underline-offset-4 hover:text-brand md:min-h-0 ${m.big ? "text-[18px]" : "text-[16px]"}`}
+                    >
+                      {m.email}
+                    </a>
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
           <div>
             <p className="ui-label mb-3 text-steel">Phone</p>

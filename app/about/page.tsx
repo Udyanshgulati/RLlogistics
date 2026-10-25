@@ -61,6 +61,12 @@ export default function AboutPage() {
             </li>
           ))}
         </ul>
+        <p className="mt-12 text-[15px] text-ink/70">
+          Something we should hear at the top? Write to the CEO&apos;s office:{" "}
+          <a href={`mailto:${company.emailCeo}`} className="inline-flex min-h-11 items-center text-ink underline decoration-ink/30 underline-offset-4 hover:text-brand md:min-h-0">
+            {company.emailCeo}
+          </a>
+        </p>
       </section>
 
       <section data-nav-theme="light" className="border-t border-ink/10 bg-paper px-gutter py-[16vh] md:pl-[clamp(140px,13vw,220px)]">

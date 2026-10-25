@@ -8,9 +8,11 @@ export const company = {
   incorporatedLabel: "27 April 2018",
   roc: "RoC Delhi",
   directors: ["Randhir Kumar Jha", "Rekha Jha"],
-  email: "randhir@rllogistics.in",
-  // From the current rllogistics.in site.
-  emailGeneral: "info@rllogistics.in",
+  // Official mailboxes: info = enquiries and quotes (the default), support = live shipments and
+  // existing customers, ceo = escalations and leadership.
+  email: "info@rllogisticsindia.com",
+  emailSupport: "support@rllogisticsindia.com",
+  emailCeo: "ceo@rllogisticsindia.com",
   phone: "+91 98102 62947",
   phoneHref: "tel:+919810262947",
   hours: "Office 9:00 AM – 6:00 PM · service 24 hours, 365 days a year",
