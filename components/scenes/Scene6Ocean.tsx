@@ -43,7 +43,7 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
           scrollTrigger: {
             trigger: el,
             start: "top top",
-            end: ctx.conditions.mobile ? "+=380%" : "+=520%",
+            end: ctx.conditions.mobile ? "+=300%" : "+=520%",
             pin: true,
             scrub: 1,
             anticipatePin: 1,
@@ -121,7 +121,7 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
           as="h2"
           lines={ocean.headline}
           mode="external"
-          className="text-[clamp(1.8rem,4.6vw,4.6rem)] leading-[0.94] [&_.block]:whitespace-normal md:[&_.block]:whitespace-nowrap"
+          className="text-[clamp(1.8rem,4.6vw,4.6rem)] leading-[0.94] [&_.block]:whitespace-normal lg:[&_.block]:whitespace-nowrap"
         />
         <span id="ocean-title" className="sr-only">
           {ocean.headline.join(" ")}
@@ -129,26 +129,26 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
       </div>
 
       {/* Features: two left, two right of the ship */}
-      <div className="absolute inset-0 z-10 grid grid-cols-2 content-center gap-x-[min(34vw,520px)] gap-y-[14vh] px-gutter max-md:gap-x-3 max-md:gap-y-3 max-md:content-end max-md:pb-[6vh]">
+      <div className="absolute inset-0 z-10 grid grid-cols-2 content-center gap-x-[min(34vw,520px)] gap-y-[14vh] px-gutter max-lg:grid-cols-1 max-lg:gap-2 max-lg:content-end max-lg:pb-[calc(5vh+var(--safe-b))] sm:max-lg:grid-cols-2">
         {ocean.features.map((f, i) => (
           <div
             key={f.title}
             data-feature
             className={cn(
-              "relative max-w-[28ch] opacity-0 motion-reduce:opacity-100 max-md:rounded-[4px] max-md:bg-[#041e5e]/75 max-md:p-3",
+              "relative max-w-[28ch] opacity-0 motion-reduce:opacity-100 max-lg:flex max-lg:max-w-none max-lg:items-center max-lg:gap-3 max-lg:justify-self-stretch max-lg:rounded-[4px] max-lg:bg-[#041e5e]/80 max-lg:px-4 max-lg:py-3 max-lg:text-left",
               i % 2 === 0 ? "justify-self-end text-right" : "justify-self-start",
             )}
           >
-            <div className={cn("relative mb-3 inline-block", i % 2 === 0 && "ml-auto")}>
-              <Icon name={f.icon as IconName} className="h-7 w-7" />
+            <div className={cn("relative mb-3 inline-block max-lg:mb-0 max-lg:shrink-0", i % 2 === 0 && "ml-auto max-lg:ml-0")}>
+              <Icon name={f.icon as IconName} className="h-6 w-6 lg:h-7 lg:w-7" />
             </div>
-            <h3 className="display relative text-[clamp(14px,1.4vw,19px)] leading-tight">
-              <span data-feature-ghost aria-hidden className="absolute inset-0 opacity-0">
+            <h3 className="display relative text-[16px] leading-tight lg:text-[clamp(14px,1.4vw,19px)]">
+              <span data-feature-ghost aria-hidden className="absolute inset-0 opacity-0 max-lg:hidden">
                 {f.title}
               </span>
               {f.title}
             </h3>
-            <p className="mt-2 text-[13px] leading-snug text-paper/70 max-md:hidden">{f.body}</p>
+            <p className="mt-2 text-[13px] leading-snug text-paper/70 max-lg:hidden">{f.body}</p>
           </div>
         ))}
       </div>
