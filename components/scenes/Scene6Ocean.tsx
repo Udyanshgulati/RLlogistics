@@ -50,7 +50,14 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
           },
         });
 
-        tl.fromTo("[data-ship-cam]", { scale: 3.2, yPercent: 8 }, { scale: 0.34, yPercent: -22, duration: 10, ease: "power1.inOut" }, 0)
+        // Mobile: the ship shrinks earlier and sits higher, so the feature cards below never cover it.
+        const mobile = ctx.conditions.mobile;
+        tl.fromTo(
+          "[data-ship-cam]",
+          { scale: mobile ? 2.4 : 3.2, yPercent: 8 },
+          { scale: mobile ? 0.3 : 0.34, yPercent: mobile ? -60 : -22, duration: 10, ease: mobile ? "power2.out" : "power1.inOut" },
+          0,
+        )
           .fromTo("[data-water-near]", { scale: 2.4 }, { scale: 0.7, duration: 10, ease: "power1.inOut" }, 0)
           .fromTo("[data-water-far]", { scale: 1.8 }, { scale: 0.9, duration: 10, ease: "power1.inOut" }, 0)
           .fromTo("[data-ocean-blend]", { autoAlpha: 1 }, { autoAlpha: 0, duration: 1.2, ease: "power1.out" }, 0)
