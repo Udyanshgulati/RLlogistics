@@ -24,8 +24,8 @@ const SLOTS = [
   { y: 0.85, side: "right" },
 ] as const;
 
-/** On phones the heading takes the top third; milestones stack evenly in one column below it. */
-const slotY = (i: number, mobile: boolean) => (mobile ? 0.34 + i * 0.13 : SLOTS[i].y);
+/** On phones the heading takes the top third, so milestones are squeezed into the space below it. */
+const slotY = (y: number, mobile: boolean) => (mobile ? 0.36 + (y - 0.24) * 0.95 : y);
 
 export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
   const root = useRef<HTMLElement>(null);
@@ -46,7 +46,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
       const measure = () => {
         W = window.innerWidth;
         H = window.innerHeight;
-        mobile = W < 1024;
+        mobile = W < 768;
         cx = mobile ? W * 0.16 : W * 0.6;
         RW = mobile ? 74 : Math.min(190, W * 0.13);
         svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
@@ -85,7 +85,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
           scrollTrigger: {
             trigger: el,
             start: "top top",
-            end: ctx.conditions.mobile ? "+=280%" : "+=480%",
+            end: ctx.conditions.mobile ? "+=360%" : "+=480%",
             pin: true,
             scrub: 1,
             anticipatePin: 1,
@@ -98,8 +98,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
         });
 
         // Transition: giant curve → straight vertical strip.
-        // Phones start closer to the final framing so the screen isn't one big black curve.
-        tl.fromTo(state, { scale: ctx.conditions.mobile ? 2 : 4 }, { scale: 1, duration: 2, ease: "power3.out" }, 0)
+        tl.to(state, { scale: 1, duration: 2, ease: "power3.out" }, 0)
           .fromTo("[data-heading-wrap]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 1.7)
           .to(state, { curve: 0, duration: 2.2, ease: "power2.inOut" }, 0.3)
           .add(ghost.tl.tweenFromTo(0, ghost.tl.duration(), { duration: 1.2, ease: "none" }), 1.8)
@@ -109,7 +108,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
 
         // Each milestone reveals as the truck passes its y.
         SLOTS.forEach((slot, i) => {
-          const at = 2.4 + ((slotY(i, !!ctx.conditions?.mobile) + 0.3 - 0.12) / 1.22) * 7;
+          const at = 2.4 + ((slotY(slot.y, !!ctx.conditions?.mobile) + 0.3 - 0.12) / 1.22) * 7;
           const item = el.querySelector(`[data-milestone="${i}"]`);
           tl.fromTo(item!.querySelector("[data-connector]"), { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, at)
             .fromTo(item!.querySelector("[data-dot]"), { scale: 0 }, { scale: 1, duration: 0.2 }, at)
@@ -160,9 +159,9 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
         <TruckTop src={assets.truckTop} className="h-auto w-full" />
       </div>
 
-      <div data-heading-wrap className="absolute left-[calc(var(--road-x)+var(--road-w)/2+20px)] top-[14vh] z-10 lg:left-[clamp(140px,13vw,220px)]">
+      <div data-heading-wrap className="absolute left-[calc(var(--road-x)+var(--road-w)/2+20px)] top-[14vh] z-10 md:left-[clamp(140px,13vw,220px)]">
         <p className="eyebrow mb-4 text-steel">{road.eyebrow}</p>
-        <GhostHeading as="h2" lines={road.headline} mutedLines={[2]} mode="external" className="text-[clamp(1.6rem,7vw,3rem)] leading-[0.95] lg:text-[clamp(1.4rem,3.5vw,3.8rem)] lg:leading-[0.92]" />
+        <GhostHeading as="h2" lines={road.headline} mutedLines={[2]} mode="external" className="text-[clamp(1.4rem,3.5vw,3.8rem)] leading-[0.92]" />
         <span id="road-title" className="sr-only">
           {road.headline.join(" ")}
         </span>
@@ -176,25 +175,25 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
             key={m.title}
             data-milestone={i}
             className={cn(
-              "absolute top-[calc(var(--y-m)-10px)] z-10 flex items-start lg:top-[calc(var(--y-d)-10px)]",
+              "absolute top-[calc(var(--y-m)-10px)] z-10 flex items-start md:top-[calc(var(--y-d)-10px)]",
               // mobile: everything sits to the right of a road hugging the left edge
               "left-[calc(var(--road-x)+var(--road-w)/2)] right-gutter",
               right
-                ? "lg:left-[calc(var(--road-x)+var(--road-w)/2)] lg:right-auto"
-                : "lg:left-auto lg:right-[calc(100%-var(--road-x)+var(--road-w)/2)] lg:flex-row-reverse",
+                ? "md:left-[calc(var(--road-x)+var(--road-w)/2)] md:right-auto"
+                : "md:left-auto md:right-[calc(100%-var(--road-x)+var(--road-w)/2)] md:flex-row-reverse",
             )}
-            style={{ "--y-d": `${slot.y * 100}%`, "--y-m": `${slotY(i, true) * 100}%` } as React.CSSProperties}
+            style={{ "--y-d": `${slot.y * 100}%`, "--y-m": `${slotY(slot.y, true) * 100}%` } as React.CSSProperties}
           >
-            <span data-dot className="relative z-10 -ml-1 mt-[7px] h-2 w-2 shrink-0 rounded-full bg-brand lg:-mr-1 lg:ml-0" />
-            <span data-connector className={cn("mt-[10px] h-px w-6 shrink-0 bg-ink/40 lg:w-16", right ? "origin-left" : "origin-left lg:origin-right")} />
-            <div className={cn("max-w-[30ch] px-3", !right && "lg:text-right")}>
-              <span data-ms-in className={cn("mb-2 flex max-lg:hidden", !right && "lg:justify-end")}>
+            <span data-dot className="relative z-10 -ml-1 mt-[7px] h-2 w-2 shrink-0 rounded-full bg-brand md:-mr-1 md:ml-0" />
+            <span data-connector className={cn("mt-[10px] h-px w-6 shrink-0 bg-ink/40 md:w-16", right ? "origin-left" : "origin-left md:origin-right")} />
+            <div className={cn("max-w-[30ch] px-3", !right && "md:text-right")}>
+              <span data-ms-in className={cn("mb-2 flex", !right && "md:justify-end")}>
                 <Icon name={m.icon as IconName} className="h-6 w-6 text-ink" />
               </span>
-              <h3 data-ms-in className="display text-[16px] leading-tight lg:text-[15px]">
+              <h3 data-ms-in className="display text-[15px] leading-tight">
                 {m.title}
               </h3>
-              <p data-ms-in className="mt-1.5 text-[14px] leading-snug text-ink/65 lg:text-[13px] lg:text-ink/60 max-lg:hidden">
+              <p data-ms-in className="mt-1.5 text-[13px] leading-snug text-ink/60 max-md:hidden">
                 {m.body}
               </p>
             </div>

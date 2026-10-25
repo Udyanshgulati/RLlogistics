@@ -41,8 +41,8 @@ export function Scene1Hero() {
     const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { rootMargin: "100px" });
     io.observe(el);
     // Phones get the lightweight 2D canvas globe; decided once so the canvas isn't swapped mid-scroll.
-    setFlat(window.innerWidth < 1024);
-    const onResize = () => setOffsetX(window.innerWidth < 1024 ? 0 : window.innerWidth < 1100 ? 0.8 : 1.02);
+    setFlat(window.innerWidth < 768);
+    const onResize = () => setOffsetX(window.innerWidth < 768 ? 0 : window.innerWidth < 1100 ? 0.8 : 1.02);
     onResize();
     window.addEventListener("resize", onResize);
     return () => {
@@ -82,7 +82,7 @@ export function Scene1Hero() {
           scrollTrigger: {
             trigger: root.current,
             start: "top top",
-            end: ctx.conditions.desktop ? "+=150%" : "+=120%",
+            end: ctx.conditions.desktop ? "+=150%" : "+=110%",
             pin: true,
             scrub: 1,
             anticipatePin: 1,
@@ -109,17 +109,17 @@ export function Scene1Hero() {
   );
 
   return (
-    <section ref={root} data-scene="hero" data-nav-theme="dark" className="relative h-[100svh] overflow-hidden bg-ink text-paper max-lg:h-auto max-lg:min-h-[100svh]" aria-label="Introduction">
+    <section ref={root} data-scene="hero" data-nav-theme="dark" className="relative h-[100svh] overflow-hidden bg-ink text-paper" aria-label="Introduction">
       {/* Globe */}
       <div data-hero-globe className="absolute inset-0">
         {flat === true && <GlobeFlat progress={progress} active={inView && !submerged} onReady={onGlobeReady} />}
         {flat === false && <Globe progress={progress} active={inView && !submerged} offsetX={offsetX} onReady={onGlobeReady} />}
       </div>
       {/* Legibility gradient behind copy on small screens */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink via-ink/80 to-transparent landscape:inset-y-0 landscape:left-0 landscape:right-auto landscape:h-full landscape:w-2/3 landscape:bg-gradient-to-r lg:hidden" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink via-ink/70 to-transparent md:hidden" />
 
       {/* Copy */}
-      <div data-hero-copy className="relative z-10 flex h-full flex-col justify-end px-gutter pb-[clamp(28px,6vh,64px)] max-lg:min-h-[100svh] max-lg:pb-[calc(32px+var(--safe-b))] max-lg:pt-[96px] max-lg:landscape:max-w-[60%] lg:pl-[clamp(140px,13vw,220px)]">
+      <div data-hero-copy className="relative z-10 flex h-full flex-col justify-end px-gutter pb-[clamp(28px,6vh,64px)] md:pl-[clamp(140px,13vw,220px)]">
         <p data-hero-fade className="eyebrow mb-5 flex items-center gap-3 text-brand">
           <span aria-hidden className="h-px w-6 bg-brand" />
           {hero.eyebrow}
@@ -130,12 +130,12 @@ export function Scene1Hero() {
           mode="manual"
           play={done}
           delay={0.35}
-          className="text-[clamp(2.5rem,11vw,7.5rem)] leading-[0.95] tracking-[-0.02em] max-lg:landscape:text-[clamp(2rem,6vw,3.5rem)] lg:text-[clamp(2.6rem,6.2vw,7.5rem)] lg:leading-[0.9]"
+          className="text-[clamp(2.6rem,6.2vw,7.5rem)] leading-[0.9] tracking-[-0.02em]"
         />
-        <p data-hero-fade className="mt-5 max-w-[44ch] text-[15px] leading-relaxed text-paper/75 lg:mt-7 lg:text-paper/70">
+        <p data-hero-fade className="mt-7 max-w-[44ch] text-[15px] leading-relaxed text-paper/70">
           {hero.sub}
         </p>
-        <div data-hero-fade className="mt-6 flex flex-wrap gap-3 max-sm:flex-col max-sm:portrait:[&>a]:w-full max-sm:portrait:[&>a]:justify-between lg:mt-7">
+        <div data-hero-fade className="mt-7 flex flex-wrap gap-3">
           <Button href={hero.primary.href} variant="filled" tone="dark">
             {hero.primary.label}
           </Button>
@@ -146,7 +146,7 @@ export function Scene1Hero() {
       </div>
 
       {/* Bottom-right meta */}
-      <div data-hero-meta className="absolute bottom-[clamp(28px,6vh,64px)] right-gutter z-10 hidden flex-col items-end gap-2 lg:flex">
+      <div data-hero-meta className="absolute bottom-[clamp(28px,6vh,64px)] right-gutter z-10 hidden flex-col items-end gap-2 md:flex">
         <span data-hero-fade className="ui-label text-steel">
           {hero.coords}
         </span>

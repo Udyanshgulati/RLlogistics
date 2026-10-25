@@ -10,7 +10,7 @@
  *   npm run snap:mobile -- --path=/contact           # any page
  *
  * Output: snaps/mobile/<device>/NN.png + NN.json (checker results), snaps/mobile/<device>/swipe.webm,
- * snaps/mobile/contact-<device>.png, snaps/mobile/report.json.
+ * snaps/mobile/<device>-sheet.png, snaps/mobile/report.json.
  *
  * Note: Chromium with each device's viewport, DPR, UA and touch emulation. WebKit isn't installed here, so iOS
  * Safari-only behaviour (address-bar resize, rubber-banding, momentum feel) still needs a real-device check.
@@ -27,13 +27,16 @@ const STEPS = 20;
 type Device = { name: string; width: number; height: number; dpr: number; ua: string };
 const ua = (d: string) => devices[d].userAgent;
 const DEVICES: Device[] = [
-  { name: "iphone-13", width: 390, height: 844, dpr: 3, ua: ua("iPhone 13") },
-  { name: "iphone-se", width: 375, height: 667, dpr: 2, ua: ua("iPhone SE") },
-  { name: "pixel-7", width: 412, height: 915, dpr: 2.625, ua: ua("Pixel 7") },
   { name: "android-360", width: 360, height: 740, dpr: 3, ua: ua("Galaxy S9+") },
+  { name: "iphone-se", width: 375, height: 667, dpr: 2, ua: ua("iPhone SE") },
+  { name: "iphone-13", width: 390, height: 844, dpr: 3, ua: ua("iPhone 13") },
+  { name: "iphone-15-pro-max", width: 430, height: 932, dpr: 3, ua: ua("iPhone 15 Pro Max") },
+  { name: "pixel-7", width: 412, height: 915, dpr: 2.625, ua: ua("Pixel 7") },
   { name: "ipad-mini", width: 768, height: 1024, dpr: 2, ua: ua("iPad Mini") },
+  // Opt-in with --only: landscape phone.
   { name: "iphone-13-land", width: 844, height: 390, dpr: 3, ua: ua("iPhone 13 landscape") },
 ];
+const DEFAULT_DEVICES = DEVICES.slice(0, 6).map((d) => d.name);
 
 const args = process.argv.slice(2);
 const only = args.find((a) => a.startsWith("--only="))?.split("=")[1]?.split(",");
@@ -105,10 +108,24 @@ const CHECK = `(() => {
     return parseFloat(getComputedStyle(el).fontSize) < 14 && (el.innerText || "").trim().length > 24;
   }).slice(0, 10).map((el) => desc(el) + " " + getComputedStyle(el).fontSize);
 
-  return { scrollY: Math.round(scrollY), overflowX, scrollWidth: document.documentElement.scrollWidth, offenders, textOverflow, overlaps, taps, smallText };
+  // Globe: the hero canvas has painted pixels, or its fallback image is showing.
+  let globe = null;
+  const gw = document.querySelector("[data-m-globe]");
+  if (gw && inView(gw.getBoundingClientRect())) {
+    const c = gw.querySelector("canvas");
+    let painted = 0;
+    try { const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; for (let i = 3; i < d.length; i += 40) if (d[i] > 0) painted++; } catch (e) {}
+    const img = gw.querySelector("img");
+    globe = painted > 200 || (img && img.complete && img.naturalWidth > 0 && getComputedStyle(img).opacity !== "0");
+  }
+  // Blank screen: no visible text, image, svg or canvas anywhere in the viewport.
+  const content = [...document.querySelectorAll("h1,h2,h3,p,li,a,button,img,svg,canvas,blockquote")].filter((el) => visible(el) && inView(el.getBoundingClientRect())).length;
+  const triggers = typeof window.__M_TRIGGERS__ === "function" ? window.__M_TRIGGERS__() : null;
+  const desktopScenes = document.querySelectorAll("[data-scene]").length;
+  return { scrollY: Math.round(scrollY), overflowX, scrollWidth: document.documentElement.scrollWidth, offenders, textOverflow, overlaps, taps, smallText, globe, blank: content === 0, triggers, desktopScenes };
 })()`;
 
-type Check = { scrollY: number; overflowX: boolean; scrollWidth: number; offenders: string[]; textOverflow: string[]; overlaps: string[]; taps: string[]; smallText: string[] };
+type Check = { scrollY: number; overflowX: boolean; scrollWidth: number; offenders: string[]; textOverflow: string[]; overlaps: string[]; taps: string[]; smallText: string[]; globe: boolean | null; blank: boolean; triggers: number | null; desktopScenes: number };
 type Report = { device: string; path: string; console: string[]; pageErrors: string[]; longTasks: number[]; reached: number[]; checks: Check[] };
 
 const frames = (page: Page) => page.evaluate("new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))");
@@ -118,7 +135,7 @@ async function swipe(cdp: CDPSession, d: Device, dist: number, stepMs = 0) {
   const x = Math.round(d.width / 2);
   let y = dist > 0 ? Math.round(d.height * 0.85) : Math.round(d.height * 0.15);
   await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
-  const n = Math.max(1, Math.round(Math.abs(dist) / 20));
+  const n = Math.max(1, Math.round(Math.abs(dist) / (stepMs ? 20 : 60)));
   for (let k = 0; k < n; k++) {
     y -= dist / n;
     await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: Math.round(y) }] });
@@ -187,7 +204,7 @@ async function shoot(browser: Browser, d: Device) {
   }
   report.longTasks = (await page.evaluate("window.__longTasks")) as number[];
   await ctx.close();
-  await contactSheet(files, path.join(OUT, `contact-${d.name}.png`), d);
+  await contactSheet(files, path.join(OUT, `${d.name}-sheet.png`), d);
   return report;
 }
 
@@ -238,13 +255,14 @@ async function video(browser: Browser, d: Device) {
   const reportFile = path.join(OUT, "report.json");
   const prev: Report[] = fs.existsSync(reportFile) ? JSON.parse(fs.readFileSync(reportFile, "utf8")) : [];
   const reports = new Map(prev.map((r) => [r.device, r]));
-  for (const d of DEVICES.filter((x) => !only || only.includes(x.name))) {
+  for (const d of DEVICES.filter((x) => (only ? only.includes(x.name) : DEFAULT_DEVICES.includes(x.name)))) {
     console.log(`▶ ${d.name} (${d.width}×${d.height} @${d.dpr}x) ${pagePath}`);
     const r = await shoot(browser, d);
     if (withVideo) await video(browser, d);
     reports.set(d.name, r);
     const n = (k: keyof Check) => r.checks.filter((c) => (Array.isArray(c[k]) ? (c[k] as string[]).length : c[k])).length;
     console.log(
+      `  globe visible at top: ${r.checks[0]?.globe} · blank frames: ${r.checks.filter((c) => c.blank).length} · triggers: ${r.checks[0]?.triggers} · desktop scenes mounted: ${r.checks[0]?.desktopScenes}\n` +
       `  ${r.pageErrors.length} page errors · ${r.console.length} console · overflow-x in ${n("overflowX")}/21 · offenders ${n("offenders")} · text-overflow ${n("textOverflow")} · overlaps ${n("overlaps")} · small taps ${n("taps")} · small text ${n("smallText")} · long tasks >100ms: ${r.longTasks.filter((t) => t > 100).length}`,
     );
   }

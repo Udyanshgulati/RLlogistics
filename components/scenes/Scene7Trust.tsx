@@ -36,10 +36,8 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
         if (!ctx.conditions?.motion) return;
         const heading = buildRevealTl(el.querySelector<HTMLElement>("[data-trust-heading] [data-reveal]")!);
         heading.tl.pause(0);
-        const mobile = !!ctx.conditions.mobile;
         const items = gsap.utils.toArray<HTMLElement>("[data-testimonial]");
-        // Phones: testimonials are a swipe carousel with plain text, so no word split / scrub there.
-        const quotes = mobile ? [] : items.map((it) => SplitText.create(it.querySelector("[data-quote]")!, { type: "words", tag: "span", aria: "none" }));
+        const quotes = items.map((it) => SplitText.create(it.querySelector("[data-quote]")!, { type: "words", tag: "span", aria: "none" }));
         const list = el.querySelector<HTMLElement>("[data-list]")!;
 
         const tl = gsap.timeline({
@@ -47,7 +45,7 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
           scrollTrigger: {
             trigger: el,
             start: "top top",
-            end: ctx.conditions.mobile ? "+=300%" : "+=640%",
+            end: ctx.conditions.mobile ? "+=520%" : "+=640%",
             pin: true,
             scrub: 1,
             anticipatePin: 1,
@@ -82,7 +80,7 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
           .fromTo("[data-trust-intro], [data-list-wrap]", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.2 }, 2.8);
 
         // Testimonials: slide the list so the active one sits in view; scrub its words.
-        if (!mobile) items.forEach((item, i) => {
+        items.forEach((item, i) => {
           const at = 3.8 + i * 2.2;
           tl.to(list, { y: () => -item.offsetTop, duration: 0.8, ease: "power2.inOut" }, at)
             .to(items, { opacity: (j: number) => (j === i ? 1 : 0.2), duration: 0.6 }, at)
@@ -110,34 +108,30 @@ export function Scene7Trust({ assets = {} }: { assets?: AssetOverrides }) {
       aria-labelledby="trust-title"
     >
       {/* Plane — flies bottom-left → top-right and exits the frame */}
-      <div data-plane className="pointer-events-none invisible absolute left-0 top-0 z-30 w-[120vw] max-w-none origin-center group-[.is-static]/trust:hidden lg:w-[62vw]">
+      <div data-plane className="pointer-events-none invisible absolute left-0 top-0 z-30 w-[120vw] max-w-none origin-center group-[.is-static]/trust:hidden md:w-[62vw]">
         <PlaneTop src={assets.planeTop} className="h-auto w-full" />
       </div>
 
-      <div className="relative z-10 grid h-full gap-10 px-gutter pb-[8vh] pt-[16vh] lg:grid-cols-12 lg:pl-[clamp(140px,13vw,220px)]">
-        <div className="lg:col-span-6">
+      <div className="relative z-10 grid h-full gap-10 px-gutter pb-[8vh] pt-[16vh] md:grid-cols-12 md:pl-[clamp(140px,13vw,220px)]">
+        <div className="md:col-span-6">
           <p className="eyebrow mb-4 text-steel">{trust.eyebrow}</p>
           <div data-trust-heading id="trust-title">
-            <RevealHeading lines={trust.headline} mutedLines={[2]} mode="external" className="whitespace-nowrap text-[clamp(1.75rem,8vw,3rem)] leading-[0.95] lg:text-[clamp(1.9rem,3.4vw,3.6rem)] lg:leading-[0.92]" />
+            <RevealHeading lines={trust.headline} mutedLines={[2]} mode="external" className="whitespace-nowrap text-[clamp(1.9rem,3.4vw,3.6rem)] leading-[0.92]" />
           </div>
           <p data-trust-intro className="mt-6 max-w-[38ch] text-[14px] leading-relaxed text-ink/65">
             {trust.intro}
           </p>
         </div>
 
-        <div data-list-wrap className="relative overflow-hidden lg:col-span-6 lg:mt-[12vh] max-lg:-mx-gutter group-[.is-static]/trust:h-auto group-[.is-static]/trust:overflow-visible">
-          {/* Phones/tablets: one testimonial per swipe (scroll-snap). Desktop: vertical list driven by the pin. */}
-          <ul
-            data-list
-            className="flex flex-col gap-14 max-lg:snap-x max-lg:snap-mandatory max-lg:scroll-px-gutter max-lg:flex-row max-lg:gap-4 max-lg:overflow-x-auto max-lg:overscroll-x-contain max-lg:px-gutter max-lg:pb-2 max-lg:[scrollbar-width:none] max-lg:[&::-webkit-scrollbar]:hidden"
-          >
+        <div data-list-wrap className="relative overflow-hidden md:col-span-6 md:mt-[12vh] max-md:h-[46vh] group-[.is-static]/trust:h-auto group-[.is-static]/trust:overflow-visible">
+          <ul data-list className="flex flex-col gap-14">
             {testimonials.map((t) => (
-              <li key={t.name} data-testimonial className="grid content-start gap-5 max-lg:min-w-[86%] max-lg:snap-start sm:grid-cols-[150px_1fr] sm:max-lg:min-w-[70%]">
+              <li key={t.name} data-testimonial className="grid gap-5 sm:grid-cols-[150px_1fr]">
                 <div className="flex items-center gap-3 sm:flex-col sm:items-start">
                   <Avatar look={t.avatar} className="h-14 w-14 shrink-0 rounded-[2px] sm:h-[110px] sm:w-[110px]" />
                   <div>
-                    <p className="display text-[14px] leading-tight lg:text-[13px]">{t.name}</p>
-                    <p className="text-[14px] leading-snug text-ink/60 lg:text-[12px] lg:leading-[inherit] lg:text-ink/55">
+                    <p className="display text-[13px] leading-tight">{t.name}</p>
+                    <p className="text-[12px] text-ink/55">
                       {t.role}
                       <br />
                       {t.company}

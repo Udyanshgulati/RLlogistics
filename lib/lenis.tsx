@@ -16,6 +16,8 @@ export function LenisProvider({ children }: { children: ReactNode }) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     // Visual test harness (scripts/snap.ts) loads ?test=1 to scroll with exact, unsmoothed positions.
     if (new URLSearchParams(window.location.search).has("test")) return;
+    // Phones and tablets scroll natively (iOS momentum, no fighting the address bar); smoothing is desktop-only.
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
 
     // Smoothing only for wheel/trackpad; touch keeps native scrolling + iOS momentum.
     const instance = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true, syncTouch: false, touchMultiplier: 1 });

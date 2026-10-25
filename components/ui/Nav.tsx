@@ -24,6 +24,7 @@ export function Nav() {
   const { done } = useLoader();
   const [open, setOpen] = useState(false);
   const [folded, setFolded] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => setOpen(false), [pathname]);
@@ -33,6 +34,7 @@ export function Nav() {
     const probe = () => {
       raf = 0;
       setFolded(window.scrollY > 80);
+      setScrolled(window.scrollY > 8);
       const hit = document
         .elementsFromPoint(window.innerWidth / 2, 36)
         .find((el) => !root.current?.contains(el) && el.closest("[data-nav-theme]"));
@@ -128,8 +130,34 @@ export function Nav() {
 
   return (
     <header ref={root}>
+      {/* Phones/tablets: 64px bar, logo left, menu right; turns solid with a blur once the page scrolls. */}
+      <div
+        className={cn(
+          "fixed inset-x-0 top-0 z-50 flex h-[calc(64px+var(--safe-t))] items-end transition-colors duration-300 lg:hidden",
+          fg,
+          scrolled && !open && (theme === "dark" ? "bg-ink/80 backdrop-blur-md" : "bg-paper/85 backdrop-blur-md shadow-[0_1px_0_rgba(10,13,20,0.06)]"),
+        )}
+      >
+        <div className="flex h-16 w-full items-center justify-between pl-[calc(20px+var(--safe-l))] pr-[calc(12px+var(--safe-r))]">
+          <Logo className="origin-left scale-[0.9]" />
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="site-menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="relative z-[70] flex h-11 w-11 items-center justify-center rounded-full"
+          >
+            <span className="relative block h-3 w-6">
+              <span className={cn("absolute left-0 top-0 h-[1.5px] w-full bg-current transition-transform duration-300", open && "translate-y-[5px] rotate-45")} />
+              <span className={cn("absolute bottom-0 left-0 h-[1.5px] w-full bg-current transition-transform duration-300", open && "-translate-y-[5px] -rotate-45")} />
+            </span>
+          </button>
+        </div>
+      </div>
+
       {/* Logo + vertical nav */}
-      <div className={cn("pointer-events-none fixed inset-x-0 top-0 z-50 transition-colors duration-500", fg)}>
+      <div className={cn("pointer-events-none fixed inset-x-0 top-0 z-50 transition-colors duration-500 max-lg:hidden", fg)}>
         <div className="flex items-start p-gutter pt-[calc(var(--gutter)+var(--safe-t))] pl-[calc(var(--gutter)+var(--safe-l))] pr-[calc(var(--gutter)+var(--safe-r))]">
           <div data-nav-in className="pointer-events-auto">
             <Logo />
@@ -164,7 +192,7 @@ export function Nav() {
       </div>
 
       {/* Utility links, CTA, mobile menu toggle */}
-      <div className={cn("pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-end gap-3 p-gutter pt-[calc(var(--gutter)+var(--safe-t))] pl-[calc(var(--gutter)+var(--safe-l))] pr-[calc(var(--gutter)+var(--safe-r))] transition-colors duration-500", fg)}>
+      <div className={cn("pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-end gap-3 p-gutter max-lg:hidden pt-[calc(var(--gutter)+var(--safe-t))] pl-[calc(var(--gutter)+var(--safe-l))] pr-[calc(var(--gutter)+var(--safe-r))] transition-colors duration-500", fg)}>
         <div className="pointer-events-auto hidden h-10 items-center gap-1 lg:flex" data-nav-in>
           {utilityNav.map((item, i) => (
             <span key={item.href} className="flex items-center">

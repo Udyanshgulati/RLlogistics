@@ -53,6 +53,9 @@ export function Footer() {
           <a href={`mailto:${company.emailGeneral}`} className="mt-6 inline-block text-[15px] underline decoration-paper/30 underline-offset-4 hover:text-brand max-lg:mt-4 max-lg:inline-flex max-lg:min-h-11 max-lg:items-center">
             {company.emailGeneral}
           </a>
+          <a href={`mailto:${company.email}`} className="flex min-h-11 items-center text-[15px] text-paper/80 underline decoration-paper/30 underline-offset-4 lg:hidden">
+            {company.email}
+          </a>
           <a href={company.phoneHref} className="mt-2 block text-[14px] text-paper/60 hover:text-brand max-lg:mt-0 max-lg:flex max-lg:min-h-11 max-lg:items-center max-lg:text-[15px] max-lg:text-paper/80">
             {company.phone}
           </a>
