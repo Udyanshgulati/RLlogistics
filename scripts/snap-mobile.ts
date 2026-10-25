@@ -91,11 +91,25 @@ const CHECK = `(() => {
   // Content blocks only: the fixed header floats over content by design, so it is left out.
   const inFixed = (el) => { for (let p = el; p && p !== document.body; p = p.parentElement) if (getComputedStyle(p).position === "fixed") return true; return false; };
   const blocks = [...document.querySelectorAll("h1,h2,h3,p,a,button,img,[data-feature],li")].filter((el) => visible(el) && inView(el.getBoundingClientRect()) && !inFixed(el));
+  // Visible part of an element: its box intersected with every ancestor that clips overflow.
+  const shown = (el) => {
+    const r = el.getBoundingClientRect();
+    let l = r.left, t = r.top, rt = r.right, b = r.bottom;
+    for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+      const cs = getComputedStyle(p);
+      if (cs.overflow !== "visible" || cs.overflowX !== "visible" || cs.overflowY !== "visible") {
+        const q = p.getBoundingClientRect();
+        l = Math.max(l, q.left); t = Math.max(t, q.top); rt = Math.min(rt, q.right); b = Math.min(b, q.bottom);
+      }
+    }
+    return rt - l > 0 && b - t > 0 ? { left: l, top: t, right: rt, bottom: b, width: rt - l, height: b - t } : null;
+  };
   const overlaps = [];
   for (let i = 0; i < blocks.length; i++) for (let j = i + 1; j < blocks.length; j++) {
     const a = blocks[i], b = blocks[j];
     if (a.contains(b) || b.contains(a)) continue;
-    const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    const ra = shown(a), rb = shown(b);
+    if (!ra || !rb) continue;
     const ix = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left);
     const iy = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
     if (ix > 4 && iy > 4 && ix * iy > 0.15 * Math.min(ra.width * ra.height, rb.width * rb.height)) overlaps.push(desc(a) + "  ×  " + desc(b));
