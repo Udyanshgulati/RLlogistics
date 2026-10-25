@@ -7,6 +7,7 @@ import type { GlobeProgress } from "./Globe";
 
 type Props = { progress: MutableRefObject<GlobeProgress>; active: boolean; onReady?: () => void };
 
+const MOBILE_MARKERS = ["delhi", "mumbai", "chennai", "kolkata"];
 const DEG = Math.PI / 180;
 const DELHI = globeMarkers[0];
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -56,9 +57,11 @@ export default function GlobeFlat({ progress, active, onReady }: Props) {
       const plunge = smoothstep(0.38, 0.78, dive);
       const lat0 = lerp(globeRest.lat, DELHI.lat, swing) * DEG;
       const lng0 = (lerp(globeRest.lng, DELHI.lng, swing) + Math.sin(t / 8000) * 4 * (1 - swing)) * DEG;
-      const R = Math.min(w, h) * 0.56 * lerp(0.9, 1, intro) * lerp(1, 1.9, swing) * lerp(1, 6, plunge);
-      const cx = w / 2;
-      const cy = lerp(h * 0.3, h / 2, swing);
+      // Portrait: globe in the top ~55% above the copy. Landscape phones: globe on the right, copy on the left.
+      const land = w > h;
+      const R = Math.min(w, h) * (land ? 0.62 : 0.56) * lerp(0.9, 1, intro) * lerp(1, 1.9, swing) * lerp(1, 6, plunge);
+      const cx = lerp(land ? w * 0.74 : w / 2, w / 2, swing);
+      const cy = lerp(land ? h * 0.52 : h * 0.3, h / 2, swing);
       const alpha = intro * (1 - smoothstep(0.42, 0.6, dive));
       const sin0 = Math.sin(lat0);
       const cos0 = Math.cos(lat0);
@@ -87,8 +90,9 @@ export default function GlobeFlat({ progress, active, onReady }: Props) {
       // Markers
       const mAlpha = intro * (1 - smoothstep(0.04, 0.22, dive));
       if (mAlpha > 0.01) {
-        g.font = "500 9px ui-monospace, monospace";
-        for (const m of globeMarkers) {
+        g.font = "500 10px ui-monospace, monospace";
+        // Small screens keep Delhi + three Indian ports; the overseas labels would collide with the copy.
+        for (const m of globeMarkers.filter((m) => MOBILE_MARKERS.includes(m.id))) {
           const lat = m.lat * DEG;
           const dl = m.lng * DEG - lng0;
           const cosc = sin0 * Math.sin(lat) + cos0 * Math.cos(lat) * Math.cos(dl);
