@@ -20,24 +20,33 @@ function rng(seed: number) {
 /** Deep-water surface: soft swell bands + scattered white caustic glints. Tileable-ish, 1024². */
 export function waterTexture() {
   if (cache.has("water")) return cache.get("water")!;
-  const S = 512;
+  const S = 1024;
   const [c, g] = canvas(S, S);
   const r = rng(7);
   g.fillStyle = "#0a3a9e";
   g.fillRect(0, 0, S, S);
-  for (let i = 0; i < 40; i++) {
-    const x = r() * S, y = r() * S, rad = 60 + r() * 130;
+  for (let i = 0; i < 70; i++) {
+    const x = r() * S, y = r() * S, rad = 120 + r() * 260;
     const grd = g.createRadialGradient(x, y, 0, x, y, rad);
     const dark = r() > 0.5;
     grd.addColorStop(0, dark ? "rgba(4,30,110,0.5)" : "rgba(40,110,230,0.35)");
     grd.addColorStop(1, "rgba(0,0,0,0)");
     g.fillStyle = grd;
-    g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+    // Draw every blob at its wrapped copies too, so the tile repeats without visible seams (no "boxes").
+    for (const ox of [-S, 0, S])
+      for (const oy of [-S, 0, S]) {
+        if (x + ox + rad < 0 || x + ox - rad > S || y + oy + rad < 0 || y + oy - rad > S) continue;
+        g.save();
+        g.translate(ox, oy);
+        g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+        g.restore();
+      }
   }
   g.strokeStyle = "rgba(255,255,255,0.10)";
-  for (let i = 0; i < 450; i++) {
-    const x = r() * S, y = r() * S, len = 3 + r() * 13;
-    g.lineWidth = 0.5 + r() * 0.8;
+  for (let i = 0; i < 900; i++) {
+    const len = 6 + r() * 26;
+    const x = r() * (S - len), y = 8 + r() * (S - 16);
+    g.lineWidth = 0.6 + r() * 1.4;
     g.beginPath();
     g.moveTo(x, y);
     g.quadraticCurveTo(x + len / 2, y - 3 - r() * 4, x + len, y);
@@ -48,25 +57,42 @@ export function waterTexture() {
   return url;
 }
 
-/** A soft cloud bank built from layered radial puffs on a transparent canvas. */
-export function cloudTexture(seed: number, w = 900, h = 450) {
+/**
+ * A soft cloud bank built from layered radial puffs on a transparent canvas.
+ * Puffs stay inside a padded area and a final elliptical mask fades every edge to alpha 0,
+ * so the bank can never show a straight (clipped) edge when it is scaled or moved.
+ */
+export function cloudTexture(seed: number, w = 1600, h = 800) {
   const key = `cloud-${seed}-${w}x${h}`;
   if (cache.has(key)) return cache.get(key)!;
   const [c, g] = canvas(w, h);
   const r = rng(seed);
-  for (let i = 0; i < 90; i++) {
-    const x = w * (0.08 + r() * 0.84);
-    const y = h * (0.3 + r() * 0.45) - Math.sin((x / w) * Math.PI) * h * 0.12;
-    const rad = (50 + r() * 150) * (w / 1400);
+  const maxR = h * 0.2;
+  for (let i = 0; i < 110; i++) {
+    const rad = maxR * (0.35 + r() * 0.65);
+    const x = rad + w * 0.06 + r() * (w * 0.88 - rad * 2);
+    const y = h * 0.38 + (r() - 0.5) * h * 0.3 - Math.sin((x / w) * Math.PI) * h * 0.1;
     const grd = g.createRadialGradient(x, y - rad * 0.2, 0, x, y, rad);
     grd.addColorStop(0, "rgba(255,255,255,0.95)");
-    grd.addColorStop(0.55, "rgba(246,249,253,0.65)");
+    grd.addColorStop(0.55, "rgba(246,249,253,0.6)");
     grd.addColorStop(1, "rgba(220,230,245,0)");
     g.fillStyle = grd;
     g.beginPath();
     g.arc(x, y, rad, 0, Math.PI * 2);
     g.fill();
   }
+  // Feather all four edges to transparent.
+  g.globalCompositeOperation = "destination-in";
+  g.save();
+  g.translate(w / 2, h / 2);
+  g.scale(w / h, 1);
+  const mask = g.createRadialGradient(0, 0, h * 0.2, 0, 0, h * 0.5);
+  mask.addColorStop(0, "rgba(0,0,0,1)");
+  mask.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = mask;
+  g.fillRect(-h / 2, -h / 2, h, h);
+  g.restore();
+  g.globalCompositeOperation = "source-over";
   const url = c.toDataURL("image/png");
   cache.set(key, url);
   return url;
@@ -75,7 +101,9 @@ export function cloudTexture(seed: number, w = 900, h = 450) {
 /** White foam wake for the top-down ship (bow up): a V that fans out behind the stern. */
 export function wakeTexture() {
   if (cache.has("wake")) return cache.get("wake")!;
-  const [c, g] = canvas(600, 1600);
+  // Drawn in 600×1600 design units at 1.5× resolution so the wake stays crisp at the ship's close-up scale.
+  const [c, g] = canvas(900, 2400);
+  g.scale(1.5, 1.5);
   const r = rng(3);
   // One soft dot sprite, stamped many times — far cheaper than a canvas blur filter.
   const [dot, dg] = canvas(64, 64);
@@ -112,24 +140,27 @@ export function wakeTexture() {
 }
 
 /**
- * Runs `cb` once, in idle time, when `el` comes within ~2 screens of the viewport.
- * Keeps texture painting out of the initial page load.
+ * Runs the tasks once, each in its own idle callback, when `el` comes within ~2 screens of the viewport.
+ * Keeps texture painting out of the initial page load and splits it into short tasks.
  */
-export function whenNear(el: Element, cb: () => void) {
-  let done = false;
-  const run = () => {
-    if (done) return;
-    done = true;
-    const ric = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
-    if (ric) ric(cb, { timeout: 600 });
-    else setTimeout(cb, 1);
+export function whenNear(el: Element, tasks: Array<() => void>) {
+  let started = false;
+  const ric =
+    (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback ??
+    ((f: () => void) => window.setTimeout(f, 16));
+  const runFrom = (i: number) => {
+    if (i >= tasks.length) return;
+    ric(() => {
+      tasks[i]();
+      runFrom(i + 1);
+    }, { timeout: 800 });
   };
   const io = new IntersectionObserver(
     (entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        io.disconnect();
-        run();
-      }
+      if (started || !entries.some((e) => e.isIntersecting)) return;
+      started = true;
+      io.disconnect();
+      runFrom(0);
     },
     { rootMargin: "200% 0px" },
   );

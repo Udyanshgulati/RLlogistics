@@ -23,11 +23,14 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
       const el = root.current!;
       // Paint the procedural textures once, in idle time, as the scene approaches.
       const clouds = [assets.cloud1, assets.cloud2, assets.cloud3];
-      const stopNear = whenNear(el, () => {
-        el.querySelectorAll<HTMLElement>("[data-water]").forEach((w) => (w.style.backgroundImage = `url(${waterTexture()})`));
-        el.querySelector<HTMLImageElement>("[data-wake]")!.src = wakeTexture();
-        el.querySelectorAll<HTMLImageElement>("[data-cloud]").forEach((c, i) => (c.src = clouds[i] ?? cloudTexture(11 + i * 7)));
-      });
+      const stopNear = whenNear(el, [
+        () => el.querySelectorAll<HTMLElement>("[data-water]").forEach((w) => (w.style.backgroundImage = `url(${waterTexture()})`)),
+        () => (el.querySelector<HTMLImageElement>("[data-wake]")!.src = wakeTexture()),
+        ...[0, 1, 2].map((i) => () => {
+          const img = el.querySelector<HTMLImageElement>(`[data-cloud='${i}']`);
+          if (img) img.src = clouds[i] ?? cloudTexture(11 + i * 7);
+        }),
+      ]);
 
       const mm = gsap.matchMedia();
       mm.add({ motion: MQ.motion, mobile: MQ.mobile }, (ctx) => {
@@ -50,6 +53,7 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
         tl.fromTo("[data-ship-cam]", { scale: 3.2, yPercent: 8 }, { scale: 0.34, yPercent: -22, duration: 10, ease: "power1.inOut" }, 0)
           .fromTo("[data-water-near]", { scale: 2.4 }, { scale: 0.7, duration: 10, ease: "power1.inOut" }, 0)
           .fromTo("[data-water-far]", { scale: 1.8 }, { scale: 0.9, duration: 10, ease: "power1.inOut" }, 0)
+          .fromTo("[data-ocean-blend]", { autoAlpha: 1 }, { autoAlpha: 0, duration: 1.2, ease: "power1.out" }, 0)
           // heading over the ship
           .add(ghost.tl.tweenFromTo(0, ghost.tl.duration(), { duration: 1.4 }), 1.6)
           .to("[data-ocean-heading]", { yPercent: -160, autoAlpha: 0, duration: 1.6, ease: "power1.in" }, 3.6)
@@ -61,14 +65,13 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
             4.2,
           )
           .fromTo("[data-feature-ghost]", { autoAlpha: 0.55, y: 22 }, { autoAlpha: 0, y: 0, duration: 0.9, stagger: 0.35 }, 4.2)
-          .to("[data-feature]", { autoAlpha: 0, y: -30, duration: 0.6, stagger: 0.1 }, 7)
-          // clouds roll in from the edges and close over the frame
-          .fromTo("[data-cloud='0']", { autoAlpha: 0, xPercent: -80, yPercent: -30, scale: 1.4 }, { autoAlpha: 0.95, xPercent: -10, yPercent: -10, scale: 1, duration: 2.6, ease: "power1.out" }, 7.2)
-          .fromTo("[data-cloud='1']", { autoAlpha: 0, xPercent: 80, yPercent: 20, scale: 1.4 }, { autoAlpha: 0.95, xPercent: 5, yPercent: 0, scale: 1, duration: 2.6, ease: "power1.out" }, 7.4)
-          .fromTo("[data-cloud='2']", { autoAlpha: 0, yPercent: 90, scale: 1.6 }, { autoAlpha: 0.95, yPercent: 10, scale: 1.1, duration: 2.6, ease: "power1.out" }, 7.6)
-          .fromTo("[data-sky]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.6 }, 8.6)
-          // Hold on sky so scrub lag never shows a seam at the hand-off to the plane.
-          .to({}, { duration: 1 });
+          .to("[data-feature]", { autoAlpha: 0, y: -30, duration: 0.6, stagger: 0.1 }, 6.6)
+          // Clouds roll in from the edges while the ship is still visible below them (scale ≤ 1.15 keeps them crisp)
+          .fromTo("[data-cloud='0']", { autoAlpha: 0, xPercent: -70, yPercent: -25, scale: 1.15 }, { autoAlpha: 0.95, xPercent: -10, yPercent: -10, scale: 1, duration: 2.2, ease: "power1.out" }, 6.9)
+          .fromTo("[data-cloud='1']", { autoAlpha: 0, xPercent: 70, yPercent: 15, scale: 1.15 }, { autoAlpha: 0.95, xPercent: 5, yPercent: 0, scale: 1, duration: 2.2, ease: "power1.out" }, 7.1)
+          .fromTo("[data-cloud='2']", { autoAlpha: 0, yPercent: 80, scale: 1.15 }, { autoAlpha: 0.95, yPercent: 10, scale: 1, duration: 2.2, ease: "power1.out" }, 7.3)
+          // Sky closes exactly as the ship's zoom-out ends, so the frame hands off to the plane without a hold.
+          .fromTo("[data-sky]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.1 }, 8.9);
 
         return () => ghost.restore();
       });
@@ -92,10 +95,13 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
       <div data-water-far data-water className={cn("absolute -inset-1/2 animate-[drift_60s_linear_infinite] bg-[length:1024px] bg-[#0a3a9e] opacity-70", assets.ocean && "hidden")} />
       <div data-water-near data-water className={cn("absolute -inset-1/2 animate-[drift_40s_linear_infinite_reverse] bg-[length:760px] opacity-40", assets.ocean && "hidden")} />
       <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(3,20,70,0.55)_100%)]" />
+      {/* Matches the road's blue tint so the hand-off has no seam; fades once the pin starts. */}
+      <div data-ocean-blend aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[70%] bg-[linear-gradient(to_bottom,#0a3a9e_25%,rgba(10,58,158,0))] motion-reduce:hidden" />
+      <div aria-hidden className="grain pointer-events-none absolute inset-0 opacity-[0.06]" />
 
       {/* Ship + wake */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div data-ship-cam className="relative w-[clamp(84px,15vw,230px)] will-change-transform">
+        <div data-ship-cam className="relative w-[clamp(84px,15vw,230px)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img data-wake alt="" className="absolute left-1/2 top-[-6%] w-[250%] max-w-none -translate-x-1/2" />
           <ShipTop src={assets.shipTop} className="relative h-auto w-full drop-shadow-[0_18px_30px_rgba(0,10,40,0.45)]" />
@@ -116,9 +122,16 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
       </div>
 
       {/* Features: two left, two right of the ship */}
-      <div className="absolute inset-0 z-10 grid grid-cols-2 content-center gap-x-[min(34vw,520px)] gap-y-[14vh] px-gutter max-md:gap-x-[96px] max-md:content-end max-md:pb-[8vh]">
+      <div className="absolute inset-0 z-10 grid grid-cols-2 content-center gap-x-[min(34vw,520px)] gap-y-[14vh] px-gutter max-md:gap-x-3 max-md:gap-y-3 max-md:content-end max-md:pb-[6vh]">
         {ocean.features.map((f, i) => (
-          <div key={f.title} data-feature className={cn("relative max-w-[28ch] opacity-0 motion-reduce:opacity-100", i % 2 === 0 ? "justify-self-end text-right" : "justify-self-start")}>
+          <div
+            key={f.title}
+            data-feature
+            className={cn(
+              "relative max-w-[28ch] opacity-0 motion-reduce:opacity-100 max-md:rounded-[4px] max-md:bg-[#041e5e]/75 max-md:p-3",
+              i % 2 === 0 ? "justify-self-end text-right" : "justify-self-start",
+            )}
+          >
             <div className={cn("relative mb-3 inline-block", i % 2 === 0 && "ml-auto")}>
               <Icon name={f.icon as IconName} className="h-7 w-7" />
             </div>
