@@ -82,7 +82,7 @@ export function Scene1Hero() {
           scrollTrigger: {
             trigger: root.current,
             start: "top top",
-            end: ctx.conditions.desktop ? "+=180%" : "+=120%",
+            end: ctx.conditions.desktop ? "+=150%" : "+=110%",
             pin: true,
             scrub: 1,
             anticipatePin: 1,
@@ -97,15 +97,12 @@ export function Scene1Hero() {
         // 0 → 0.4: copy lifts and fades
         tl.to("[data-hero-copy]", { yPercent: -18, autoAlpha: 0, duration: 0.36, ease: "power1.in" }, 0)
           .to("[data-hero-meta]", { autoAlpha: 0, duration: 0.2 }, 0)
-          // 0.4 → 0.7: entering the atmosphere
-          // 0.4 → 0.62: land dots dissolve as we fall through them
-          .fromTo("[data-hero-globe]", { filter: "blur(0px)" }, { filter: "blur(14px)", duration: 0.2, ease: "power1.in" }, 0.4)
-          .set("[data-hero-globe]", { filter: "none" }, 0.75)
+          // 0.4 → 0.7: entering the atmosphere (the land dots fade out in their shader — no CSS blur on the canvas wrapper)
           .fromTo("[data-atmos]", { autoAlpha: 0, scale: 1.15 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "power1.inOut" }, 0.42)
           // 0.7 → 1: haze whitens into paper
           .fromTo("[data-haze]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.24, ease: "power1.inOut" }, 0.72)
-          // Hold on paper so scrub lag never shows a seam at the hand-off.
-          .to({}, { duration: 0.1 });
+          // Brief hold on paper so scrub lag never shows a seam at the hand-off.
+          .to({}, { duration: 0.03 });
       });
     },
     { scope: root },
@@ -168,9 +165,12 @@ export function Scene1Hero() {
         className="pointer-events-none invisible absolute inset-0 z-20 opacity-0"
         style={{
           background:
-            "linear-gradient(to bottom, rgb(var(--ocean)) 0%, rgb(var(--ocean-bright)) 22%, rgb(150 185 255) 48%, rgb(var(--paper)) 82%)",
+            "linear-gradient(to bottom, rgb(var(--ocean)) 0%, rgb(20 80 215) 11%, rgb(var(--ocean-bright)) 22%, rgb(88 142 255) 35%, rgb(150 185 255) 48%, rgb(200 216 250) 65%, rgb(var(--paper)) 82%)",
         }}
-      />
+      >
+        {/* Grain dithers the gradient so it doesn't band into stripes */}
+        <div className="grain absolute inset-0 opacity-[0.05]" />
+      </div>
       <div data-haze aria-hidden className="pointer-events-none invisible absolute inset-0 z-20 bg-paper opacity-0" />
     </section>
   );

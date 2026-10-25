@@ -162,6 +162,19 @@ function Stars({ opacity }: { opacity: MutableRefObject<number> }) {
     g.setAttribute("position", new THREE.BufferAttribute(arr, 3));
     return g;
   }, []);
+  // Soft round sprite — plain PointsMaterial draws square points.
+  const sprite = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const g = c.getContext("2d")!;
+    const grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grd.addColorStop(0, "rgba(255,255,255,1)");
+    grd.addColorStop(0.4, "rgba(255,255,255,0.6)");
+    grd.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = grd;
+    g.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(c);
+  }, []);
 
   useFrame((_, dt) => {
     const p = ref.current;
@@ -172,7 +185,7 @@ function Stars({ opacity }: { opacity: MutableRefObject<number> }) {
 
   return (
     <points ref={ref} geometry={geometry}>
-      <pointsMaterial size={0.025} sizeAttenuation color="#c9d2e6" transparent depthWrite={false} />
+      <pointsMaterial size={0.05} sizeAttenuation color="#c9d2e6" map={sprite} transparent depthWrite={false} />
     </points>
   );
 }
@@ -349,7 +362,7 @@ export default function Globe({ progress, active, onReady, offsetX = 1 }: Props)
       <Canvas
         flat
         frameloop={active ? "always" : "never"}
-        dpr={[1, 1.75]}
+        dpr={[1, 2]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         camera={{ fov: 35, near: 0.01, far: 100, position: [0, 0, 3.8] }}
       >
@@ -364,7 +377,7 @@ export default function Globe({ progress, active, onReady, offsetX = 1 }: Props)
           <div
             key={m.id}
             ref={(el) => void (labels.current[i] = el)}
-            className="absolute left-0 top-0 opacity-0 will-change-transform"
+            className="absolute left-0 top-0 opacity-0"
           >
             <div className={m.side === "left" ? "absolute bottom-0 right-0 flex items-end" : "absolute bottom-0 left-0 flex items-end"}>
               {m.side === "left" && <MarkerText label={m.label} sub={m.sub} hub={"hub" in m} align="right" />}
