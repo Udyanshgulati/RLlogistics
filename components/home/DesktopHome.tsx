@@ -8,11 +8,13 @@ import { Scene6Ocean } from "@/components/scenes/Scene6Ocean";
 import { Scene7Trust } from "@/components/scenes/Scene7Trust";
 import { Scene8Cta } from "@/components/scenes/Scene8Cta";
 import type { AssetOverrides } from "@/lib/asset-slots";
+import { JourneyRoute } from "./JourneyRoute";
 
 /** The cinematic desktop journey (≥ 1024px), unchanged. */
 export default function DesktopHome({ assets }: { assets: AssetOverrides }) {
   return (
     <>
+      <JourneyRoute />
       <Scene1Hero />
       <Scene2About assets={assets} />
       {/* Scene 3 (yard) also carries Scene 4 (services) inside its dark panel. */}

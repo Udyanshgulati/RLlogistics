@@ -4,8 +4,19 @@ import { cn } from "@/lib/cn";
 
 /** Phone design system primitives: one gutter (px-5), one type scale, full-width 52px buttons. */
 
-export function MEyebrow({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <p className={cn("font-mono text-[12px] uppercase leading-none tracking-[0.1em]", className)}>{children}</p>;
+/** Section label. `node` adds the RL route marker (amber stop + dashed lane) in front of it. */
+export function MEyebrow({ children, className, node = false }: { children: React.ReactNode; className?: string; node?: boolean }) {
+  return (
+    <p className={cn("flex items-center gap-2.5 font-mono text-[12px] uppercase leading-none tracking-[0.1em]", className)}>
+      {node && (
+        <span aria-hidden className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full border-2 border-brand" />
+          <span className="h-[2px] w-6 bg-[repeating-linear-gradient(90deg,rgb(var(--brand))_0_5px,transparent_5px_9px)]" />
+        </span>
+      )}
+      {children}
+    </p>
+  );
 }
 
 /** Display heading with hand-set lines (one block per line, never broken mid-word). */

@@ -68,7 +68,7 @@ export const ocean = {
 } as const;
 
 export const trust = {
-  eyebrow: "RLWU 04 · Clients",
+  eyebrow: "RLWU 05 · Clients",
   headline: ["Chosen by", "brands that", "can't wait."],
   intro: "From first-time importers to national retail chains, our clients stay because we treat their cargo like our own.",
 };

@@ -10,11 +10,10 @@ import { homeServices } from "@/content/services";
 import { testimonials, clientLogos } from "@/content/testimonials";
 import { company } from "@/content/company";
 import type { AssetOverrides } from "@/lib/asset-slots";
-import { waterTexture, wakeTexture, whenNear } from "@/lib/textures";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Avatar } from "@/components/ui/Avatar";
 import { TruckTop } from "@/components/illustrations/TruckTop";
-import { ShipTop } from "@/components/illustrations/ShipTop";
+import { PortTerminal } from "@/components/illustrations/PortTerminal";
 import { PlaneTop } from "@/components/illustrations/PlaneTop";
 import { MobileGlobe } from "./MobileGlobe";
 import { MobileYard } from "./MobileYard";
@@ -100,7 +99,11 @@ export function MobileHome({ assets = {} }: { assets?: AssetOverrides }) {
         );
 
         // Ocean: ship glides up through the frame; plane crosses the sky band diagonally.
-        gsap.fromTo("[data-m-ship]", { yPercent: 8 }, { yPercent: -8, ease: "none", scrollTrigger: { trigger: "[data-m-ocean]", start: "top bottom", end: "bottom top", scrub: true } });
+        // Port: trucks run the lane, crane trolleys shuttle, the route to Delhi draws in, all tied to scroll.
+        const port = { trigger: "[data-m-ocean]", start: "top bottom", end: "bottom top", scrub: 0.6 };
+        gsap.fromTo("[data-m-ocean] [data-truck]", { x: -200 }, { x: 260, ease: "none", stagger: 0.05, scrollTrigger: port });
+        gsap.fromTo("[data-m-ocean] [data-trolley]", { y: 0 }, { y: 250, ease: "sine.inOut", stagger: 0.15, scrollTrigger: port });
+        gsap.fromTo("[data-m-ocean] [data-route]", { strokeDashoffset: 1 }, { strokeDashoffset: 0, ease: "none", scrollTrigger: port });
         gsap.fromTo(
           "[data-m-plane]",
           { xPercent: -120, yPercent: 60, rotate: -28 },
@@ -112,13 +115,6 @@ export function MobileHome({ assets = {} }: { assets?: AssetOverrides }) {
         ScrollTrigger.refresh();
         (window as Window & { __M_TRIGGERS__?: () => number }).__M_TRIGGERS__ = () => ScrollTrigger.getAll().length;
       });
-
-      // Ocean textures are generated only when the section gets close.
-      const ocean = el.querySelector<HTMLElement>("[data-m-ocean]")!;
-      return whenNear(ocean, [
-        () => (ocean.querySelector<HTMLElement>("[data-m-water]")!.style.backgroundImage = `url(${waterTexture()})`),
-        () => (ocean.querySelector<HTMLImageElement>("[data-m-wake]")!.src = wakeTexture()),
-      ]);
     },
     { scope: root },
   );
@@ -130,7 +126,7 @@ export function MobileHome({ assets = {} }: { assets?: AssetOverrides }) {
       <MobileYard assets={assets} />
       <Services />
       <Road truckTop={assets.truckTop} />
-      <Ocean shipTop={assets.shipTop} />
+      <Ocean />
       <section data-m-sky aria-hidden className="relative h-[60svh] overflow-hidden bg-[linear-gradient(to_bottom,#0a2a7a,#7ea2e6_45%,rgb(var(--paper)))]">
         <div data-m-plane className="absolute left-0 top-1/2 w-[78vw]">
           <PlaneTop src={assets.planeTop} className="h-auto w-full" />
@@ -197,7 +193,7 @@ function About({ heroRoad }: { heroRoad?: string }) {
         <img src={heroRoad ?? "/assets/hero-road.jpg"} alt={about.imageAlt} loading="lazy" className="h-full w-full object-cover" />
         <span className="absolute bottom-3 left-3 font-mono text-[12px] uppercase tracking-[0.1em] text-paper/90">NH-48 · Gurugram</span>
       </div>
-      <MEyebrow className="mt-12 text-steel">{about.eyebrow}</MEyebrow>
+      <MEyebrow node className="mt-12 text-steel">{about.eyebrow}</MEyebrow>
       <MHeading id="m-about" lines={mobileHeadlines.about} muted={[2]} className="mt-5" />
       <p data-m-reveal className="mt-5 text-[16px] leading-[1.55] text-ink/75">
         {about.paragraphs[0]}
@@ -232,7 +228,7 @@ function Services() {
   return (
     <section data-nav-theme="dark" aria-labelledby="m-services" className="bg-ink py-24 text-paper">
       <div className="px-5">
-        <MEyebrow className="text-brand">{servicesSection.eyebrow}</MEyebrow>
+        <MEyebrow node className="text-brand">{servicesSection.eyebrow}</MEyebrow>
         <MHeading id="m-services" lines={mobileHeadlines.services} muted={[2]} className="mt-5" />
         <p data-m-reveal className="mt-5 text-[16px] leading-[1.55] text-paper/70">
           {mobileCopy.services}
@@ -246,7 +242,7 @@ function Services() {
       >
         {homeServices.map((s, i) => (
           <li key={s.title} className="w-[82vw] max-w-[420px] shrink-0 snap-start">
-            <Link href={s.href} className="flex h-full flex-col rounded-2xl border border-paper/15 bg-paper/[0.04] p-5">
+            <Link href={s.href} className="corner-cast flex h-full flex-col rounded-2xl border border-paper/15 bg-paper/[0.04] p-5">
               <span className="font-mono text-[12px] uppercase tracking-[0.1em] text-steel">{String(i + 1).padStart(2, "0")}</span>
               <Icon name={s.icon} className="mt-4 h-8 w-8 text-paper" />
               <span className="mt-4 text-[18px] font-semibold leading-snug">{s.title}</span>
@@ -268,7 +264,7 @@ function Services() {
 function Road({ truckTop }: { truckTop?: string }) {
   return (
     <section data-nav-theme="light" aria-labelledby="m-road" className="bg-paper px-5 py-24 text-ink">
-      <MEyebrow className="text-steel">{road.eyebrow}</MEyebrow>
+      <MEyebrow node className="text-steel">{road.eyebrow}</MEyebrow>
       <MHeading id="m-road" lines={mobileHeadlines.road} muted={[2]} className="mt-5" />
       <p data-m-reveal className="mt-5 text-[16px] leading-[1.55] text-ink/70">
         {mobileCopy.road}
@@ -295,25 +291,26 @@ function Road({ truckTop }: { truckTop?: string }) {
   );
 }
 
-function Ocean({ shipTop }: { shipTop?: string }) {
+function Ocean() {
   return (
-    <section data-m-ocean data-nav-theme="dark" aria-labelledby="m-ocean" className="bg-[#0a2a7a] text-paper">
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#0a3a9e]">
-        <div data-m-water aria-hidden className="absolute -inset-[10%] animate-[drift_60s_linear_infinite] bg-[length:640px] opacity-80 motion-reduce:animate-none" />
-        <div data-m-ship aria-hidden className="absolute left-1/2 top-[50%] w-[26%] -translate-x-1/2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img data-m-wake alt="" className="absolute left-1/2 top-[-4%] w-[250%] max-w-none -translate-x-1/2" />
-          <ShipTop src={shipTop} className="relative h-auto w-full drop-shadow-[0_14px_24px_rgba(0,10,40,0.45)]" />
-        </div>
-        {/* Headline over the footage, on a dark gradient for contrast. */}
-        <div className="absolute inset-x-0 top-0 bg-[linear-gradient(to_bottom,rgba(4,20,70,0.9),rgba(4,20,70,0.7)_65%,transparent)] px-5 pb-16 pt-24">
+    <section data-m-ocean data-nav-theme="dark" aria-labelledby="m-ocean" className="bg-ink text-paper">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#0b3aa8]">
+        {/* Terminal from above, cropped to the cranes and the berth. */}
+        <PortTerminal className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" />
+        <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-[linear-gradient(to_top,rgb(var(--ink)),transparent)]" />
+        {/* Headline over the water, on a navy gradient for contrast. */}
+        <div className="absolute inset-x-0 top-0 bg-[linear-gradient(to_bottom,rgba(11,31,77,0.92),rgba(11,31,77,0.7)_65%,transparent)] px-5 pb-16 pt-24">
+          <MEyebrow node className="mb-5 text-brand">RLWU 04 · Port &amp; ocean</MEyebrow>
           <MHeading id="m-ocean" lines={mobileHeadlines.ocean} muted={[1]} />
         </div>
       </div>
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-8 px-5 py-16">
+      <p data-m-reveal className="px-5 pt-8 text-[16px] leading-[1.55] text-paper/75">
+        Cleared at JNPT or Mundra, on our trucks the same day, in your Delhi NCR warehouse inside 36 hours.
+      </p>
+      <ul className="grid grid-cols-2 gap-3 px-5 pb-16 pt-8">
         {ocean.features.map((f) => (
-          <li key={f.title} data-m-reveal>
-            <Icon name={f.icon as IconName} className="h-7 w-7" />
+          <li key={f.title} data-m-reveal className="corner-cast rounded-[10px] bg-paper/[0.05] p-4 ring-1 ring-paper/10">
+            <Icon name={f.icon as IconName} className="h-6 w-6 text-brand" />
             <h3 className="mt-3 text-[16px] font-semibold leading-snug">{f.title}</h3>
             <p className="mt-1.5 text-[14px] leading-[1.5] text-paper/70">{f.body}</p>
           </li>
@@ -329,7 +326,7 @@ function Testimonials() {
   return (
     <section data-nav-theme="light" aria-labelledby="m-trust" className="bg-paper py-24 text-ink">
       <div className="px-5">
-        <MEyebrow className="text-steel">{trust.eyebrow}</MEyebrow>
+        <MEyebrow node className="text-steel">{trust.eyebrow}</MEyebrow>
         <MHeading id="m-trust" lines={mobileHeadlines.trust} muted={[2]} className="mt-5" />
         <p data-m-reveal className="mt-5 text-[16px] leading-[1.55] text-ink/70">
           {trust.intro}
@@ -342,7 +339,7 @@ function Testimonials() {
       >
         {testimonials.map((t, i) => (
           <li key={t.name} className="w-[86vw] max-w-[440px] shrink-0 snap-start">
-            <figure className="flex h-full flex-col rounded-2xl bg-white p-5 ring-1 ring-ink/5">
+            <figure className="corner-cast flex h-full flex-col rounded-2xl bg-white p-5 ring-1 ring-ink/5">
               <figcaption className="flex items-center gap-4">
                 <Avatar look={t.avatar} className="h-14 w-14 shrink-0 rounded-xl" />
                 <span className="min-w-0">
@@ -380,7 +377,7 @@ function Testimonials() {
 function Cta() {
   return (
     <section data-nav-theme="light" aria-labelledby="m-cta" className="border-t border-ink/10 bg-paper px-5 py-24 text-ink">
-      <MEyebrow className="text-steel">RLWU 05 · Next shipment</MEyebrow>
+      <MEyebrow node className="text-steel">RLWU 06 · Next shipment</MEyebrow>
       <MHeading id="m-cta" lines={mobileHeadlines.cta} className="mt-5" />
       <p data-m-reveal className="mt-5 text-[16px] leading-[1.55] text-ink/70">
         {cta.sub}

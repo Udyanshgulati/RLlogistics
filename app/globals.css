@@ -107,3 +107,19 @@
   from { background-position: 0 0; }
   to { background-position: 0 40px; }
 }
+
+/* Container corner castings: amber L-marks on two opposite corners of a card (RL motif). */
+@layer utilities {
+  .corner-cast { position: relative; }
+  .corner-cast::before,
+  .corner-cast::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+    border-color: rgb(var(--brand));
+  }
+  .corner-cast::before { top: 6px; left: 6px; border-top: 2px solid; border-left: 2px solid; border-color: rgb(var(--brand)); }
+  .corner-cast::after { bottom: 6px; right: 6px; border-bottom: 2px solid; border-right: 2px solid; border-color: rgb(var(--brand)); }
+}

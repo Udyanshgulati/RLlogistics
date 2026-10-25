@@ -19,6 +19,7 @@ import { cn } from "@/lib/cn";
  */
 export function Nav() {
   const root = useRef<HTMLElement>(null);
+  const routeFill = useRef<HTMLSpanElement>(null);
   const pathname = usePathname();
   const lenis = useLenis();
   const { done } = useLoader();
@@ -35,6 +36,8 @@ export function Nav() {
       raf = 0;
       setFolded(window.scrollY > 80);
       setScrolled(window.scrollY > 8);
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (routeFill.current) routeFill.current.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
       const hit = document
         .elementsFromPoint(window.innerWidth / 2, 36)
         .find((el) => !root.current?.contains(el) && el.closest("[data-nav-theme]"));
@@ -138,6 +141,8 @@ export function Nav() {
           scrolled && !open && (theme === "dark" ? "bg-ink/80 backdrop-blur-md" : "bg-paper/85 backdrop-blur-md shadow-[0_1px_0_rgba(11,31,77,0.06)]"),
         )}
       >
+        {/* Route progress: an amber lane marking that fills along the bottom edge as you travel the page. */}
+        <span aria-hidden ref={routeFill} className="absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-[repeating-linear-gradient(90deg,rgb(var(--brand))_0_14px,transparent_14px_22px)]" />
         <div className="flex h-16 w-full items-center justify-between pl-[calc(20px+var(--safe-l))] pr-[calc(12px+var(--safe-r))]">
           <Logo className="origin-left scale-[0.9]" />
           <button

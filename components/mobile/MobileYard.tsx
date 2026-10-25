@@ -142,7 +142,7 @@ export function MobileYard({ assets = {} }: { assets?: { stackerBody?: string; s
 
   return (
     <section ref={root} data-nav-theme="light" className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-paper px-5 pb-12 pt-24 text-ink">
-      <MEyebrow className="mb-5 text-steel">Container yard · ICD Tughlakabad</MEyebrow>
+      <MEyebrow node className="mb-5 text-steel">Container yard · ICD Tughlakabad</MEyebrow>
       <MHeading lines={mobileHeadlines.yard} muted={[2]} />
       <p className="mt-5 text-[16px] leading-[1.55] text-ink/70">{mobileCopy.yard}</p>
       {/* Scene: frames the stacker and the 17.6 m rig at their real proportions, ~92vw wide. */}
