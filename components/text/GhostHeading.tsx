@@ -130,7 +130,7 @@ export function GhostHeading({
     <Tag ref={ref} className={cn("display relative", className)} data-ghost-heading>
       <span className="sr-only">{lines.join(" ")}</span>
       {Array.from({ length: copies }, (_, i) => (
-        <span key={i} aria-hidden data-ghost className="pointer-events-none absolute inset-0 opacity-0 will-change-transform">
+        <span key={i} aria-hidden data-ghost className="pointer-events-none absolute inset-0 opacity-0">
           {renderLines(false)}
         </span>
       ))}

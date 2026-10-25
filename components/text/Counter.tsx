@@ -66,7 +66,7 @@ export function Counter({ value, decimals = 0, suffix = "", className, mode = "s
           const seq = [...Array.from({ length: cycles * 10 }, (_, k) => k % 10), ...Array.from({ length: Number(ch) + 1 }, (_, k) => k)];
           return (
             <span key={i} className="relative inline-block h-[1em] overflow-hidden">
-              <span data-strip data-len={seq.length} className="flex flex-col will-change-transform">
+              <span data-strip data-len={seq.length} className="flex flex-col">
                 {seq.map((d, k) => (
                   <span key={k} className="block h-[1em] leading-none">
                     {d}

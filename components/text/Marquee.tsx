@@ -54,7 +54,7 @@ export function Marquee({
 
   return (
     <div ref={ref} aria-hidden className={cn("pointer-events-none select-none overflow-hidden", className)}>
-      <div data-track className="flex w-max whitespace-nowrap will-change-transform">
+      <div data-track className="flex w-max whitespace-nowrap">
         {Array.from({ length: 4 }, (_, i) => (
           <span key={i} className={cn("display pr-[0.4em] text-[clamp(5rem,18vw,18rem)] leading-none", outline && "text-outline")}>
             {text}
