@@ -4,6 +4,8 @@ import type { Config } from "tailwindcss";
 const token = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
 
 const config: Config = {
+  // hover: styles only apply on devices that can hover, so taps never leave things stuck in a hover state.
+  future: { hoverOnlyWhenSupported: true },
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./content/**/*.ts"],
   theme: {
     extend: {

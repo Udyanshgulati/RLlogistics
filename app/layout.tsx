@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-export const viewport: Viewport = { themeColor: "#0A0D14", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#0A0D14", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

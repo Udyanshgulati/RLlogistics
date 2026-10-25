@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/Button";
 
 export default function NotFound() {
   return (
-    <section data-nav-theme="dark" className="flex min-h-screen flex-col justify-end bg-ink px-gutter pb-[12vh] text-paper md:pl-[clamp(140px,13vw,220px)]">
+    <section data-nav-theme="dark" className="flex min-h-[100svh] flex-col justify-end bg-ink px-gutter pb-[12vh] text-paper md:pl-[clamp(140px,13vw,220px)]">
       <p className="eyebrow mb-6 text-brand">Error 404 · Consignment not found</p>
       <h1 className="display text-[clamp(3rem,11vw,11rem)] leading-[0.88]">
         Wrong

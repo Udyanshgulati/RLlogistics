@@ -19,13 +19,24 @@
   --c-teal: 18 128 128;
   --c-red: 190 40 40;
 
-  --gutter: clamp(16px, 2.2vw, 32px);
+  /* 20px side gutter on phones/tablets, fluid on desktop. */
+  --gutter: 20px;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   color-scheme: light;
 }
+@media (min-width: 1024px) {
+  :root { --gutter: clamp(16px, 2.2vw, 32px); }
+}
 
 @layer base {
+  /* clip (not hidden): hidden would create a scroll container and break position: sticky and pins. */
+  html, body { overflow-x: clip; }
   html {
+    -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
