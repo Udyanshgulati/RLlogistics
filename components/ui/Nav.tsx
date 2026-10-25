@@ -130,12 +130,12 @@ export function Nav() {
     <header ref={root}>
       {/* Logo + vertical nav */}
       <div className={cn("pointer-events-none fixed inset-x-0 top-0 z-50 transition-colors duration-500", fg)}>
-        <div className="flex items-start p-gutter">
+        <div className="flex items-start p-gutter pt-[calc(var(--gutter)+var(--safe-t))] pl-[calc(var(--gutter)+var(--safe-l))] pr-[calc(var(--gutter)+var(--safe-r))]">
           <div data-nav-in className="pointer-events-auto">
             <Logo />
           </div>
         </div>
-        <nav aria-label="Primary" className="absolute left-gutter top-[112px] hidden md:block">
+        <nav aria-label="Primary" className="absolute left-gutter top-[112px] hidden lg:block">
           <ul className="pointer-events-auto flex flex-col gap-[7px]">
             {primaryNav.map((item, i) => (
               <li key={item.href} data-nav-in>
@@ -164,7 +164,7 @@ export function Nav() {
       </div>
 
       {/* Utility links, CTA, mobile menu toggle */}
-      <div className={cn("pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-end gap-3 p-gutter transition-colors duration-500", fg)}>
+      <div className={cn("pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-end gap-3 p-gutter pt-[calc(var(--gutter)+var(--safe-t))] pl-[calc(var(--gutter)+var(--safe-l))] pr-[calc(var(--gutter)+var(--safe-r))] transition-colors duration-500", fg)}>
         <div className="pointer-events-auto hidden h-10 items-center gap-1 lg:flex" data-nav-in>
           {utilityNav.map((item, i) => (
             <span key={item.href} className="flex items-center">
@@ -178,7 +178,7 @@ export function Nav() {
         <Link
           href={ctaNav.href}
           data-nav-in
-          className="group pointer-events-auto hidden h-10 items-center gap-2 rounded-full bg-brand px-4 text-[13px] font-medium text-ink transition-colors hover:bg-paper sm:inline-flex"
+          className="group pointer-events-auto hidden h-10 items-center gap-2 rounded-full bg-brand px-4 max-lg:h-11 text-[13px] font-medium text-ink transition-colors hover:bg-paper sm:inline-flex"
         >
           {ctaNav.label}
           <Arrow className="transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -189,7 +189,7 @@ export function Nav() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="site-menu"
-          className="ui-label pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full border px-4 md:hidden"
+          className="ui-label pointer-events-auto inline-flex h-11 min-w-11 items-center gap-2 rounded-full border px-4 lg:hidden"
           style={{ borderColor: "color-mix(in srgb, currentColor 30%, transparent)" }}
         >
           <span className="relative block h-2 w-4">
@@ -207,7 +207,7 @@ export function Nav() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="site-menu"
-        className={cn("ui-label invisible fixed left-gutter top-[112px] z-50 hidden items-center gap-2 opacity-0 transition-colors duration-500 md:inline-flex", fg)}
+        className={cn("ui-label invisible fixed left-gutter top-[112px] z-50 hidden items-center gap-2 opacity-0 transition-colors duration-500 lg:inline-flex", fg)}
       >
         <span className="flex flex-col gap-[3px]">
           <span className="block h-px w-4 bg-current" />
@@ -220,13 +220,13 @@ export function Nav() {
       <div
         id="site-menu"
         data-menu
-        className="invisible fixed inset-0 z-[60] flex flex-col bg-ink text-paper"
+        className="invisible fixed inset-x-0 top-0 z-[60] flex h-[100vh] h-[100dvh] flex-col overflow-y-auto overscroll-contain bg-ink text-paper"
         style={{ clipPath: "inset(0 0 100% 0)" }}
         aria-hidden={!open}
       >
-        <div className="flex items-start justify-between p-gutter">
+        <div className="flex items-start justify-between p-gutter pt-[calc(var(--gutter)+var(--safe-t))] pl-[calc(var(--gutter)+var(--safe-l))] pr-[calc(var(--gutter)+var(--safe-r))]">
           <Logo />
-          <button type="button" onClick={() => setOpen(false)} className="ui-label inline-flex h-10 items-center rounded-full border border-paper/30 px-4">
+          <button type="button" onClick={() => setOpen(false)} className="ui-label inline-flex h-10 items-center rounded-full border border-paper/30 px-4 max-lg:h-11">
             Close
           </button>
         </div>
@@ -238,7 +238,7 @@ export function Nav() {
                   href={item.href}
                   tabIndex={open ? 0 : -1}
                   data-menu-link
-                  className="display group flex items-baseline gap-4 py-2 text-[clamp(2rem,6.5vw,4.75rem)] leading-[0.95] transition-colors hover:text-brand"
+                  className="display group flex items-baseline gap-4 py-2 text-[clamp(2rem,9vw,4.75rem)] leading-[0.95] max-lg:min-h-[52px] max-lg:items-center transition-colors hover:text-brand"
                 >
                   <span className="ui-label w-8 text-steel">{String(i).padStart(2, "0")}</span>
                   {item.label}
@@ -247,8 +247,17 @@ export function Nav() {
             ))}
           </ul>
         </nav>
-        <div data-menu-meta className="grid gap-4 p-gutter text-[13px] text-steel sm:grid-cols-3">
-          <a href={`mailto:${company.email}`} tabIndex={open ? 0 : -1} className="hover:text-paper">
+        <div data-menu-meta className="grid gap-4 p-gutter pb-[calc(var(--gutter)+var(--safe-b))] text-[13px] text-steel sm:grid-cols-3 max-lg:text-[14px]">
+          {/* Phones/tablets: quote CTA + tap-to-call up front */}
+          <div className="flex flex-col gap-3 lg:hidden sm:col-span-3">
+            <Link href={ctaNav.href} tabIndex={open ? 0 : -1} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-brand px-5 text-[15px] font-medium text-ink">
+              Get a quote <Arrow />
+            </Link>
+            <a href={company.phoneHref} tabIndex={open ? 0 : -1} className="inline-flex min-h-11 items-center text-paper">
+              {company.phone}
+            </a>
+          </div>
+          <a href={`mailto:${company.email}`} tabIndex={open ? 0 : -1} className="inline-flex min-h-11 items-center hover:text-paper lg:min-h-0">
             {company.email}
           </a>
           <span>{company.address.lines.join(", ")}</span>
