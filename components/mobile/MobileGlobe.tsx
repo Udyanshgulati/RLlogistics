@@ -104,19 +104,19 @@ export function MobileGlobe({ className }: { className?: string }) {
         const hub = m.id === "delhi";
         if (hub) {
           const k = (t % 1800) / 1800;
-          g.strokeStyle = `rgba(255,90,31,${(1 - k) * 0.85})`;
+          g.strokeStyle = `rgba(242,169,0,${(1 - k) * 0.85})`;
           g.lineWidth = 1.5;
           g.beginPath();
           g.arc(x, y, 5 + k * 14, 0, Math.PI * 2);
           g.stroke();
         }
-        g.fillStyle = hub ? "#ff5a1f" : "#ffffff";
+        g.fillStyle = hub ? "#f2a900" : "#ffffff";
         g.beginPath();
         g.arc(x, y, hub ? 4.5 : 3, 0, Math.PI * 2);
         g.fill();
         const label = m.label.toUpperCase();
         const lw = g.measureText(label).width;
-        g.fillStyle = hub ? "#ff5a1f" : "rgba(243,242,238,0.9)";
+        g.fillStyle = hub ? "#f2a900" : "rgba(244,247,251,0.9)";
         g.fillText(label, m.side === "left" ? x - 10 - lw : x + 10, y);
       }
       if (!drawnOnce) {
@@ -164,9 +164,9 @@ export function MobileGlobe({ className }: { className?: string }) {
         ref={glow}
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
         style={{
-          background: "radial-gradient(circle at 50% 50%, #05070d 66%, transparent 71%)",
+          background: "radial-gradient(circle at 50% 50%, #061331 66%, transparent 71%)",
           boxShadow:
-            "-16px -20px 46px -6px rgba(255,90,36,0.75), 18px 24px 56px -8px rgba(30,107,255,0.8), inset 10px 14px 30px -10px rgba(30,107,255,0.6), inset -8px -10px 26px -10px rgba(255,90,36,0.7)",
+            "-16px -20px 46px -6px rgba(56,189,248,0.7), 18px 24px 56px -8px rgba(30,107,255,0.8), inset 10px 14px 30px -10px rgba(30,107,255,0.6), inset -8px -10px 26px -10px rgba(56,189,248,0.6)",
         }}
       />
       {/* eslint-disable-next-line @next/next/no-img-element */}

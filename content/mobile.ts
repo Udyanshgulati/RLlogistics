@@ -1,20 +1,20 @@
 // Phone-only copy: shorter strings and hand-set line breaks for the display headings.
-// Display type is wide (≈0.8em per capital), so a phone line holds ~11 characters at the H2 size.
+// Sora in sentence case holds ~15 characters per phone line at the H2 size.
 
 export const mobileHero = {
   eyebrow: "One operator · Since 2018",
-  headline: ["Every mile.", "Every", "milestone."],
+  headline: ["From Delhi", "to every", "doorstep."],
   sub: "Warehousing, transport, forwarding and customs — one accountable team out of Delhi.",
 };
 
 export const mobileHeadlines = {
-  about: ["We move", "freight.", "We own the", "outcome."],
+  about: ["We own every", "shipment,", "end to end."],
   yard: ["From the", "yard to", "the road."],
-  services: ["All your", "freight.", "One roof."],
-  road: ["Reliability", "at every", "milestone."],
-  ocean: ["Logistics", "that works", "as hard as", "you do."],
-  trust: ["Trusted by", "businesses", "across", "India."],
-  cta: ["Let's move", "something."],
+  services: ["Warehouse to", "last mile.", "One team."],
+  road: ["Tracked", "every", "kilometre."],
+  ocean: ["Port to shelf,", "one partner."],
+  trust: ["Chosen by", "brands that", "can't wait."],
+  cta: ["Ready when", "your cargo is."],
 };
 
 export const mobileCopy = {

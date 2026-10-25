@@ -151,7 +151,7 @@ export function Scene5Road({ assets = {} }: { assets?: AssetOverrides }) {
         <g data-road-group>
           <path data-edge fill="none" stroke="#c9ccd2" strokeLinecap="butt" />
           <path data-asphalt fill="none" stroke="#0e1117" strokeLinecap="butt" />
-          <path data-lane fill="none" stroke="#f3f2ee" strokeWidth={3} strokeDasharray="34 46" />
+          <path data-lane fill="none" stroke="#f4f7fb" strokeWidth={3} strokeDasharray="34 46" />
         </g>
       </svg>
 

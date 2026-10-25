@@ -7,7 +7,7 @@ import { MagneticButton } from "@/components/ui/MagneticButton";
 export function Scene8Cta() {
   return (
     <section data-scene="cta" data-nav-theme="light" className="relative overflow-hidden bg-paper px-gutter py-[22vh] md:pl-[clamp(140px,13vw,220px)]" aria-labelledby="cta-title">
-      <p className="eyebrow mb-6 text-steel">05 — Next shipment</p>
+      <p className="eyebrow mb-6 text-steel">RLWU 05 · Next shipment</p>
       <GhostHeading as="h2" lines={cta.headline} className="text-[clamp(3rem,10vw,10.5rem)] leading-[0.88]" />
       <span id="cta-title" className="sr-only">
         {cta.headline.join(" ")}

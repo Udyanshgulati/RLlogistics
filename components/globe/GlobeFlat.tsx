@@ -97,18 +97,18 @@ export default function GlobeFlat({ progress, active, onReady }: Props) {
           const y = cy - R * (cos0 * Math.sin(lat) - sin0 * Math.cos(lat) * Math.cos(dl));
           const hub = "hub" in m;
           g.globalAlpha = mAlpha;
-          g.fillStyle = hub ? "#ff5a1f" : "#ffffff";
+          g.fillStyle = hub ? "#f2a900" : "#ffffff";
           g.beginPath();
           g.arc(x, y, hub ? 4 : 2.6, 0, Math.PI * 2);
           g.fill();
           if (hub) {
             const k = (t % 1600) / 1600;
-            g.strokeStyle = `rgba(255,90,31,${(1 - k) * 0.8})`;
+            g.strokeStyle = `rgba(242,169,0,${(1 - k) * 0.8})`;
             g.beginPath();
             g.arc(x, y, 4 + k * 12, 0, Math.PI * 2);
             g.stroke();
           }
-          g.fillStyle = hub ? "#ff5a1f" : "rgba(243,242,238,0.85)";
+          g.fillStyle = hub ? "#f2a900" : "rgba(244,247,251,0.85)";
           g.fillText(m.label.toUpperCase(), x + (m.side === "left" ? -8 - g.measureText(m.label.toUpperCase()).width : 8), y - 6);
           g.globalAlpha = 1;
         }
@@ -132,8 +132,8 @@ export default function GlobeFlat({ progress, active, onReady }: Props) {
         ref={glow}
         className="absolute left-0 top-0 rounded-full opacity-0"
         style={{
-          background: "radial-gradient(circle at 50% 50%, #05070d 66%, transparent 71%)",
-          boxShadow: "-18px -22px 50px -6px rgba(255,90,36,0.75), 20px 26px 60px -8px rgba(30,107,255,0.8), inset 10px 14px 30px -10px rgba(30,107,255,0.6), inset -8px -10px 26px -10px rgba(255,90,36,0.7)",
+          background: "radial-gradient(circle at 50% 50%, #061331 66%, transparent 71%)",
+          boxShadow: "-18px -22px 50px -6px rgba(56,189,248,0.7), 20px 26px 60px -8px rgba(30,107,255,0.8), inset 10px 14px 30px -10px rgba(30,107,255,0.6), inset -8px -10px 26px -10px rgba(56,189,248,0.6)",
         }}
       />
       <canvas ref={canvas} className="absolute inset-0 h-full w-full" />

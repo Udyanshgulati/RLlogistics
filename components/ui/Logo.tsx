@@ -11,7 +11,7 @@ export function Logo({ className, size = "md" }: { className?: string; size?: "m
       href="/"
       aria-label={`${company.legalName} — home`}
       className={cn(
-        "group inline-flex items-center rounded-[6px] bg-white shadow-[0_1px_0_rgba(10,13,20,0.06),0_8px_24px_-12px_rgba(10,13,20,0.35)] ring-1 ring-black/5 transition-transform duration-500 ease-expo hover:-translate-y-0.5",
+        "group inline-flex items-center rounded-[6px] bg-white shadow-[0_1px_0_rgba(11,31,77,0.06),0_8px_24px_-12px_rgba(11,31,77,0.35)] ring-1 ring-black/5 transition-transform duration-500 ease-expo hover:-translate-y-0.5",
         size === "lg" ? "px-5 py-4" : "px-3 py-2.5",
         className,
       )}

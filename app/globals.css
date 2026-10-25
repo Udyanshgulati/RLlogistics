@@ -5,15 +5,16 @@
 /* ── Design tokens ─────────────────────────────────────────────
    Space-separated RGB so Tailwind can apply alpha (bg-ink/40). */
 :root {
-  --ink: 10 13 20;          /* #0A0D14 */
-  --paper: 243 242 238;     /* #F3F2EE */
-  --steel: 138 143 152;     /* #8A8F98 */
-  --brand: 255 90 31;       /* #FF5A1F */
-  --ocean: 11 59 168;       /* #0B3BA8 */
+  /* RL navy (dark sections, text), cool paper, RL blue, amber accent. */
+  --ink: 11 31 77;          /* #0B1F4D */
+  --paper: 244 247 251;     /* #F4F7FB */
+  --steel: 124 138 165;     /* #7C8AA5 blue-grey */
+  --brand: 242 169 0;       /* #F2A900 amber: highway signage, used sparingly */
+  --ocean: 21 84 209;      /* #1554D1 RL blue */
   --ocean-bright: 30 107 255; /* #1E6BFF */
-  --rule: 138 143 152;
+  --rule: 124 138 165;
   /* Steel tuned for small text on paper (≥ 4.5:1 AA); --steel itself stays the spec value for dark sections. */
-  --steel-on-paper: 101 106 115;
+  --steel-on-paper: 85 98 122;
   --c-orange: 232 93 36;
   --c-navy: 27 44 84;
   --c-teal: 18 128 128;
@@ -55,11 +56,11 @@
 }
 
 @layer components {
+  /* Headlines: Sora, sentence case, tight tracking. */
   .display {
-    @apply font-display uppercase;
-    font-weight: 850;
-    font-stretch: 125%;
-    font-variation-settings: "wdth" 125;
+    @apply font-display;
+    font-weight: 700;
+    letter-spacing: -0.035em;
   }
   .eyebrow { @apply font-mono text-eyebrow uppercase; }
   .ui-label { @apply font-mono text-[11px] uppercase tracking-[0.1em]; }

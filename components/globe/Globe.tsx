@@ -215,7 +215,7 @@ function GlobeScene({
   const first = useRef(true);
 
   const colors = useMemo(() => {
-    const warm = new THREE.Color("#ff5a24");
+    const warm = new THREE.Color("#38bdf8");
     const cool = new THREE.Color(...tokenRGB("ocean-bright"));
     return { warm, cool };
   }, []);
@@ -303,7 +303,7 @@ function GlobeScene({
               vertexShader={ocean.vertex}
               fragmentShader={ocean.fragment}
               uniforms={{
-                uBase: { value: new THREE.Color("#05070d") },
+                uBase: { value: new THREE.Color("#061331") },
                 uRim: { value: 1.25 },
                 uWarm: { value: colors.warm },
                 uCool: { value: colors.cool },

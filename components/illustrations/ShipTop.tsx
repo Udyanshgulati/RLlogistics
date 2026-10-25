@@ -37,7 +37,7 @@ export function ShipTop({ className, src }: { className?: string; src?: string }
       {/* bridge + funnel near stern */}
       <rect x="22" y="866" width="196" height="64" rx="4" fill="#eef0f3" />
       <rect x="30" y="874" width="180" height="8" fill="#1d2430" opacity="0.7" />
-      <rect x="96" y="896" width="48" height="26" rx="3" fill="#ff5a1f" />
+      <rect x="96" y="896" width="48" height="26" rx="3" fill="#f2a900" />
       <rect x="104" y="900" width="32" height="6" fill="#16191f" />
       <rect x="40" y="944" width="160" height="30" rx="4" fill="#c9ced6" />
     </svg>

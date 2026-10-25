@@ -198,7 +198,7 @@ function About({ heroRoad }: { heroRoad?: string }) {
         <span className="absolute bottom-3 left-3 font-mono text-[12px] uppercase tracking-[0.1em] text-paper/90">NH-48 · Gurugram</span>
       </div>
       <MEyebrow className="mt-12 text-steel">{about.eyebrow}</MEyebrow>
-      <MHeading id="m-about" lines={mobileHeadlines.about} muted={[2, 3]} className="mt-5" />
+      <MHeading id="m-about" lines={mobileHeadlines.about} muted={[2]} className="mt-5" />
       <p data-m-reveal className="mt-5 text-[16px] leading-[1.55] text-ink/75">
         {about.paragraphs[0]}
       </p>
@@ -276,7 +276,7 @@ function Road({ truckTop }: { truckTop?: string }) {
       <div data-m-road className="relative mt-10">
         {/* Road strip: 48px wide, lane dashes scroll with CSS. */}
         <div aria-hidden className="absolute bottom-0 left-0 top-0 w-12 overflow-hidden rounded-full bg-[#0e1117]">
-          <div className="absolute inset-y-0 left-1/2 w-[3px] -translate-x-1/2 animate-[roaddash_0.9s_linear_infinite] bg-[repeating-linear-gradient(to_bottom,#f3f2ee_0_18px,transparent_18px_40px)] motion-reduce:animate-none" />
+          <div className="absolute inset-y-0 left-1/2 w-[3px] -translate-x-1/2 animate-[roaddash_0.9s_linear_infinite] bg-[repeating-linear-gradient(to_bottom,#f4f7fb_0_18px,transparent_18px_40px)] motion-reduce:animate-none" />
           <div data-m-truck className="absolute left-1/2 top-2 w-[26px] -translate-x-1/2">
             <TruckTop src={truckTop} className="h-auto w-full" />
           </div>
@@ -307,7 +307,7 @@ function Ocean({ shipTop }: { shipTop?: string }) {
         </div>
         {/* Headline over the footage, on a dark gradient for contrast. */}
         <div className="absolute inset-x-0 top-0 bg-[linear-gradient(to_bottom,rgba(4,20,70,0.9),rgba(4,20,70,0.7)_65%,transparent)] px-5 pb-16 pt-24">
-          <MHeading id="m-ocean" lines={mobileHeadlines.ocean} muted={[2, 3]} />
+          <MHeading id="m-ocean" lines={mobileHeadlines.ocean} muted={[1]} />
         </div>
       </div>
       <ul className="grid grid-cols-2 gap-x-4 gap-y-8 px-5 py-16">
@@ -330,7 +330,7 @@ function Testimonials() {
     <section data-nav-theme="light" aria-labelledby="m-trust" className="bg-paper py-24 text-ink">
       <div className="px-5">
         <MEyebrow className="text-steel">{trust.eyebrow}</MEyebrow>
-        <MHeading id="m-trust" lines={mobileHeadlines.trust} muted={[2, 3]} className="mt-5" />
+        <MHeading id="m-trust" lines={mobileHeadlines.trust} muted={[2]} className="mt-5" />
         <p data-m-reveal className="mt-5 text-[16px] leading-[1.55] text-ink/70">
           {trust.intro}
         </p>
@@ -380,7 +380,7 @@ function Testimonials() {
 function Cta() {
   return (
     <section data-nav-theme="light" aria-labelledby="m-cta" className="border-t border-ink/10 bg-paper px-5 py-24 text-ink">
-      <MEyebrow className="text-steel">05 — Next shipment</MEyebrow>
+      <MEyebrow className="text-steel">RLWU 05 · Next shipment</MEyebrow>
       <MHeading id="m-cta" lines={mobileHeadlines.cta} className="mt-5" />
       <p data-m-reveal className="mt-5 text-[16px] leading-[1.55] text-ink/70">
         {cta.sub}

@@ -104,7 +104,7 @@ export default function ContactPage() {
           href="https://www.google.com/maps/search/?api=1&query=Bhajanpura+Delhi+110053"
           target="_blank"
           rel="noreferrer"
-          className="ui-label absolute bottom-6 right-gutter rounded-full bg-paper px-4 py-2 shadow hover:text-brand"
+          className="ui-label absolute bottom-6 right-gutter rounded-[10px] bg-paper px-4 py-2 shadow hover:text-brand"
         >
           Open in Google Maps ↗
         </a>

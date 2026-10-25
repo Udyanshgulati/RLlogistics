@@ -4,7 +4,7 @@ export function TruckTop({ className, src }: { className?: string; src?: string 
   if (src) return <img src={src} alt="" aria-hidden className={className} />;
   return (
     <svg viewBox="0 0 60 200" className={className} aria-hidden>
-      <rect x="2" y="4" width="56" height="196" rx="6" fill="#0a0d14" opacity="0.18" transform="translate(3 3)" />
+      <rect x="2" y="4" width="56" height="196" rx="6" fill="#0b1f4d" opacity="0.18" transform="translate(3 3)" />
       {/* trailer with container */}
       <rect x="3" y="2" width="54" height="142" rx="2" fill="#e9ebee" />
       {Array.from({ length: 13 }, (_, i) => (
@@ -12,7 +12,7 @@ export function TruckTop({ className, src }: { className?: string; src?: string 
       ))}
       <rect x="3" y="2" width="54" height="5" fill="#c3c8cf" />
       <rect x="3" y="139" width="54" height="5" fill="#c3c8cf" />
-      <rect x="22" y="60" width="16" height="22" fill="#ff5a1f" opacity="0.9" />
+      <rect x="22" y="60" width="16" height="22" fill="#f2a900" opacity="0.9" />
       {/* coupling */}
       <rect x="24" y="144" width="12" height="10" fill="#3a404a" />
       {/* cab */}

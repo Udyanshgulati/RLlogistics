@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Inter, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Mono, Manrope, Sora } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/lib/lenis";
 import { LoaderProvider } from "@/lib/loader";
@@ -9,13 +9,14 @@ import { Footer } from "@/components/ui/Footer";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { company } from "@/content/company";
 
-const display = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-display", display: "swap" });
-const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap", weight: ["400", "500"] });
+// RL type system: Sora for headlines (sentence case), Manrope for text, IBM Plex Mono for labels and codes.
+const display = Sora({ subsets: ["latin"], variable: "--font-display", display: "swap", weight: ["600", "700", "800"] });
+const body = Manrope({ subsets: ["latin"], variable: "--font-body", display: "swap" });
+const mono = IBM_Plex_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap", weight: ["400", "500"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(company.url),
-  title: { default: `${company.name} & Warehousing — Every mile. Every milestone.`, template: `%s — ${company.name}` },
+  title: { default: `${company.name} & Warehousing — From Delhi to every doorstep.`, template: `%s — ${company.name}` },
   description:
     "Warehousing, road transport, freight forwarding and customs clearance — run by one accountable team out of Delhi, moving cargo across India.",
   openGraph: { type: "website", locale: "en_IN", siteName: "RL Logistics & Warehousing" },
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-export const viewport: Viewport = { themeColor: "#0A0D14", width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#0B1F4D", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

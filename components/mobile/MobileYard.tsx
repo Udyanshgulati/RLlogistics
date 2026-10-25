@@ -154,9 +154,9 @@ export function MobileYard({ assets = {} }: { assets?: { stackerBody?: string; s
             <stop offset="1" stopColor="#5a4632" stopOpacity="0.18" />
           </linearGradient>
         </defs>
-        <line x1={-400} x2={1800} y1={GROUND} y2={GROUND} stroke="#0a0d14" strokeOpacity={0.2} strokeWidth={2} />
+        <line x1={-400} x2={1800} y1={GROUND} y2={GROUND} stroke="#0b1f4d" strokeOpacity={0.2} strokeWidth={2} />
         {[...Array(14)].map((_, i) => (
-          <line key={i} x1={i * 110 - 40} x2={i * 110 + 20} y1={GROUND + 18} y2={GROUND + 18} stroke="#0a0d14" strokeOpacity={0.1} strokeWidth={3} />
+          <line key={i} x1={i * 110 - 40} x2={i * 110 + 20} y1={GROUND + 18} y2={GROUND + 18} stroke="#0b1f4d" strokeOpacity={0.1} strokeWidth={3} />
         ))}
         <ReachStacker bodyImg={assets.stackerBody} boomImg={assets.stackerBoom} />
         <TruckSide img={assets.truckSide} />

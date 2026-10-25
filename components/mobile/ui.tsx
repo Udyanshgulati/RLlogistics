@@ -27,7 +27,7 @@ export function MHeading({
       id={id}
       data-m-reveal
       className={cn(
-        "display uppercase",
+        "display",
         Tag === "h1" ? "text-[clamp(40px,11vw,56px)] leading-[0.95] tracking-[-0.02em]" : "text-[clamp(32px,9.5vw,44px)] leading-none tracking-[-0.015em]",
         className,
       )}
@@ -60,7 +60,13 @@ export function MButton({
     "ghost-light": "border border-ink/25 text-ink",
   }[variant];
   return (
-    <Link href={href} data-m-reveal className={cn("flex h-[52px] w-full items-center justify-between rounded-full px-6 text-[16px] font-medium", styles, className)}>
+    <Link
+      href={href}
+      data-m-reveal
+      className={cn("flex h-[52px] w-full items-center justify-between rounded-[10px] px-6 text-[16px] font-medium", styles, className)}
+      // The brand CTA gets the container corner-casting chamfer.
+      style={variant === "brand" ? { borderRadius: 0, clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))" } : undefined}
+    >
       <span>{children}</span>
       <Arrow className="h-4 w-4" />
     </Link>

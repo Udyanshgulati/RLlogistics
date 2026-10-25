@@ -34,7 +34,7 @@ export function Scene2About({ assets = {} }: { assets?: AssetOverrides }) {
           "[data-about-heading] .block",
           { color: "rgb(138 143 152 / 0.45)" },
           {
-            color: "rgb(10 13 20)",
+            color: "rgb(11 31 77)",
             stagger: 0.3,
             ease: "none",
             scrollTrigger: { trigger: root.current, start: "top 60%", end: "center 45%", scrub: true },

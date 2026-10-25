@@ -143,7 +143,7 @@ export function Scene6Ocean({ assets = {} }: { assets?: AssetOverrides }) {
               <Icon name={f.icon as IconName} className="h-7 w-7" />
             </div>
             <h3 className="display relative text-[clamp(14px,1.4vw,19px)] leading-tight">
-              <span data-feature-ghost aria-hidden className="absolute inset-0 opacity-0">
+              <span data-feature-ghost aria-hidden className="absolute inset-0 hidden opacity-0">
                 {f.title}
               </span>
               {f.title}

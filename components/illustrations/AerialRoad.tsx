@@ -25,7 +25,7 @@ export function AerialRoad({ className }: { className?: string }) {
           <path d={d} stroke="#22252a" strokeWidth={i < 2 ? 46 : 30} fill="none" opacity="0.45" transform="translate(6 8)" />
           <path d={d} stroke="#9fa3a8" strokeWidth={i < 2 ? 42 : 26} fill="none" />
           <path d={d} stroke="#7d8187" strokeWidth={i < 2 ? 38 : 22} fill="none" />
-          <path d={d} stroke="#f3f2ee" strokeWidth="1.5" strokeDasharray="10 12" fill="none" opacity="0.8" />
+          <path d={d} stroke="#f4f7fb" strokeWidth="1.5" strokeDasharray="10 12" fill="none" opacity="0.8" />
         </g>
       ))}
       {[
@@ -35,7 +35,7 @@ export function AerialRoad({ className }: { className?: string }) {
         [330, 236, 4],
         [600, 186, 20],
       ].map(([x, y, r], i) => (
-        <rect key={i} x={x} y={y} width="14" height="7" rx="2" fill={i % 2 ? "#ff5a1f" : "#f3f2ee"} transform={`rotate(${r} ${x} ${y})`} />
+        <rect key={i} x={x} y={y} width="14" height="7" rx="2" fill={i % 2 ? "#f2a900" : "#f4f7fb"} transform={`rotate(${r} ${x} ${y})`} />
       ))}
       <rect width="640" height="320" fill="url(#ar-light)" />
     </svg>

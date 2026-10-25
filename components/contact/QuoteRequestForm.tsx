@@ -57,7 +57,7 @@ export function QuoteRequestForm() {
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <a
             href={sent.mailto}
-            className="inline-flex h-11 items-center rounded-full bg-brand px-5 text-[13px] font-medium text-ink transition-colors hover:bg-paper"
+            className="inline-flex h-11 items-center rounded-[10px] bg-brand px-5 text-[13px] font-medium text-ink transition-colors hover:bg-paper"
           >
             Email these details to {company.email}
           </a>
@@ -117,7 +117,7 @@ export function QuoteRequestForm() {
         <textarea id="q-notes" name="notes" rows={3} placeholder="Dimensions, packaging, frequency, special handling…" className={cn(field, "resize-none")} />
       </label>
       <div className="sm:col-span-2">
-        <button type="submit" className="inline-flex h-12 items-center max-sm:w-full max-sm:justify-center rounded-full bg-brand px-6 text-[14px] font-medium text-ink transition-colors hover:bg-paper">
+        <button type="submit" className="inline-flex h-12 items-center max-sm:w-full max-sm:justify-center rounded-[10px] bg-brand px-6 text-[14px] font-medium text-ink transition-colors hover:bg-paper">
           Request a quote
         </button>
       </div>

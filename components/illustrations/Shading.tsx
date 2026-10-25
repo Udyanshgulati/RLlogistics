@@ -19,9 +19,9 @@ export function ShadingDefs() {
         <stop offset="1" stopColor="#2a3a4a" stopOpacity="0.95" />
       </linearGradient>
       <radialGradient id="sh-contact">
-        <stop offset="0" stopColor="#0a0d14" stopOpacity={LIGHT.contactShadow} />
-        <stop offset="0.6" stopColor="#0a0d14" stopOpacity={LIGHT.contactShadow * 0.35} />
-        <stop offset="1" stopColor="#0a0d14" stopOpacity="0" />
+        <stop offset="0" stopColor="#0b1f4d" stopOpacity={LIGHT.contactShadow} />
+        <stop offset="0.6" stopColor="#0b1f4d" stopOpacity={LIGHT.contactShadow * 0.35} />
+        <stop offset="1" stopColor="#0b1f4d" stopOpacity="0" />
       </radialGradient>
       <radialGradient id="sh-tyre" cx="0.4" cy="0.38" r="0.65">
         <stop offset="0" stopColor="#2b2b2b" />

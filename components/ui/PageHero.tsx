@@ -20,7 +20,7 @@ export function PageHero({
       data-nav-theme={tone}
       className={`relative overflow-hidden px-gutter pb-[10vh] pt-[30vh] md:pl-[clamp(140px,13vw,220px)] ${dark ? "bg-ink text-paper" : "bg-paper text-ink"}`}
     >
-      <div aria-hidden className={`pointer-events-none absolute -right-[10vw] -top-[20vw] h-[60vw] w-[60vw] rounded-full blur-3xl ${dark ? "bg-[radial-gradient(circle,rgba(255,90,31,0.22),transparent_60%)]" : "bg-[radial-gradient(circle,rgba(30,107,255,0.12),transparent_60%)]"}`} />
+      <div aria-hidden className={`pointer-events-none absolute -right-[10vw] -top-[20vw] h-[60vw] w-[60vw] rounded-full blur-3xl ${dark ? "bg-[radial-gradient(circle,rgba(242,169,0,0.22),transparent_60%)]" : "bg-[radial-gradient(circle,rgba(30,107,255,0.12),transparent_60%)]"}`} />
       <p className="eyebrow relative mb-6 flex items-center gap-3 text-brand">
         <span aria-hidden className="h-px w-6 bg-brand" />
         {eyebrow}

@@ -33,7 +33,7 @@ export function Button({ href, children, variant = "filled", tone = "dark", clas
     <Link
       href={href}
       className={cn(
-        "group inline-flex h-11 items-center gap-3 rounded-full px-5 text-[13px] font-medium tracking-wide transition-colors duration-300",
+        "group inline-flex h-11 items-center gap-3 rounded-[10px] px-5 text-[13px] font-medium tracking-wide transition-colors duration-300",
         styles,
         className,
       )}

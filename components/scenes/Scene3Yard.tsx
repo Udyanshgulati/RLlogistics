@@ -6,7 +6,6 @@ import { gsap, useGSAP, MQ } from "@/lib/gsap";
 import { servicesSection } from "@/content/home";
 import { homeServices } from "@/content/services";
 import { GhostHeading, buildGhostTl } from "@/components/text/GhostHeading";
-import { Marquee } from "@/components/text/Marquee";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { ReachStacker, STACKER } from "@/components/illustrations/ReachStacker";
@@ -237,7 +236,6 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
           .fromTo("[data-panel]", { clipPath: "inset(100% 0 0 0)" }, { clipPath: () => `inset(${panelTop() * 100}% 0 0 0)`, duration: 1.4 }, 9.6)
           // SCENE 4 · services inside the panel; truck creeps right
           .to(rig, { tx: TRUCK_X_LOAD + 260, duration: 5, ease: "none" }, 11)
-          .fromTo("[data-panel] [data-track]", { xPercent: 0 }, { xPercent: -18, duration: 7, ease: "none" }, 10)
           .add(ghost.tl.tweenFromTo(0, ghost.tl.duration(), { duration: 1.4, ease: "none" }), 11.1)
           .fromTo("[data-services-copy] p", { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, stagger: 0.2, duration: 0.8 }, 11.6)
           .fromTo(
@@ -303,9 +301,9 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
           </defs>
           <ShadingDefs />
           <g data-cam>
-            <line x1={-4000} x2={5600} y1={GROUND} y2={GROUND} stroke="#0a0d14" strokeOpacity={0.18} strokeWidth={1.5} />
+            <line x1={-4000} x2={5600} y1={GROUND} y2={GROUND} stroke="#0b1f4d" strokeOpacity={0.18} strokeWidth={1.5} />
             {[...Array(40)].map((_, i) => (
-              <line key={i} x1={-2000 + i * 160} x2={-1940 + i * 160} y1={GROUND + 16} y2={GROUND + 16} stroke="#0a0d14" strokeOpacity={0.08} strokeWidth={2} />
+              <line key={i} x1={-2000 + i * 160} x2={-1940 + i * 160} y1={GROUND + 16} y2={GROUND + 16} stroke="#0b1f4d" strokeOpacity={0.08} strokeWidth={2} />
             ))}
             {/* Stack */}
             <g data-stack>
@@ -328,7 +326,6 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
         style={{ clipPath: "inset(100% 0 0 0)" }}
       >
         <div data-panel-content className="absolute inset-x-0 bottom-0 top-[30%] flex flex-col justify-center gap-[3vh] md:top-[40%] md:gap-[3.5vh] px-gutter py-[4vh] group-[.is-static]/yard:relative group-[.is-static]/yard:top-0 group-[.is-static]/yard:py-24 md:pl-[clamp(140px,13vw,220px)]">
-          <Marquee text={servicesSection.watermark} drive="external" className="absolute inset-x-0 top-[8%] text-paper/[0.05]" />
           <div className="relative grid items-end gap-6 md:grid-cols-12">
             <div className="md:col-span-7">
               <p className="eyebrow mb-4 text-brand">{servicesSection.eyebrow}</p>
@@ -359,7 +356,7 @@ export function Scene3Yard({ assets = {} }: { assets?: AssetOverrides }) {
                   <span className="ui-label mb-3 block text-steel">{String(i + 1).padStart(2, "0")}</span>
                   <span className="relative mb-3 block h-7 w-7">
                     <Icon name={s.icon} className="absolute inset-0 h-7 w-7 text-paper transition-transform duration-500 ease-expo group-hover:translate-x-1" />
-                    <span data-service-ghost aria-hidden className="absolute inset-0">
+                    <span data-service-ghost aria-hidden className="absolute inset-0 hidden">
                       <Icon name={s.icon} className="h-7 w-7 text-paper/60" />
                     </span>
                   </span>

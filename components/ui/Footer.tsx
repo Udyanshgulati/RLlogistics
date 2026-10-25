@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef } from "react";
-import { gsap, SplitText, useGSAP, MQ } from "@/lib/gsap";
+import { gsap, useGSAP, MQ } from "@/lib/gsap";
 import { useLenis, scrollToTarget } from "@/lib/lenis";
 import { company } from "@/content/company";
 import { services } from "@/content/services";
@@ -19,18 +19,16 @@ export function Footer() {
     () => {
       const mm = gsap.matchMedia();
       mm.add(MQ.motion, () => {
-        const split = SplitText.create("[data-wordmark]", { type: "chars", mask: "chars" });
         gsap.fromTo(
-          split.chars,
-          { yPercent: 105 },
-          {
-            yPercent: 0,
-            stagger: 0.05,
-            ease: "none",
-            scrollTrigger: { trigger: "[data-wordmark]", start: "top bottom", end: "bottom bottom-=20", scrub: 1 },
-          },
+          "[data-footer-tagline]",
+          { autoAlpha: 0, y: 30 },
+          { autoAlpha: 1, y: 0, duration: 1, ease: "expo", scrollTrigger: { trigger: "[data-footer-tagline]", start: "top 90%", toggleActions: "play none none reverse" } },
         );
-        return () => split.revert();
+        gsap.fromTo(
+          "[data-route]",
+          { strokeDashoffset: 1 },
+          { strokeDashoffset: 0, duration: 2.2, ease: "power2.out", stagger: 0.12, scrollTrigger: { trigger: "[data-footer-tagline]", start: "top 95%" } },
+        );
       });
     },
     { scope: root },
@@ -107,9 +105,12 @@ export function Footer() {
         </div>
       </div>
 
-      <p data-wordmark aria-hidden className="display select-none whitespace-nowrap pt-10 text-[clamp(2.4rem,8.6vw,12rem)] max-lg:text-[clamp(28px,8.4vw,72px)] leading-[0.85] tracking-[-0.03em] text-paper">
-        RL Logistics
-      </p>
+      <div className="relative mt-10 overflow-hidden">
+        <FooterRoutes />
+        <p data-footer-tagline className="display relative max-w-[18ch] py-10 text-[clamp(28px,4.4vw,64px)] leading-[1.05]">
+          From Delhi to <span className="text-brand">every doorstep.</span>
+        </p>
+      </div>
 
       <div className="mt-10 flex flex-col gap-4 text-[14px] leading-relaxed text-paper/55 lg:flex-row lg:items-center lg:justify-between lg:text-[12px] lg:leading-[inherit] lg:text-paper/50">
         <p>
@@ -118,7 +119,7 @@ export function Footer() {
         <button
           type="button"
           onClick={() => scrollToTarget(lenis, 0)}
-          className="ui-label inline-flex items-center gap-2 self-start rounded-full border border-paper/20 px-4 py-2 text-paper/80 hover:border-brand hover:text-brand max-lg:min-h-11"
+          className="ui-label inline-flex items-center gap-2 self-start rounded-[10px] border border-paper/20 px-4 py-2 text-paper/80 hover:border-brand hover:text-brand max-lg:min-h-11"
         >
           <Icon name="arrowUp" className="h-3.5 w-3.5" />
           Back to top
@@ -138,5 +139,25 @@ export function Footer() {
         </a>
       </div>
     </footer>
+  );
+}
+
+/** Faint route lines fanning out from Delhi: the RL motif, drawn in as the footer arrives. */
+function FooterRoutes() {
+  const routes = [
+    "M150 40 C 260 60, 330 120, 420 210",
+    "M150 40 C 120 120, 110 180, 90 260",
+    "M150 40 C 300 30, 520 40, 760 120",
+    "M150 40 C 360 80, 600 160, 980 200",
+    "M150 40 C 210 140, 300 200, 520 250",
+  ];
+  return (
+    <svg aria-hidden viewBox="0 0 1000 270" preserveAspectRatio="xMinYMid slice" className="pointer-events-none absolute inset-0 h-full w-full text-paper/15">
+      {routes.map((d) => (
+        <path key={d} data-route d={d} pathLength={1} fill="none" stroke="currentColor" strokeWidth={1.5} strokeDasharray="0.012 0.008" />
+      ))}
+      <circle cx={150} cy={40} r={5} className="fill-brand" />
+      <circle cx={150} cy={40} r={12} fill="none" className="stroke-brand" strokeOpacity={0.4} />
+    </svg>
   );
 }

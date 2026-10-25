@@ -40,7 +40,7 @@ export function ContactForm() {
         <p className="mt-3 max-w-[44ch] text-ink/70">A member of our team will call you within one working day with next steps and an all-in quote.</p>
         <a
           href={sent.mailto}
-          className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-paper transition-colors hover:bg-brand hover:text-ink"
+          className="mt-6 inline-flex h-11 items-center rounded-[10px] bg-ink px-5 text-[13px] font-medium text-paper transition-colors hover:bg-brand hover:text-ink"
         >
           Email these details to {company.email}
         </a>
@@ -95,7 +95,7 @@ export function ContactForm() {
         <textarea id="cf-message" name="message" rows={4} placeholder="Cargo, volumes, lanes, timelines…" className={cn(field, "resize-none")} />
       </label>
       <div className="sm:col-span-2">
-        <button type="submit" className="inline-flex h-12 items-center max-sm:w-full max-sm:justify-center gap-3 rounded-full bg-ink px-6 text-[14px] font-medium text-paper transition-colors hover:bg-brand hover:text-ink">
+        <button type="submit" className="inline-flex h-12 items-center max-sm:w-full max-sm:justify-center gap-3 rounded-[10px] bg-ink px-6 text-[14px] font-medium text-paper transition-colors hover:bg-brand hover:text-ink">
           Send enquiry
         </button>
       </div>

@@ -2,7 +2,7 @@
 
 export const hero = {
   eyebrow: "One operator · Since 2018",
-  headline: ["Every mile.", "Every", "milestone."],
+  headline: ["From Delhi", "to every", "doorstep."],
   sub: "Warehousing, road transport, freight forwarding and customs — run by one accountable team out of Delhi, moving cargo across India.",
   primary: { label: "Our services", href: "/services" },
   secondary: { label: "Get a quote", href: "/contact#quote" },
@@ -24,8 +24,8 @@ export const globeMarkers = [
 export const globeRest = { lat: 21, lng: 80 };
 
 export const about = {
-  eyebrow: "01 — Who we are",
-  headline: ["We move freight.", "We own", "the outcome."],
+  eyebrow: "RLWU 01 · Who we are",
+  headline: ["We own every", "shipment,", "end to end."],
   paragraphs: [
     "Warehousing, trucking, forwarding and customs under one roof, with one team answering for every consignment from the dock in Tughlakabad to the shelf in Bengaluru.",
     "No finger-pointing between vendors. No cargo lost in handoffs. One plan, one tracker, one phone number — and a team that treats your delivery date like its own.",
@@ -35,8 +35,8 @@ export const about = {
 };
 
 export const servicesSection = {
-  eyebrow: "02 — What we do",
-  headline: ["Everything your", "freight needs.", "Under one roof."],
+  eyebrow: "RLWU 02 · What we do",
+  headline: ["Warehouse to", "last mile.", "One team."],
   paragraphs: [
     "From the bonded warehouse in Tughlakabad to the last doorstep in Gurugram, every leg runs on our own processes, our own control tower and our own people.",
     "One contract, one tracker and one invoice, whether the cargo moves by truck, vessel or freighter.",
@@ -46,8 +46,8 @@ export const servicesSection = {
 };
 
 export const road = {
-  eyebrow: "03 — How we deliver",
-  headline: ["Reliability", "at every", "milestone."],
+  eyebrow: "RLWU 03 · How we deliver",
+  headline: ["Tracked", "every", "kilometre."],
   milestones: [
     { icon: "gps", title: "Real-time GPS tracking", body: "Every vehicle pings the control tower every 60 seconds. You see what we see." },
     { icon: "user", title: "Dedicated account manager", body: "One named person who knows your SKUs, your docks and your deadlines." },
@@ -58,7 +58,7 @@ export const road = {
 } as const;
 
 export const ocean = {
-  headline: ["Logistics that works", "as hard as you do."],
+  headline: ["Port to shelf,", "one partner."],
   features: [
     { icon: "contact", title: "One point of contact", body: "No call-centre roulette. One team owns your account across every mode." },
     { icon: "eye", title: "Full supply-chain visibility", body: "PO to POD on one dashboard: container, truck, shelf and doorstep." },
@@ -68,13 +68,13 @@ export const ocean = {
 } as const;
 
 export const trust = {
-  eyebrow: "04 — Clients",
-  headline: ["Trusted", "by businesses", "across India"],
+  eyebrow: "RLWU 04 · Clients",
+  headline: ["Chosen by", "brands that", "can't wait."],
   intro: "From first-time importers to national retail chains, our clients stay because we treat their cargo like our own.",
 };
 
 export const cta = {
-  headline: ["Let's move", "something."],
+  headline: ["Ready when", "your cargo is."],
   sub: "Tell us what you're shipping, where it's going and when it needs to get there. We'll come back with a plan and an all-in quote within one working day.",
   button: { label: "Get a quote", href: "/contact#quote" },
 };

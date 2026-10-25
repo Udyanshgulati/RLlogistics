@@ -72,7 +72,7 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
           <p className="ui-label mb-4 text-steel">Key lanes & locations</p>
           <ul className="flex flex-wrap gap-2">
             {s.lanes.map((l) => (
-              <li key={l} className="ui-label rounded-full border border-paper/20 px-4 py-2 text-paper/80">
+              <li key={l} className="ui-label rounded-[10px] border border-paper/20 px-4 py-2 text-paper/80">
                 {l}
               </li>
             ))}

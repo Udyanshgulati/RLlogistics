@@ -16,8 +16,8 @@ export function PlaneTop({ className, src }: { className?: string; src?: string 
         </linearGradient>
       </defs>
       <g opacity="0.16" transform="translate(40 60)">
-        <path d="M60 380 L900 360 Q990 380 900 420 L60 420 Z" fill="#0a0d14" />
-        <path d="M560 380 L330 40 H260 L380 380 Z M560 420 L330 760 H260 L380 420 Z" fill="#0a0d14" />
+        <path d="M60 380 L900 360 Q990 380 900 420 L60 420 Z" fill="#0b1f4d" />
+        <path d="M560 380 L330 40 H260 L380 380 Z M560 420 L330 760 H260 L380 420 Z" fill="#0b1f4d" />
       </g>
       {/* wings */}
       <path d="M560 372 L330 30 H262 Q252 30 256 42 L370 372 Z" fill="url(#wing)" />
@@ -31,7 +31,7 @@ export function PlaneTop({ className, src }: { className?: string; src?: string 
       ))}
       {/* tailplane */}
       <path d="M150 384 L60 250 H22 L70 384 Z M150 416 L60 550 H22 L70 416 Z" fill="url(#wing)" />
-      <path d="M40 392 H170 V408 H40 Z" fill="#ff5a1f" />
+      <path d="M40 392 H170 V408 H40 Z" fill="#f2a900" />
       {/* fuselage */}
       <path d="M30 372 H860 Q980 372 994 400 Q980 428 860 428 H30 Q14 428 14 400 Q14 372 30 372 Z" fill="url(#fus)" />
       <path d="M920 384 Q960 388 972 400 Q960 412 920 416 Z" fill="#26303c" />
