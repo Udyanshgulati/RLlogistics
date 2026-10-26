@@ -1,9 +1,14 @@
 #!/bin/sh
-# One-time nginx setup for rllogistics.thodalogic.com on the Thoda Logic server.
-# Run as root AFTER the site files are in /var/www/rllogistics. Safe to re-run.
+# nginx + HTTPS setup for the RL Logistics static site. Run as root. Safe to re-run.
+#   bash server-setup.sh                                          → staging: rllogistics.thodalogic.com
+#   bash server-setup.sh rllogisticsindia.com www.rllogisticsindia.com   → production (apex + www)
+# Each domain gets its own folder, so staging and production never overwrite each other.
 set -e
-DOMAIN=rllogistics.thodalogic.com
-ROOT=/var/www/rllogistics
+DOMAIN=${1:-rllogistics.thodalogic.com}
+ALIASES=""
+shift 2>/dev/null || true
+for a in "$@"; do ALIASES="$ALIASES $a"; done
+if [ "$DOMAIN" = "rllogistics.thodalogic.com" ]; then ROOT=/var/www/rllogistics; else ROOT=/var/www/$DOMAIN; fi
 
 # If uploaded as the bundle (server-setup.sh next to a site/ folder), install the site first.
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -27,7 +32,7 @@ fi
 cat > "$CONF" <<NGINX
 server {
     listen 80;
-    server_name $DOMAIN;
+    server_name $DOMAIN$ALIASES;
     root $ROOT;
     index index.html;
     location / { try_files \$uri \$uri/ \$uri.html =404; }
@@ -60,9 +65,12 @@ if ! command -v certbot >/dev/null 2>&1 && command -v apt-get >/dev/null 2>&1; t
   apt-get install -y certbot python3-certbot-nginx >/dev/null 2>&1 || true
 fi
 if command -v certbot >/dev/null 2>&1; then
-  certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m udyanshgulati@thodalogic.com --redirect \
+  CERT_ARGS="-d $DOMAIN"
+  for a in $ALIASES; do CERT_ARGS="$CERT_ARGS -d $a"; done
+  # shellcheck disable=SC2086
+  certbot --nginx $CERT_ARGS --non-interactive --agree-tos -m udyanshgulati@thodalogic.com --redirect \
     && echo "✓ HTTPS ready: https://$DOMAIN" \
-    || echo "! certbot failed — site still works on http://$DOMAIN (check the Cloudflare record is DNS only)"
+    || echo "! certbot failed — site still works on http://$DOMAIN (check the Cloudflare A/CNAME records are DNS only, grey cloud)"
 else
   echo "! certbot not available — site works on http://$DOMAIN"
 fi

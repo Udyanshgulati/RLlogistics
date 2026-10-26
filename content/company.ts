@@ -31,5 +31,5 @@ export const company = {
     country: "IN",
   },
   // Canonical address for SEO (sitemap, OG, JSON-LD). Override per deployment with NEXT_PUBLIC_SITE_URL.
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://rllogistics.in",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://rllogisticsindia.com",
 } as const;
