@@ -1,0 +1,10 @@
+/* TEAM */
+Client: RL Logistics and Warehousing Private Limited, Delhi
+Site: https://rllogisticsindia.com
+
+Design & development: Thoda Logic
+Site: https://thodalogic.com/
+Location: Delhi, India
+
+/* SITE */
+Built with: Next.js, React, GSAP, Tailwind CSS

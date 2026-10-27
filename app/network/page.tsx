@@ -4,6 +4,7 @@ import { IndiaMap } from "@/components/network/IndiaMap";
 import { networkStats } from "@/content/network";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/network" },
   title: "Network",
   description: "RL Logistics' pan-India network: Delhi NCR hub, port gateways at JNPT, Mundra, Chennai and Kolkata, ICD Tughlakabad and partner hubs.",
 };

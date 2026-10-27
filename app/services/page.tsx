@@ -6,6 +6,7 @@ import { Arrow } from "@/components/ui/Button";
 import { services } from "@/content/services";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/services" },
   title: "Services",
   description: "Warehousing & 3PL, FTL/PTL road transport, air and ocean freight forwarding, customs clearance, last-mile delivery and project cargo across India.",
 };

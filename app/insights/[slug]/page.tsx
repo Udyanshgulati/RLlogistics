@@ -16,7 +16,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
   const a = insights.find((x) => x.slug === slug);
-  return a ? { title: a.title, description: a.excerpt, openGraph: { type: "article", images: [a.cover.src] } } : {};
+  return a
+    ? { title: a.title, description: a.excerpt, alternates: { canonical: `/insights/${a.slug}` }, openGraph: { type: "article", images: [a.cover.src] } }
+    : {};
 }
 
 export default async function ArticlePage({ params }: { params: Promise<Params> }) {

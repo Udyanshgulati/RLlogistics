@@ -7,6 +7,7 @@ import { insights } from "@/content/insights";
 import { formatDate } from "@/lib/format";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/insights" },
   title: "Insights",
   description: "Practical notes from the RL Logistics floor on e-commerce peaks, customs clearance, e-way bills and cold-chain shipping in India.",
 };

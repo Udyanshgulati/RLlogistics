@@ -16,10 +16,32 @@ const mono = IBM_Plex_Mono({ subsets: ["latin"], variable: "--font-mono", displa
 
 export const metadata: Metadata = {
   metadataBase: new URL(company.url),
-  title: { default: `${company.name} & Warehousing — From Delhi to every doorstep.`, template: `%s — ${company.name}` },
+  title: {
+    default: `${company.name} & Warehousing | Logistics Company in Delhi — Warehousing, Transport & Customs`,
+    template: `%s | ${company.name} & Warehousing, Delhi`,
+  },
   description:
-    "Warehousing, road transport, freight forwarding and customs clearance — run by one accountable team out of Delhi, moving cargo across India.",
-  openGraph: { type: "website", locale: "en_IN", siteName: "RL Logistics & Warehousing" },
+    "RL Logistics & Warehousing is a Delhi logistics company: warehousing & 3PL, FTL/PTL road transport, freight forwarding and customs clearance across India, run by one accountable team since 2018.",
+  keywords: [
+    "logistics company in Delhi",
+    "warehousing in Delhi NCR",
+    "3PL Delhi",
+    "road transport Delhi",
+    "FTL PTL trucking India",
+    "freight forwarding Delhi",
+    "customs clearance ICD Tughlakabad",
+    "RL Logistics",
+  ],
+  alternates: { canonical: "/" },
+  applicationName: "RL Logistics & Warehousing",
+  publisher: company.legalName,
+  // Website credit: the studio that designed and built the site.
+  creator: "Thoda Logic",
+  // Site credits (humans.txt) — renders <meta name="author"> + <link rel="author">.
+  authors: [{ name: "Thoda Logic", url: "/humans.txt" }],
+  other: { designer: "Thoda Logic — https://thodalogic.com" },
+  category: "logistics",
+  openGraph: { type: "website", locale: "en_IN", siteName: "RL Logistics & Warehousing", url: "/" },
   ...(process.env.NEXT_PUBLIC_NOINDEX === "1" ? { robots: { index: false, follow: false } } : {}),
   twitter: { card: "summary_large_image" },
 };

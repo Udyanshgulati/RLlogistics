@@ -7,6 +7,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Button, Arrow } from "@/components/ui/Button";
 import { RevealHeading } from "@/components/text/RevealHeading";
 import { services } from "@/content/services";
+import { company } from "@/content/company";
 
 type Params = { slug: string };
 
@@ -17,7 +18,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
   const s = services.find((x) => x.slug === slug);
-  return s ? { title: s.title, description: s.short } : {};
+  return s ? { title: `${s.title} in Delhi & across India`, description: s.short, alternates: { canonical: `/services/${s.slug}` } } : {};
 }
 
 export default async function ServicePage({ params }: { params: Promise<Params> }) {
@@ -27,8 +28,20 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
   const s = services[index];
   const next = services[(index + 1) % services.length];
 
+  const serviceLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: s.title,
+    description: s.short,
+    serviceType: s.title,
+    url: `${company.url}/services/${s.slug}`,
+    areaServed: { "@type": "Country", name: "India" },
+    provider: { "@id": `${company.url}/#organization` },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }} />
       <PageHero eyebrow={`Service ${s.index} · ${s.title}`} headline={s.hero.split(/(?<=\.)\s+|(?<=,)\s+/)} intro={s.intro}>
         <div className="relative mt-10 flex flex-wrap gap-3">
           <Button href="/contact#quote" variant="brand">

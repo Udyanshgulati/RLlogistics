@@ -5,6 +5,7 @@ import { QuoteRequestForm } from "@/components/contact/QuoteRequestForm";
 import { company } from "@/content/company";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contact" },
   title: "Contact",
   description: `Get a quote or talk to RL Logistics and Warehousing. ${company.address.street}, Delhi 110053. ${company.email}`,
 };

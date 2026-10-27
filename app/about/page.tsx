@@ -8,6 +8,7 @@ import { aboutPage } from "@/content/about";
 import { company } from "@/content/company";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/about" },
   title: "About",
   description: "RL Logistics and Warehousing: an owner-run Delhi logistics company since 2018, running warehousing, transport, forwarding and customs under one roof.",
 };

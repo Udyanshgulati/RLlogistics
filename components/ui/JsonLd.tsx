@@ -9,10 +9,23 @@ export function JsonLd() {
     postalCode: company.address.postalCode,
     addressCountry: company.address.country,
   };
+  // The studio that designed and built the site (credited as the website's creator).
+  const studio = { "@type": "Organization", "@id": "https://thodalogic.com/#organization", name: "Thoda Logic", url: "https://thodalogic.com/" };
   const data = [
     {
       "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": `${company.url}/#website`,
+      name: "RL Logistics & Warehousing",
+      url: company.url,
+      inLanguage: "en-IN",
+      publisher: { "@id": `${company.url}/#organization` },
+      creator: studio,
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "Organization",
+      "@id": `${company.url}/#organization`,
       name: company.legalName,
       alternateName: "RL Logistics",
       url: company.url,
@@ -30,7 +43,12 @@ export function JsonLd() {
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
+      "@id": `${company.url}/#localbusiness`,
       name: company.legalName,
+      description: "Logistics company in Delhi: warehousing & 3PL, road transport, freight forwarding and customs clearance across India.",
+      openingHours: "Mo-Sa 09:00-18:00",
+      priceRange: "₹₹",
+      geo: { "@type": "GeoCoordinates", latitude: 28.7041, longitude: 77.2613 },
       url: company.url,
       email: company.email,
       telephone: company.phone,

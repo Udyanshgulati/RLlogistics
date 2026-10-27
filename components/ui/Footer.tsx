@@ -130,9 +130,10 @@ export function Footer() {
       {/* Studio credit */}
       <div className="-mx-gutter mt-10 border-t border-paper/10 px-gutter pb-1 pt-7 text-center lg:-ml-[clamp(140px,13vw,220px)] lg:pl-[clamp(140px,13vw,220px)]">
         <a
-          href="https://thodalogic.com"
+          href="https://thodalogic.com/"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener"
+          title="Website design and development by Thoda Logic"
           className="group inline-block font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-paper/45 transition-colors hover:text-paper/70 sm:text-[11px]"
         >
           Designed and developed by{" "}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { industries } from "@/content/industries";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/industries" },
   title: "Industries",
   description: "Logistics for FMCG, pharma, e-commerce, automotive, electronics and textiles — built around how each industry actually ships.",
 };
