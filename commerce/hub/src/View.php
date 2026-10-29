@@ -29,7 +29,7 @@ final class View
         // purchase orders
         'ordered' => ['Ordered', 'info'], 'partially_received' => ['Partly received', 'info'],
         // stores
-        'connected' => ['Connected', 'ok'], 'not_connected' => ['Not connected', 'warn'], 'paused' => ['Paused', 'neutral'],
+        'connected' => ['Connected', 'ok'], 'not_connected' => ['Not connected', 'neutral'], 'paused' => ['Paused', 'neutral'],
     ];
 
     public const ATTENTION = [
@@ -52,7 +52,8 @@ final class View
     public function render(string $template, array $vars, ?string $layout = 'layout'): string
     {
         $content = $this->partial($template, $vars);
-        if ($layout === null || ($vars['bare'] ?? false)) {
+        // Signed-out pages never get the app shell.
+        if ($layout === null || ($vars['bare'] ?? false) || $this->app->user === null) {
             return $content;
         }
         return $this->partial($layout, $vars + ['content' => $content]);

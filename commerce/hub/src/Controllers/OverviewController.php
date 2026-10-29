@@ -38,16 +38,52 @@ final class OverviewController extends Controller
             'title' => 'Overview',
             'nav' => 'overview',
             'range' => $range,
-            'from' => $from,
-            'to' => $to,
+            'fromDate' => $from->setTimezone(new \DateTimeZone($this->app->env['DISPLAY_TZ'] ?? 'Asia/Kolkata'))->format('Y-m-d'),
             'kpi' => $kpi,
             'stock' => $stock,
             'showOrders' => $orderScope !== [],
             'showStock' => $invScope !== [],
             'attention' => $this->attention($os, $kpi, $stock),
+            'journey' => $orderScope === [] ? null : $this->journey($os),
+            'flow' => $invScope === [] ? null : $this->flow($stock),
+            'recentOrders' => $orderScope === [] ? [] : $this->db->all("SELECT o.id, o.order_number, o.ship_country, o.payment_status, o.fulfilment_status, o.total_minor, o.currency, o.attention, s.brand_id {$base} ORDER BY o.placed_at DESC LIMIT 6"),
+            'movements' => $invScope === [] ? [] : $this->db->all("SELECT m.created_at, m.type, m.d_on_hand, m.d_reserved, m.d_damaged, m.d_quarantine, i.sku, i.id AS item_id FROM stock_movements m JOIN inventory_items i ON i.id = m.inventory_item_id ORDER BY m.id DESC LIMIT 6"),
+            'health' => $this->app->user->can('integrations.view') ? [
+                'stores' => $this->db->all('SELECT name, brand_id, status, last_seen_at FROM stores ORDER BY id'),
+                'failed' => (int) $this->db->value("SELECT (SELECT COUNT(*) FROM outbox WHERE status = 'dead') + (SELECT COUNT(*) FROM inbox_events WHERE status = 'failed')"),
+                'waiting' => (int) $this->db->value("SELECT COUNT(*) FROM outbox WHERE status IN ('pending','processing')"),
+            ] : null,
             'checklist' => $this->checklist(),
             'activity' => $this->activity($os),
         ]);
+    }
+
+    /**
+     * Counts for the shipment route: parcels at each stage, from shipment records (carrier status), not live location.
+     */
+    private function journey(string $os): array
+    {
+        $j = $this->db->one(
+            "SELECT SUM(o.payment_status = 'paid' AND o.fulfilment_status = 'packed') AS at_warehouse,
+                    (SELECT COUNT(*) FROM shipments sh JOIN orders o2 ON o2.id = sh.order_id JOIN stores s2 ON s2.id = o2.store_id WHERE " . str_replace('s.', 's2.', $os) . " AND sh.status IN ('dispatched','in_transit')) AS in_transit,
+                    (SELECT COUNT(*) FROM shipments sh JOIN orders o2 ON o2.id = sh.order_id JOIN stores s2 ON s2.id = o2.store_id WHERE " . str_replace('s.', 's2.', $os) . " AND sh.status = 'exception') AS problems,
+                    (SELECT COUNT(*) FROM shipments sh JOIN orders o2 ON o2.id = sh.order_id JOIN stores s2 ON s2.id = o2.store_id WHERE " . str_replace('s.', 's2.', $os) . " AND sh.status = 'delivered' AND sh.delivered_at >= ?) AS delivered
+             FROM orders o JOIN stores s ON s.id = o.store_id WHERE {$os}",
+            [$this->app->clock->now()->modify('-7 days')],
+        );
+        return array_map('intval', $j);
+    }
+
+    /** Stock lifecycle counts: received and dispatched in the last 7 days, available and reserved now. */
+    private function flow(array $stock): array
+    {
+        $since = $this->app->clock->now()->modify('-7 days');
+        return [
+            'received' => (int) $this->db->value("SELECT COALESCE(SUM(d_on_hand), 0) FROM stock_movements WHERE created_at >= ? AND type IN ('opening','adjust.received','purchase.receive','return.restock','adjust.returned_to_inventory')", [$since]),
+            'available' => $stock['available'],
+            'reserved' => (int) $this->db->value('SELECT COALESCE(SUM(reserved), 0) FROM stock_levels'),
+            'dispatched' => (int) $this->db->value("SELECT COALESCE(-SUM(d_on_hand), 0) FROM stock_movements WHERE created_at >= ? AND type = 'dispatch'", [$since]),
+        ];
     }
 
     /** Each item: [count, message, link, action label, tone]. Only non-zero items are shown. */

@@ -1,0 +1,95 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Command line for operators and cron.
+//   bin/hub migrate                         apply database migrations
+//   bin/hub seed                            create brands, stores and the Delhi warehouse (once)
+//   bin/hub create-owner EMAIL "NAME"       create the first owner and print a set-up link
+//   bin/hub work                            run due background work once (cron: every minute)
+//   bin/hub rates                           refresh display exchange rates (cron: daily)
+//   bin/hub reconcile                       check the ledger; exit code 1 when anything disagrees
+//   bin/hub demo                            load clearly labelled demonstration data (refused in production)
+
+use Commerce\Core\Db\Migrator;
+use Commerce\Core\Inventory\ExpiryWorker;
+use Commerce\Core\Inventory\Reconciler;
+use Commerce\Core\Market\EcbRateSource;
+use Commerce\Core\Market\ExchangeRates;
+use Commerce\Core\Support\SystemClock;
+use Commerce\Hub\App;
+use Commerce\Hub\Http\ArraySession;
+
+require __DIR__ . '/../bootstrap.php';
+
+$env = hub_env();
+$db = hub_db($env);
+$clock = new SystemClock();
+$cmd = $argv[1] ?? 'help';
+
+switch ($cmd) {
+    case 'migrate':
+        $done = (new Migrator($db, __DIR__ . '/../../core/migrations'))->migrate();
+        echo $done ? 'Applied: ' . implode(', ', $done) . "\n" : "Already up to date.\n";
+        break;
+
+    case 'seed':
+        if ((int) $db->value('SELECT COUNT(*) FROM brands') > 0) {
+            echo "Brands already exist; nothing to do.\n";
+            break;
+        }
+        // Brand codes and SKU prefixes are configuration; confirm them with the client before go-live.
+        $db->run("INSERT INTO brands (id, code, name, sku_prefix) VALUES (1, 'milan-icons', 'Milan Icons', 'MI'), (2, 'significant-sports', 'Significant Sports', 'SS'), (3, 'schermo', 'Schermo', 'SCH')");
+        $db->run("INSERT INTO stores (id, brand_id, code, name, base_url) VALUES (1, 1, 'milan-icons', 'Milan Icons', NULL), (2, 2, 'significant-sports', 'Significant Sports', NULL), (3, 3, 'schermo', 'Schermo', 'https://schermo.in')");
+        $db->run("INSERT INTO warehouses (id, code, name, country_code, city) VALUES (1, 'DEL1', 'Delhi warehouse', 'IN', 'Delhi')");
+        echo "Seeded 3 brands, 3 storefronts and the Delhi warehouse. Storefront addresses for Milan Icons and Significant Sports are empty until confirmed.\n";
+        break;
+
+    case 'create-owner':
+        [$email, $name] = [strtolower($argv[2] ?? ''), $argv[3] ?? ''];
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $name === '') {
+            fwrite(STDERR, "Usage: bin/hub create-owner EMAIL \"NAME\"\n");
+            exit(2);
+        }
+        $token = bin2hex(random_bytes(32));
+        $id = $db->insert('INSERT INTO users (email, name, password_hash, created_at, setup_token_hash, setup_expires_at) VALUES (?, ?, ?, ?, ?, ?)', [
+            $email, $name, password_hash(bin2hex(random_bytes(32)), Commerce\Hub\Controllers\AuthController::algo()), $clock->now(), hash('sha256', $token), $clock->now()->modify('+72 hours'),
+        ]);
+        $db->run("INSERT INTO user_roles (user_id, role, brand_id) VALUES (?, 'owner', NULL)", [$id]);
+        echo 'Owner created. Open this link within 72 hours to set the password:' . "\n" . rtrim($env['APP_URL'] ?? 'http://localhost:8080', '/') . "/setup?token={$token}\n";
+        break;
+
+    case 'work':
+        // One process at a time per host is not required (SKIP LOCKED), but cron overlap is pointless.
+        $lock = fopen(sys_get_temp_dir() . '/hub-work.lock', 'c');
+        if (!flock($lock, LOCK_EX | LOCK_NB)) {
+            exit(0);
+        }
+        $app = new App($db, $clock, new ArraySession(), $env);
+        $expiry = (new ExpiryWorker($db, $app->services->ledger(), $app->services->store(), $clock))->run();
+        $outbox = $app->services->outbox(['notify.customer' => new Commerce\Hub\PendingNotificationHandler(), 'alert.stock' => new Commerce\Hub\PendingNotificationHandler()])->runOnce(200);
+        echo json_encode(['expiry' => $expiry, 'outbox' => $outbox]) . "\n";
+        break;
+
+    case 'rates':
+        $n = (new ExchangeRates($db, $clock))->refresh(new EcbRateSource());
+        echo "Stored {$n} exchange rates.\n";
+        break;
+
+    case 'reconcile':
+        $problems = (new Reconciler($db))->problems();
+        echo $problems === [] ? "Ledger consistent.\n" : json_encode($problems, JSON_PRETTY_PRINT) . "\n";
+        exit($problems === [] ? 0 : 1);
+
+    case 'demo':
+        if (($env['APP_ENV'] ?? 'production') === 'production') {
+            fwrite(STDERR, "Refusing to load demonstration data when APP_ENV=production.\n");
+            exit(2);
+        }
+        require __DIR__ . '/../demo/seed.php';
+        break;
+
+    default:
+        echo implode('', array_map(fn ($l) => ltrim(substr($l, 2)) . '', array_slice(file(__FILE__), 4, 9)));
+}
