@@ -13,7 +13,8 @@ use Commerce\Hub\Http\Response;
 
 final class InventoryController extends Controller
 {
-    private const PER_PAGE = 50;
+    /** SKUs per page; rows are grouped by product, so a page holds whole size runs in practice. */
+    private const PER_PAGE = 200;
     /** Warehouse staff may record only these; the rest need full inventory rights. */
     private const BASIC = [Adjustment::Received, Adjustment::Damaged, Adjustment::ReturnedToInventory];
 
@@ -23,8 +24,24 @@ final class InventoryController extends Controller
         $f = ['q' => $req->q('q'), 'category' => $req->q('category'), 'size' => $req->q('size'), 'status' => $req->q('status'), 'sort' => $req->q('sort', 'name'), 'dir' => $req->q('dir', 'asc')];
         $page = max(1, $req->int('page', 1));
         $result = $this->app->services->inventory()->list($f, $scope, self::PER_PAGE, ($page - 1) * self::PER_PAGE);
+        // Group sizes under their product, keeping the requested sort order of products.
+        $groups = [];
+        foreach ($result['rows'] as $r) {
+            $groups[$r['product_id']] ??= ['product_id' => $r['product_id'], 'name' => $r['name'], 'category' => $r['category'], 'image_url' => $r['image_url'], 'code' => $r['product_code'], 'items' => []];
+            $groups[$r['product_id']]['items'][] = $r;
+        }
+        foreach ($groups as &$g) {
+            $sum = fn (string $k) => array_sum(array_column($g['items'], $k));
+            $brands = array_values(array_unique(array_merge(...array_column($g['items'], 'listing_brands'))));
+            $statuses = array_column($g['items'], 'status');
+            $g += ['on_hand' => $sum('on_hand'), 'reserved' => $sum('reserved'), 'available' => $sum('available'), 'incoming' => $sum('incoming'), 'brands' => $brands,
+                'status' => in_array('out', $statuses, true) ? 'out' : (in_array('low', $statuses, true) ? 'low' : 'in'),
+                'problems' => count(array_filter($statuses, fn ($st) => $st !== 'in')),
+                'sharing' => in_array('shared', array_column($g['items'], 'sharing'), true) ? 'shared' : (count($brands) ? 'exclusive' : 'unmapped')];
+        }
+        unset($g);
         return $this->app->page($req, 'inventory/index', [
-            'title' => 'Inventory', 'nav' => 'inventory', 'f' => $f, 'rows' => $result['rows'], 'total' => $result['total'], 'page' => $page, 'perPage' => self::PER_PAGE,
+            'title' => 'Inventory', 'nav' => 'inventory', 'f' => $f, 'rows' => $result['rows'], 'groups' => array_values($groups), 'total' => $result['total'], 'page' => $page, 'perPage' => self::PER_PAGE,
             'categories' => array_column($this->db->all('SELECT DISTINCT category FROM products WHERE category IS NOT NULL ORDER BY category'), 'category'),
             'sizes' => $this->app->services->skuPolicy()->sizeRun(),
             'views' => $this->db->all("SELECT name, query FROM saved_views WHERE user_id = ? AND page = 'inventory' ORDER BY name", [$this->app->user->userId]),
@@ -37,6 +54,10 @@ final class InventoryController extends Controller
         $scope = $this->app->scope('inventory.view');
         $f = ['q' => $req->q('q'), 'category' => $req->q('category'), 'size' => $req->q('size'), 'status' => $req->q('status'), 'sort' => 'sku'];
         $rows = $this->app->services->inventory()->list($f, $scope, 100000)['rows'];
+        if (($ids = $req->q('ids')) !== '') {
+            $wanted = array_flip(array_map('intval', explode(',', $ids)));
+            $rows = array_values(array_filter($rows, fn ($r) => isset($wanted[(int) $r['id']])));
+        }
         $names = array_map(fn ($b) => $b['name'], $this->app->services->brands());
         $this->app->services->audit()->log($this->actor(), 'inventory.export', 'inventory', 'csv', ['rows' => count($rows)], $req->ip);
         return Response::csv('inventory-' . $this->app->clock->now()->format('Y-m-d') . '.csv', InventoryCsv::export($rows, $names));
@@ -109,7 +130,12 @@ final class InventoryController extends Controller
         $id = (int) $p['id'];
         $types = $this->allowedTypes($id);
         $item = $this->app->services->inventory()->one($id) ?? throw new HttpError(404, 'This product does not exist.');
-        return $this->app->page($req, 'inventory/adjust', ['title' => 'Adjust stock', 'nav' => 'inventory', 'item' => $item, 'types' => $types, 'canCount' => $this->canFull($id)]);
+        $vars = ['title' => 'Adjust stock', 'nav' => 'inventory', 'item' => $item, 'types' => $types, 'canCount' => $this->canFull($id)];
+        if ($req->q('panel') === '1') {
+            // Fragment for the side panel on the inventory list; the full page stays the no-JavaScript route.
+            return $this->app->page($req, 'inventory/adjust-panel', $vars + ['bare' => true]);
+        }
+        return $this->app->page($req, 'inventory/adjust', $vars);
     }
 
     public function adjust(Request $req, array $p): Response
@@ -126,6 +152,27 @@ final class InventoryController extends Controller
         $sku = $this->db->value('SELECT sku FROM inventory_items WHERE id = ?', [$id]);
         $this->app->flash('success', "{$type->label()} recorded for {$sku}. On hand {$before->onHand} → {$after->onHand}, available {$before->available()} → {$after->available()}.", ['action' => "/inventory/movements/{$mid}/undo", 'label' => 'Undo']);
         return Response::redirect($req->p('return') === 'list' ? '/inventory' : "/inventory/{$id}");
+    }
+
+    /** Bulk: set the same reorder level on the selected SKUs (confirmed in the browser first). */
+    public function bulkReorder(Request $req): Response
+    {
+        $level = $req->int('reorder_level', -1, true);
+        $ids = array_values(array_filter(array_map('intval', (array) ($req->post['ids'] ?? []))));
+        if ($level < 0 || $ids === []) {
+            throw new LedgerException('Select products and enter a reorder level of 0 or more.');
+        }
+        foreach ($ids as $id) {
+            $this->requireForAny('products.manage', $this->brandsOfItem($id));
+        }
+        $this->db->transaction(function () use ($ids, $level) {
+            foreach ($ids as $id) {
+                $this->db->run('UPDATE inventory_items SET reorder_level = ?, updated_at = ? WHERE id = ?', [$level, $this->app->clock->now(), $id]);
+            }
+        });
+        $this->app->services->audit()->log($this->actor(), 'item.reorder_level_bulk', 'inventory_item', implode(',', $ids), ['reorder_level' => $level], $req->ip);
+        $this->app->flash('success', 'Reorder level set to ' . $level . ' for ' . count($ids) . ' SKU' . (count($ids) === 1 ? '' : 's') . '.');
+        return Response::redirect($this->app->back($req));
     }
 
     public function count(Request $req, array $p): Response

@@ -117,6 +117,7 @@ final class App
         $r('POST', '/inventory/incoming', $inv->createPurchaseOrder(...));
         $r('POST', '/inventory/incoming/{id}/ordered', $inv->markOrdered(...));
         $r('POST', '/inventory/incoming/lines/{id}/receive', $inv->receiveLine(...));
+        $r('POST', '/inventory/bulk-reorder', $inv->bulkReorder(...));
         $r('GET', '/inventory/{id}', $inv->show(...));
         $r('GET', '/inventory/{id}/adjust', $inv->adjustForm(...));
         $r('POST', '/inventory/{id}/adjust', $inv->adjust(...));

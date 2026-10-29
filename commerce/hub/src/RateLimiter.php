@@ -14,6 +14,14 @@ final class RateLimiter
     {
     }
 
+    /** True when $bucket already reached $max inside the window. Does not count anything. */
+    public function exceeded(string $bucket, int $max, int $windowSeconds): bool
+    {
+        $row = $this->db->one('SELECT * FROM rate_limits WHERE bucket = ?', [hash('sha256', $bucket)]);
+        return $row !== null && (int) $row['hits'] >= $max
+            && new \DateTimeImmutable($row['window_start'], new \DateTimeZone('UTC')) >= $this->clock->now()->modify("-{$windowSeconds} seconds");
+    }
+
     /** @return bool true when the call is allowed (and counted) */
     public function hit(string $bucket, int $max, int $windowSeconds): bool
     {

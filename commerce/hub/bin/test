@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Runs the dashboard's HTTP-level tests with the core's dependency-free runner.
+dir="$(cd "$(dirname "$0")/.." && pwd)"
+TEST_BOOTSTRAP="$dir/tests/bootstrap.php" TEST_ROOT="$dir/tests" TEST_NS='Commerce\Hub\Tests\' exec php "$dir/../core/bin/test" "$@"

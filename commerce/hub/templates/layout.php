@@ -98,6 +98,7 @@ $initials = $u ? strtoupper(implode('', array_map(fn ($w) => mb_substr($w, 0, 1)
     </main>
   </div>
 </div>
+<dialog class="drawer" id="drawer" aria-labelledby="drawer-title"><div class="drawer-inner" data-drawer-content><div class="drawer-loading" role="status">Loading…</div></div></dialog>
 <dialog class="confirm" id="confirm-dialog">
   <div class="d-body"><h2 data-title>Are you sure?</h2><p data-message></p></div>
   <div class="d-foot"><button class="btn" type="button" data-cancel>Cancel</button><button class="btn btn-primary" type="button" data-ok>Confirm</button></div>

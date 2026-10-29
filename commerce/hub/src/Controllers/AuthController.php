@@ -27,9 +27,15 @@ final class AuthController extends Controller
         $next = $req->p('next', '/');
         $limiter = new RateLimiter($this->db, $this->app->clock);
         $fail = fn (string $msg) => $this->app->page($req, 'login', ['bare' => true, 'next' => $next, 'email' => $email, 'error' => $msg], 401);
-        if (!$limiter->hit('login:ip:' . $req->ip, 20, 900) || !$limiter->hit('login:email:' . $email, 5, 900)) {
+        // Only failed attempts count towards the limits, so people who sign in often are never locked out.
+        if ($limiter->exceeded('login:ip:' . $req->ip, 20, 900) || $limiter->exceeded('login:email:' . $email, 5, 900)) {
             return $fail('Too many sign-in attempts. Wait 15 minutes and try again.');
         }
+        $fail = function (string $msg) use ($fail, $limiter, $req, $email) {
+            $limiter->hit('login:ip:' . $req->ip, 20, 900);
+            $limiter->hit('login:email:' . $email, 5, 900);
+            return $fail($msg);
+        };
         $u = $this->db->one('SELECT * FROM users WHERE email = ?', [$email]);
         $now = $this->app->clock->now();
         if ($u !== null && $u['locked_until'] !== null && new \DateTimeImmutable($u['locked_until'], new \DateTimeZone('UTC')) > $now) {

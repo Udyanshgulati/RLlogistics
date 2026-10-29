@@ -54,15 +54,23 @@ $canFulfil = $v->can('orders.fulfil', $brand);
           <?php endif; ?>
         </div>
       <?php endif; ?>
-      <?php if ($stepNow >= 0): ?>
-      <div class="card-body"><ol class="steps" aria-label="Fulfilment progress">
-        <?php $labels = ['Paid', 'Processing', 'Picked', 'Packed', 'Shipped', 'Delivered'];
-          $flags = array_map(fn ($i) => $i === 0 ? ($o['payment_status'] === 'paid' || $stepNow > 0) : $stepNow >= $i, array_keys($labels));
-          $nowAt = array_search(false, $flags, true);
-          foreach ($labels as $i => $label): ?>
-          <li class="<?= $flags[$i] ? 'done' : ($i === $nowAt ? 'now' : '') ?>"><?= $label ?></li>
-        <?php endforeach; ?>
-      </ol></div>
+      <?php if ($stepNow >= 0):
+          // Stages follow the server's fulfilment status only; nothing is shown done before it is recorded.
+          $stage = ['unfulfilled' => 0, 'processing' => 1, 'picked' => 1, 'packed' => 2, 'partially_shipped' => 3, 'shipped' => 3, 'delivered' => 4][$o['fulfilment_status']] ?? 0;
+          $times = [];
+          foreach ($events as $e) {
+              $k = ['received' => 0, 'processing' => 1, 'packed' => 2, 'shipment.dispatched' => 3, 'tracking.delivered' => 4][$e['type']] ?? null;
+              if ($k !== null && !isset($times[$k])) { $times[$k] = $e['created_at']; }
+          } ?>
+      <div class="card-body">
+        <ol class="journey" data-journey="<?= (int) $o['id'] ?>" data-stage="<?= $stage ?>" aria-label="Order progress">
+          <?php foreach (['New order', 'Processing', 'Packed', 'Dispatched', 'Delivered'] as $i => $label): ?>
+            <li class="<?= $i < $stage || ($i === $stage && $stage === 4) ? 'done' : ($i === $stage ? 'now' : '') ?>"<?= $i === $stage ? ' aria-current="step"' : '' ?>>
+              <span class="node" aria-hidden="true"></span><b><?= $label ?></b><span class="when"><?= isset($times[$i]) && $i <= $stage ? $v->date($times[$i]) : '' ?></span>
+            </li>
+          <?php endforeach; ?>
+        </ol>
+      </div>
       <?php endif; ?>
     </section>
 
