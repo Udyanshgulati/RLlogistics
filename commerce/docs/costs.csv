@@ -1,0 +1,32 @@
+budget,item,type,amount,currency,unit,basis,source_or_status,avoidable_with_custom_code,notes
+A,Production VPS Hostinger KVM 4 (intro),one-time prepaid,311.76,USD,24 months,checked 29 Oct 2026,hostinger.com/vps-hosting,no,$12.99/mo intro; renews at $28.99/mo
+A,Production VPS Hostinger KVM 4 (renewal),monthly,28.99,USD,month,checked 29 Oct 2026,hostinger.com/vps-hosting,no,after the 24-month term
+A,Upgrade option Hostinger KVM 8 (intro),one-time prepaid,623.76,USD,24 months,checked 29 Oct 2026,hostinger.com/vps-hosting,no,only if load requires; renews at $49.99/mo
+A,Staging VPS (small plan),monthly,,USD,month,estimate,verify plan price,no,required: staging before production
+A,Domains (Milan Icons / Significant Sports / schermo.in renewals),annual,,INR,per domain,existing domains,client to confirm registrar and renewal dates,no,
+A,Cloudflare (CDN + WAF),monthly,0,USD,month,free plan,verify plan limits,no,paid plan optional
+A,Off-site backup storage,monthly,,USD,month,usage-based,quote required (e.g. Backblaze B2 or similar),no,small at this data size
+A,Amazon SES email,usage,0.10,USD,per 1000 emails,checked 29 Oct 2026,aws.amazon.com/ses/pricing,no,attachments $0.12/GB; dedicated IP optional $24.95/mo
+A,WhatsApp Cloud API,usage,,INR/USD,per delivered message,per category and country,developers.facebook.com/docs/whatsapp/pricing (rate card),no,optional; 1000 free service messages/month per number
+A,Razorpay domestic,usage,2,%,of transaction + 18% GST on fee,checked 29 Oct 2026,razorpay.com/pricing,no,no setup or annual fee
+A,Razorpay international cards,usage,3,%,up to; + 18% GST on fee,checked 29 Oct 2026,razorpay.com/pricing,no,
+A,Cashfree international Visa/Mastercard,usage,2.99,%,of transaction,checked 29 Oct 2026,cashfree.com/payment-gateway-charges,no,alternative gateway
+A,PayPal commercial international,usage,4.4,%,+ fixed fee per currency,checked 29 Oct 2026,paypal.com/in business fees,no,India accounts: international only; 3-4% conversion spread
+A,Carrier shipping (express),usage,,INR,per shipment,contract,quote required,no,passed to customers via checkout shipping
+A,Uptime and error monitoring,monthly,0,USD,month,free tiers,verify limits,no,
+A,Paid WooCommerce plugins,annual,0,USD,year,none recommended,doc 05,yes,multi-currency checkout uses a free plugin in phase 2
+B,Core ledger + OMS dashboard (built in this session),one-time,0,hours,remaining,done,see README status,n/a,maintenance counted below
+B,Discovery + SKU/mapping workshop,one-time,20,hours,estimate,assumption,,n/a,16-24 h
+B,Storefront themes (parent + 3 brand child themes),one-time,150,hours,estimate,assumption,,n/a,120-180 h; depends on assets
+B,WooCommerce connector plugin (reservation hook + catalogue sync + market selector),one-time,65,hours,estimate,assumption,,n/a,50-80 h
+B,Carrier adapter (first carrier),one-time,55,hours,estimate,assumption,,n/a,40-70 h per carrier
+B,Notification engine + 10 events x 3 brand templates + SES/DNS,one-time,50,hours,estimate,assumption,,n/a,40-60 h
+B,WhatsApp adapter (optional),one-time,20,hours,estimate,assumption,,n/a,16-24 h
+B,Payment gateway set-up and testing,one-time,40,hours,estimate,assumption,,n/a,~16-24 h per gateway incl. refunds
+B,Order pull backstop + remaining hub items,one-time,25,hours,estimate,assumption,,n/a,
+B,Catalogue migration and SKU mapping,one-time,,hours,0.1-0.25 h per SKU,assumption,needs SKU count,n/a,
+B,Staging + production deployment + monitoring + backups,one-time,32,hours,estimate,assumption,,n/a,24-40 h
+B,Testing and acceptance (staging),one-time,50,hours,estimate,assumption,,n/a,40-60 h
+B,Training and handover,one-time,12,hours,estimate,assumption,,n/a,8-16 h
+B,Maintenance (updates; monitoring; small fixes),monthly,10,hours,estimate,assumption,,n/a,8-12 h/month across 3 stores + hub
+B,Economic value of development effort,formula,,INR,hours x rate,ASSUMPTION: set your rate,e.g. 519 h x rate,n/a,see 08-costs.md
