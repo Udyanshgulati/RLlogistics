@@ -24,9 +24,6 @@ add_action('after_setup_theme', static function (): void {
         'single_image_width' => 1000,
         'product_grid' => ['default_columns' => 4, 'default_rows' => 4, 'min_columns' => 2, 'max_columns' => 4],
     ]);
-    add_theme_support('wc-product-gallery-zoom');
-    add_theme_support('wc-product-gallery-lightbox');
-    add_theme_support('wc-product-gallery-slider');
     register_nav_menus([
         'primary' => __('Main menu', 'brandhouse'),
         'footer-shop' => __('Footer: shop', 'brandhouse'),

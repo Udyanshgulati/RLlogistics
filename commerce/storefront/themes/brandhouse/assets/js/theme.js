@@ -29,6 +29,12 @@
     });
   }
 
+  // Phone photo slider counter.
+  $$('[data-swipe]').forEach((row) => {
+    const out = row.parentElement.querySelector('[data-swipe-index]');
+    row.addEventListener('scroll', () => { out.textContent = String(Math.round(row.scrollLeft / row.clientWidth) + 1); }, { passive: true });
+  });
+
   // Search panel.
   const searchBtn = $('[data-search-open]');
   const panel = $('#site-search');

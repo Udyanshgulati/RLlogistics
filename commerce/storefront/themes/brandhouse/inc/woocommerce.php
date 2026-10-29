@@ -43,6 +43,17 @@ add_action('woocommerce_single_product_summary', 'brandhouse_product_details', 4
 add_action('woocommerce_before_add_to_cart_button', 'brandhouse_size_guide_link', 5);
 // No product photo yet: a labelled placeholder instead of WooCommerce's generic picture icon.
 add_filter('woocommerce_single_product_image_thumbnail_html', static fn (string $html, int $id): string => $id ? $html : '<div class="woocommerce-product-gallery__image--placeholder">' . brandhouse_placeholder(__('Product photo', 'brandhouse')) . '</div>', 10, 2);
+// "Buy now" beside "Add to cart": same form, then straight to checkout.
+add_action('woocommerce_after_add_to_cart_button', static function (): void {
+    global $product;
+    if ($product instanceof WC_Product && $product->is_type('simple')) {
+        // Simple products submit their ID on the main button only; the hidden field lets "Buy now" add it too.
+        printf('<input type="hidden" name="add-to-cart" value="%d">', (int) $product->get_id());
+    }
+    echo '<button type="submit" name="bh_buy_now" value="1" class="button buy-now btn-outline">' . esc_html__('Buy now', 'brandhouse') . '</button>';
+});
+add_filter('woocommerce_add_to_cart_redirect', static fn ($url) => !empty($_REQUEST['bh_buy_now']) ? wc_get_checkout_url() : $url); // phpcs:ignore WordPress.Security.NonceVerification -- only chooses the redirect target
+
 add_filter('woocommerce_output_related_products_args', static fn (array $a): array => array_merge($a, ['posts_per_page' => 4, 'columns' => 4]));
 
 function brandhouse_size_guide_link(): void

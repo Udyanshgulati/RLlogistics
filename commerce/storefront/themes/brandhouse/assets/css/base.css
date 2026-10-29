@@ -140,7 +140,7 @@ nav.woocommerce-pagination span.current { background: var(--ink); color: var(--b
 .empty-state h2 { font-size: 22px; margin: 10px 0 20px; }
 
 /* ── Product page ─────────────────────────────────────────────────────── */
-.single-product div.product { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 72px); max-width: var(--max); margin: 0 auto; padding: 24px var(--gutter) 0; align-items: start; }
+.single-product div.product { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(320px, 1fr); gap: clamp(24px, 4vw, 72px); max-width: var(--max); margin: 0 auto; padding: 24px var(--gutter) 0; align-items: start; }
 .single-product .crumbs { max-width: var(--max); margin: 0 auto; padding: 24px var(--gutter) 0; }
 .woocommerce-product-gallery { position: relative; }
 .woocommerce-product-gallery__image img { width: 100%; }
@@ -192,6 +192,18 @@ form.cart:not(.variations_form), .woocommerce-variation-add-to-cart { display: f
 .product_meta { display: none; }
 .related, .upsells { grid-column: 1 / -1; padding-top: 48px; }
 .related > h2, .upsells > h2 { font: 700 14px/1 var(--font-display); letter-spacing: .16em; text-transform: uppercase; margin-bottom: 24px; }
+
+/* Product media: sticky main photo + scrolling photos (desktop), swipe row with counter (phone). */
+.pdp-media { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items: start; }
+.pdp-media.is-single { grid-template-columns: 1fr; }
+.pdp-hero { position: sticky; top: calc(var(--header-h) + 16px); background: var(--ph); }
+.pdp-hero .pdp-img, .pdp-hero .ph, .pdp-shot .pdp-img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.pdp-media:not(.is-single) .pdp-hero .pdp-img, .pdp-media:not(.is-single) .pdp-hero .ph { height: calc(100vh - var(--header-h) - 32px); aspect-ratio: auto; max-height: 900px; }
+.pdp-stack { display: grid; gap: 6px; }
+.pdp-shot { margin: 0; background: var(--ph); }
+.pdp-swipe, .pdp-count { display: none; }
+.summary .buy-now { flex: 1 1 100%; background: transparent; color: var(--ink); border-color: var(--ink); }
+.summary .buy-now:hover { background: var(--ink); color: var(--bg); }
 
 /* ── Dialogs (size guide) ────────────────────────────────────────────── */
 dialog.sheet { border: 0; padding: 0; width: min(560px, calc(100vw - 32px)); background: var(--bg); }
@@ -257,6 +269,13 @@ main.page { padding-top: 40px; padding-bottom: 80px; }
   .nav-primary ul { gap: 18px; }
 }
 @media (max-width: 860px) {
+  .pdp-media { display: block; position: relative; margin: 0 calc(var(--gutter) * -1); }
+  .pdp-media:not(.is-single) .pdp-hero, .pdp-stack { display: none; }
+  .pdp-swipe { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .pdp-swipe::-webkit-scrollbar { display: none; }
+  .pdp-swipe .pdp-shot { flex: 0 0 100%; scroll-snap-align: start; }
+  .pdp-count { display: block; position: absolute; right: 12px; bottom: 12px; margin: 0; padding: 5px 9px; background: var(--bg); font: 600 11px/1 var(--font-label); letter-spacing: .08em; }
+  .pdp-hero { position: static; }
   .menu-toggle { display: inline-grid; }
   .nav-primary { display: none; }
   .single-product div.product { grid-template-columns: 1fr; padding-top: 8px; }
