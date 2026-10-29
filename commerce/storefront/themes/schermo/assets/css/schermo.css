@@ -100,3 +100,7 @@
   .foot-art { width: 110vw; bottom: -8%; }
   .story-mark { display: none; }
 }
+
+/* Schermo icons: square ends, mitred corners and the logo's forward slant. */
+.i { stroke-width: 1.75; stroke-linecap: square; stroke-linejoin: miter; transform: skewX(-12deg); overflow: visible; }
+.hero .btn .i, .section-link .i { transform: none; }

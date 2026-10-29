@@ -62,7 +62,7 @@ function brandhouse_size_guide_link(): void
     if (!$product instanceof WC_Product || !$product->is_type('variable') || !array_key_exists('pa_size', $product->get_variation_attributes())) {
         return;
     }
-    echo '<button type="button" class="link-btn size-guide-open" data-dialog="size-guide">' . esc_html__('Size guide', 'brandhouse') . '</button>';
+    echo '<button type="button" class="link-btn size-guide-open" data-dialog="size-guide">' . brandhouse_icon('ruler') . esc_html__('Size guide', 'brandhouse') . '</button>';
     add_action('wp_footer', 'brandhouse_size_guide_dialog');
 }
 

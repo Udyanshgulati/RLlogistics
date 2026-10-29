@@ -318,3 +318,5 @@ main.page { padding-top: 40px; padding-bottom: 80px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+.size-guide-open, .notify-open { display: inline-flex; align-items: center; gap: 6px; }
+.size-guide-open .i, .notify-open .i { width: 16px; height: 16px; }

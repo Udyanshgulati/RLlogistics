@@ -81,7 +81,7 @@ add_action('woocommerce_single_product_summary', static function (): void {
         echo '<p class="notify-done is-error" role="alert">' . esc_html__('Please enter a valid email address.', 'brandhouse') . '</p>';
     }
     $label = $product->is_type('variable') ? __('Size sold out? Notify me', 'brandhouse') : __('Notify me when available', 'brandhouse');
-    printf('<button type="button" class="%s" data-dialog="notify-me">%s</button>', $product->is_type('variable') ? 'link-btn notify-open' : 'button btn-outline notify-open notify-block', esc_html($label));
+    printf('<button type="button" class="%s" data-dialog="notify-me">%s%s</button>', $product->is_type('variable') ? 'link-btn notify-open' : 'button btn-outline notify-open notify-block', brandhouse_icon('bell'), esc_html($label));
     add_action('wp_footer', static function () use ($product, $options): void {
         ?>
         <dialog class="sheet" id="notify-me" aria-labelledby="notify-title">
