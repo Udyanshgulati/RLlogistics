@@ -18,6 +18,17 @@
     if (e.target instanceof HTMLDialogElement) e.target.close();
   });
 
+  // Country/currency popup: opens on a first visit. Closing it without choosing keeps the detected market.
+  const market = document.getElementById('market-picker');
+  if (market && market.hasAttribute('data-autoopen')) {
+    market.showModal();
+    market.addEventListener('close', () => {
+      if (document.cookie.includes('bh_market=')) return;
+      const picked = market.querySelector('input[name=bh_market]:checked');
+      if (picked) document.cookie = `bh_market=${picked.value}; path=/; max-age=31536000; samesite=lax${location.protocol === 'https:' ? '; secure' : ''}`;
+    });
+  }
+
   // Search panel.
   const searchBtn = $('[data-search-open]');
   const panel = $('#site-search');

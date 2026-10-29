@@ -14,7 +14,7 @@
   </div>
   <div class="foot-base">
     <p>&copy; <?php echo esc_html(gmdate('Y') . ' ' . get_bloginfo('name')); ?></p>
-    <?php if (class_exists('WooCommerce')): ?><p><?php printf(esc_html__('Prices in %s', 'brandhouse'), esc_html(get_woocommerce_currency())); ?></p><?php endif; ?>
+    <?php if (function_exists('brandhouse_market_button')) echo brandhouse_market_button('foot-market'); ?>
   </div>
 </footer>
 <?php wp_footer(); ?>
