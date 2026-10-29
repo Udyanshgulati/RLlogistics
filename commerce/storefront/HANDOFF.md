@@ -6,7 +6,11 @@ the VPS at /opt/schermo) owns this code and the deployment. Pull before changing
 ## Live
 - https://schermo.thodalogic.com — Docker stack `schermo` (compose in this folder), WordPress on 127.0.0.1:8095,
   host nginx site `/etc/nginx/sites-available/schermo.thodalogic.com`, certificate via certbot. Secrets: /opt/schermo/schermo.env.
-- Deploy: `git -C /opt/schermo/src pull && cd /opt/schermo/src/commerce/storefront && docker compose -p schermo --env-file /opt/schermo/schermo.env up -d --build`.
+- Push-to-deploy (once installed): pushing to the branch is enough. `deploy/autodeploy.sh` runs every minute
+  (systemd timer `schermo-autodeploy.timer`), rebuilds when the branch moves, checks the site and rolls back on failure.
+  Log: /var/log/schermo-autodeploy.log. Install once on the VPS:
+  `git -C /opt/schermo/src checkout -q --detach origin/claude/modest-ptolemy-9yf78k && cp /opt/schermo/src/commerce/storefront/deploy/schermo-autodeploy.{service,timer} /etc/systemd/system/ && systemctl daemon-reload && systemctl enable --now schermo-autodeploy.timer`
+- Manual deploy: `git -C /opt/schermo/src pull && cd /opt/schermo/src/commerce/storefront && docker compose -p schermo --env-file /opt/schermo/schermo.env up -d --build`.
   Themes are re-synced from the image on every start (docker/setup.sh), so edits made inside the container are lost on redeploy:
   change the repo, then deploy.
 

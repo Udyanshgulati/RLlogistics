@@ -1,0 +1,7 @@
+[Unit]
+Description=Schermo storefront push-to-deploy
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/schermo/src/commerce/storefront/deploy/autodeploy.sh
