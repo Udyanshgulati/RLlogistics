@@ -1,0 +1,49 @@
+# Coolify: New Resource → Public/Private Repository → Build Pack "Docker Compose",
+# Base Directory "/commerce/storefront", Docker Compose Location "/docker-compose.yml".
+# Coolify generates the SERVICE_* passwords and routes the domain set on the "wordpress" service.
+services:
+  wordpress:
+    build: .
+    restart: unless-stopped
+    environment:
+      - SERVICE_FQDN_WORDPRESS_80
+      - WP_URL=${WP_URL:-https://schermo.thodalogic.com}
+      - WP_ADMIN_USER=${WP_ADMIN_USER:-schermo-admin}
+      - WP_ADMIN_PASSWORD=${SERVICE_PASSWORD_WPADMIN}
+      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL:?Set WP_ADMIN_EMAIL in Coolify}
+      - SEED_DEMO=${SEED_DEMO:-1}
+      - WORDPRESS_DB_HOST=mariadb
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DB_USER=${SERVICE_USER_MARIADB}
+      - WORDPRESS_DB_PASSWORD=${SERVICE_PASSWORD_MARIADB}
+      - WORDPRESS_CONFIG_EXTRA=define('DISALLOW_FILE_EDIT', true); define('WP_ENVIRONMENT_TYPE', 'staging'); define('FORCE_SSL_ADMIN', true);
+    volumes:
+      - wordpress-files:/var/www/html
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-o", "/dev/null", "http://127.0.0.1/wp-includes/images/blank.gif"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  mariadb:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      - MARIADB_DATABASE=wordpress
+      - MARIADB_USER=${SERVICE_USER_MARIADB}
+      - MARIADB_PASSWORD=${SERVICE_PASSWORD_MARIADB}
+      - MARIADB_ROOT_PASSWORD=${SERVICE_PASSWORD_MARIADBROOT}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  wordpress-files:
+  mariadb-data:

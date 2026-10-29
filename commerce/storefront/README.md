@@ -19,3 +19,15 @@ Nothing is invented. Empty slots show a labelled grey placeholder.
 
 ## Local preview
 Install WordPress + WooCommerce, symlink both theme folders into `wp-content/themes`, activate **Schermo**, and create the global attribute **Size** (`pa_size`, terms S–XXXL). Product variations use that attribute.
+
+## Deploy with Coolify (staging: https://schermo.thodalogic.com)
+`Dockerfile` + `docker-compose.yml` in this folder build WordPress 7.1.4 + WooCommerce 11.2.1 (checksums pinned) with both themes, plus MariaDB 11.4. The first start installs WordPress, activates WooCommerce and the Schermo theme, sets INR, pretty links, the Size attribute (S–XXXL), categories, the menu and the homepage. With `SEED_DEMO=1` it also adds the labelled demo products. Later starts only re-sync the themes from the image, so a redeploy ships theme changes and keeps orders, products and uploads (volumes `wordpress-files`, `mariadb-data`). Search engines are blocked (Settings → Reading) until launch is approved.
+
+1. DNS: `A schermo → 200.141.13.226`, DNS only (already set).
+2. Coolify → Projects → New Resource → Private Repository (GitHub App) → `udyanshgulati/rllogistics`, branch `claude/modest-ptolemy-9yf78k`.
+3. Build Pack **Docker Compose**, Base Directory `/commerce/storefront`, Docker Compose Location `/docker-compose.yml`.
+4. On the `wordpress` service set Domain `https://schermo.thodalogic.com`.
+5. Environment variables: set `WP_ADMIN_EMAIL`. Coolify generates `SERVICE_PASSWORD_*` and `SERVICE_USER_MARIADB`; the WordPress admin password is `SERVICE_PASSWORD_WPADMIN` (user `schermo-admin`). Set `SEED_DEMO=0` to start with an empty catalogue.
+6. Deploy. Coolify issues the Let's Encrypt certificate. Admin: `https://schermo.thodalogic.com/wp-admin`.
+
+No payment gateway is configured; add Razorpay in WooCommerce → Settings → Payments with test keys first. Keys go in WordPress admin only, never in this repository.
