@@ -1,0 +1,14 @@
+{
+  "name": "commerce/core",
+  "description": "Central inventory ledger, catalogue rules, market engine and access control shared by the Milan Icons, Significant Sports and Schermo storefronts.",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.2",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-json": "*"
+  },
+  "autoload": { "psr-4": { "Commerce\\Core\\": "src/" } },
+  "autoload-dev": { "psr-4": { "Commerce\\Core\\Tests\\": "tests/" } }
+}

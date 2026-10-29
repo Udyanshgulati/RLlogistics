@@ -1,0 +1,62 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Dependency-free test runner: finds tests/**/*Test.php and runs every public test* method.
+// Usage: bin/test [filter]   (filter matches Class::method)
+
+require __DIR__ . '/../src/autoload.php';
+
+use Commerce\Core\Tests\Support\TestCase;
+
+$filter = $argv[1] ?? null;
+$root = realpath(__DIR__ . '/../tests');
+$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root));
+$classes = [];
+foreach ($files as $f) {
+    if (str_ends_with($f->getFilename(), 'Test.php')) {
+        $rel = substr($f->getPathname(), strlen($root) + 1, -4);
+        $classes[] = 'Commerce\\Core\\Tests\\' . str_replace('/', '\\', $rel);
+    }
+}
+sort($classes);
+
+$passed = $failed = $assertions = 0;
+$failures = [];
+$started = microtime(true);
+foreach ($classes as $class) {
+    foreach ((new ReflectionClass($class))->getMethods(ReflectionMethod::IS_PUBLIC) as $m) {
+        if (!str_starts_with($m->name, 'test')) {
+            continue;
+        }
+        $name = (new ReflectionClass($class))->getShortName() . '::' . $m->name;
+        if ($filter !== null && !str_contains($name, $filter)) {
+            continue;
+        }
+        /** @var TestCase $t */
+        $t = new $class();
+        $t0 = microtime(true);
+        try {
+            $t->setUp();
+            $t->{$m->name}();
+            $passed++;
+            printf("  \033[32m✓\033[0m %s \033[90m(%d ms)\033[0m\n", $name, (microtime(true) - $t0) * 1000);
+        } catch (Throwable $e) {
+            $failed++;
+            printf("  \033[31m✗ %s\033[0m\n", $name);
+            $failures[] = [$name, $e];
+        } finally {
+            try {
+                $t->tearDown();
+            } catch (Throwable) {
+            }
+            $assertions += $t->assertions;
+        }
+    }
+}
+foreach ($failures as [$name, $e]) {
+    printf("\n\033[31m%s\033[0m\n  %s: %s\n  at %s:%d\n", $name, $e::class, $e->getMessage(), $e->getFile(), $e->getLine());
+}
+printf("\n%d passed, %d failed, %d assertions, %.1fs\n", $passed, $failed, $assertions, microtime(true) - $started);
+exit($failed === 0 && $passed > 0 ? 0 : 1);

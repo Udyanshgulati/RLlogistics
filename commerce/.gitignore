@@ -1,0 +1,4 @@
+.env
+*.local.json
+config/markets.json
+storage/

@@ -1,0 +1,88 @@
+{
+  "_status": "PLACEHOLDER. Country, currency and duty rules below are a technical starting point. Every gateway is disabled with no verified currencies until the merchant account confirms them. Tax and duty presentation must be approved by the client's tax adviser before launch.",
+  "base_currency": "INR",
+  "default_market": "INTL",
+  "rates": { "max_age_hours": 48, "on_stale": "show_base_currency" },
+  "markets": {
+    "IN": {
+      "name": "India",
+      "countries": ["IN"],
+      "display_currency": "INR",
+      "checkout_currencies": ["INR"],
+      "languages": ["en"],
+      "tax_display": "inclusive",
+      "duties": { "mode": "not_applicable", "message": null },
+      "express_only": false,
+      "communication": { "email": true, "whatsapp": "opt_in" }
+    },
+    "US": {
+      "name": "United States",
+      "countries": ["US"],
+      "display_currency": "USD",
+      "checkout_currencies": ["USD", "INR"],
+      "languages": ["en"],
+      "tax_display": "exclusive",
+      "duties": { "mode": "dap", "message": "Import duties and taxes, if any, are charged by the carrier on delivery." },
+      "express_only": true,
+      "communication": { "email": true, "whatsapp": "opt_in" }
+    },
+    "GB": {
+      "name": "United Kingdom",
+      "countries": ["GB"],
+      "display_currency": "GBP",
+      "checkout_currencies": ["GBP", "INR"],
+      "languages": ["en"],
+      "tax_display": "exclusive",
+      "duties": { "mode": "dap", "message": "Import VAT and duties, if any, are charged by the carrier on delivery." },
+      "express_only": true,
+      "communication": { "email": true, "whatsapp": "opt_in" }
+    },
+    "EUROZONE": {
+      "name": "Eurozone",
+      "countries": ["AT", "BE", "BG", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK"],
+      "display_currency": "EUR",
+      "checkout_currencies": ["EUR", "INR"],
+      "languages": ["en"],
+      "tax_display": "exclusive",
+      "duties": { "mode": "dap", "message": "Import VAT and duties, if any, are charged by the carrier on delivery." },
+      "express_only": true,
+      "communication": { "email": true, "whatsapp": "opt_in" }
+    },
+    "AE": {
+      "name": "United Arab Emirates",
+      "countries": ["AE"],
+      "display_currency": "AED",
+      "checkout_currencies": ["AED", "INR"],
+      "languages": ["en"],
+      "tax_display": "exclusive",
+      "duties": { "mode": "dap", "message": "Import duties and taxes, if any, are charged by the carrier on delivery." },
+      "express_only": true,
+      "communication": { "email": true, "whatsapp": "opt_in" }
+    },
+    "INTL": {
+      "name": "Rest of world",
+      "countries": "*",
+      "display_currency": "INR",
+      "checkout_currencies": ["INR"],
+      "languages": ["en"],
+      "tax_display": "exclusive",
+      "duties": { "mode": "dap", "message": "Import duties and taxes, if any, are charged by the carrier on delivery." },
+      "express_only": true,
+      "communication": { "email": true, "whatsapp": "none" }
+    }
+  },
+  "gateways": {
+    "razorpay": { "label": "Card / UPI (Razorpay)", "enabled": false, "verified_currencies": [], "countries": "*", "status": "unverified" },
+    "cashfree": { "label": "Card / UPI (Cashfree)", "enabled": false, "verified_currencies": [], "countries": "*", "status": "unverified" },
+    "ppcp-gateway": { "label": "PayPal", "enabled": false, "verified_currencies": [], "countries": "*", "exclude_countries": ["IN"], "status": "unverified" }
+  },
+  "shipping": {
+    "destination_allowlist": [],
+    "allow_non_express_fallback": false
+  },
+  "brands": {
+    "milan-icons": { "disabled_markets": [] },
+    "significant-sports": { "disabled_markets": [] },
+    "schermo": { "disabled_markets": [] }
+  }
+}
