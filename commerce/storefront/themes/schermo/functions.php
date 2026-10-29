@@ -48,3 +48,28 @@ add_action('customize_register', static function (WP_Customize_Manager $c): void
         $c->add_control(new WP_Customize_Media_Control($c, $id, ['label' => $label, 'section' => 'schermo_home', 'mime_type' => 'image']));
     }
 });
+
+/** Inline SVG from the Schermo logo files (extracted from Schermo_Logo.ai), decorative unless labelled by the caller. */
+function schermo_svg(string $name, string $class = ''): string
+{
+    static $cache = [];
+    $cache[$name] ??= (string) file_get_contents(get_stylesheet_directory() . '/assets/img/' . $name . '.svg');
+    return str_replace('<svg ', '<svg class="' . esc_attr($class) . '" aria-hidden="true" focusable="false" ', $cache[$name]);
+}
+
+// Header and drawer: the wordmark. Footer: the stacked logo (S mark above the wordmark).
+add_filter('brandhouse_logo_svg', static fn (string $svg, string $where): string => $where === 'footer'
+    ? schermo_svg('schermo-logo', 'logo-svg')
+    : schermo_svg('schermo-wordmark', 'logo-svg'), 10, 2);
+
+// Large, faint S mark behind the footer.
+add_action('brandhouse_footer_art', static function (): void {
+    echo '<div class="foot-art">' . schermo_svg('schermo-mark') . '</div>';
+});
+
+// Favicon from the S mark, unless a Site Icon has been set in the Customizer.
+add_action('wp_head', static function (): void {
+    if (!has_site_icon()) {
+        printf('<link rel="icon" type="image/svg+xml" href="%s">' . "\n", esc_url(get_stylesheet_directory_uri() . '/assets/img/favicon.svg'));
+    }
+});

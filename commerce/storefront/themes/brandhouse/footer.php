@@ -1,8 +1,9 @@
 <?php defined('ABSPATH') || exit; ?>
 <footer class="site-footer">
+  <?php do_action('brandhouse_footer_art'); ?>
   <div class="foot-grid">
     <div class="foot-brand">
-      <?php brandhouse_logo(); ?>
+      <?php brandhouse_logo('footer'); ?>
       <p><?php echo esc_html(brandhouse_mod('brandhouse_footer_note', __('Shipped from Delhi, India.', 'brandhouse'))); ?></p>
     </div>
     <?php foreach (['footer-shop' => __('Shop', 'brandhouse'), 'footer-help' => __('Help', 'brandhouse'), 'footer-legal' => __('Policies', 'brandhouse')] as $loc => $title): ?>

@@ -4,14 +4,23 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-/** Logo from Customizer → Site identity; otherwise the brand name set in type (never a redrawn logo). */
-function brandhouse_logo(): void
+/**
+ * Logo, in order: Customizer → Site identity; the brand's own vector logo supplied by a child theme through
+ * the `brandhouse_logo_svg` filter ($where is 'header', 'drawer' or 'footer'); otherwise the name set in type.
+ */
+function brandhouse_logo(string $where = 'header'): void
 {
     if (has_custom_logo()) {
         the_custom_logo();
         return;
     }
-    printf('<a class="wordmark" href="%s" rel="home">%s</a>', esc_url(home_url('/')), esc_html(get_bloginfo('name')));
+    $name = get_bloginfo('name');
+    $svg = (string) apply_filters('brandhouse_logo_svg', '', $where);
+    if ($svg !== '') {
+        printf('<a class="wordmark has-svg logo-%s" href="%s" rel="home">%s<span class="sr-only">%s</span></a>', esc_attr($where), esc_url(home_url('/')), $svg, esc_html($name)); // SVG is a theme file, not user input.
+        return;
+    }
+    printf('<a class="wordmark" href="%s" rel="home">%s</a>', esc_url(home_url('/')), esc_html($name));
 }
 
 /** Neutral placeholder tile for missing photography — states what goes there instead of faking it. */

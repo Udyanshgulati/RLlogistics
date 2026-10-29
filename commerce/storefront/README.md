@@ -3,14 +3,14 @@
 Classic WooCommerce themes. No WordPress or WooCommerce core files are modified.
 
 - `themes/brandhouse` — shared parent theme for all three stores: header, footer, listing with size filter, product page (size buttons from real variation stock, size guide, accordions), cart/checkout styling. Checkout stays WooCommerce's own.
-- `themes/schermo` — Schermo child theme: monochrome tokens from the logo, Syncopate + Inter (self-hosted, OFL), homepage.
+- `themes/schermo` — Schermo child theme: monochrome tokens from the logo, Syncopate + Inter (self-hosted, OFL), homepage. `assets/img/schermo-{logo,mark,wordmark}.svg` are vector paths extracted unchanged from the client file `Schermo_Logo.ai`; the S mark is also used as a faint background motif (hero, footer, story, shop header, placeholders, 404) and as the favicon.
 
 ## Client content (placeholders until supplied)
 Nothing is invented. Empty slots show a labelled grey placeholder.
 
 | What | Where |
 |---|---|
-| Logo | Appearance → Customize → Site Identity → Logo (until then the name is typeset as a wordmark) |
+| Logo | Built in from the supplied vector logo. A logo uploaded in Customize → Site Identity overrides it. |
 | Hero image, headline, line, button; brand story text and image | Customize → Homepage |
 | Announcement bar, footer note | Customize → General |
 | Delivery and returns text, size guide table | Customize → Product pages |

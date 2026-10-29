@@ -21,7 +21,7 @@ $cats = class_exists('WooCommerce') ? get_terms(['taxonomy' => 'product_cat', 'p
       <?php endif; ?>
     </div>
     <div class="hero-copy container">
-      <span class="hero-mark" aria-hidden="true">S</span>
+      <?php echo schermo_svg('schermo-mark', 'hero-mark'); ?>
       <h1 id="hero-title"><?php echo esc_html(brandhouse_mod('schermo_hero_title', get_bloginfo('name'))); ?></h1>
       <p><?php echo esc_html(brandhouse_mod('schermo_hero_text', __('Clothing · Sportswear · Fan accessories', 'schermo'))); ?></p>
       <a class="btn btn-light" href="<?php echo esc_url($shop); ?>"><?php echo esc_html(brandhouse_mod('schermo_hero_cta', __('Shop all', 'schermo'))); ?><?php echo brandhouse_icon('arrow'); ?></a>
@@ -60,6 +60,7 @@ $cats = class_exists('WooCommerce') ? get_terms(['taxonomy' => 'product_cat', 'p
   <?php endif; ?>
 
   <section class="story container" aria-labelledby="story-title">
+    <?php echo schermo_svg('schermo-mark', 'story-mark'); ?>
     <div class="story-media">
       <?php echo $story ? '<img src="' . esc_url($story) . '" alt="" loading="lazy">' : brandhouse_placeholder(__('Brand image — to be supplied', 'schermo')); ?>
     </div>
