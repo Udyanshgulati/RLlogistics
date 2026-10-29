@@ -1,12 +1,12 @@
-# Coolify: New Resource → Public/Private Repository → Build Pack "Docker Compose",
-# Base Directory "/commerce/storefront", Docker Compose Location "/docker-compose.yml".
-# Coolify generates the SERVICE_* passwords and routes the domain set on the "wordpress" service.
+# Coolify: New Resource → Private Repository → Build Pack "Docker Compose",
+# Base Directory "/commerce/storefront", Docker Compose Location "/docker-compose.yml". Leave the Domain empty.
+# Coolify generates the SERVICE_* passwords. On this server the host's nginx owns ports 80/443, so WordPress is
+# published on 127.0.0.1 only and nginx proxies schermo.thodalogic.com to it (see deploy/nginx-schermo.conf).
 services:
   wordpress:
     build: .
     restart: unless-stopped
     environment:
-      - SERVICE_FQDN_WORDPRESS_80
       - WP_URL=${WP_URL:-https://schermo.thodalogic.com}
       - WP_ADMIN_USER=${WP_ADMIN_USER:-schermo-admin}
       - WP_ADMIN_PASSWORD=${SERVICE_PASSWORD_WPADMIN}
@@ -17,6 +17,8 @@ services:
       - WORDPRESS_DB_USER=${SERVICE_USER_MARIADB}
       - WORDPRESS_DB_PASSWORD=${SERVICE_PASSWORD_MARIADB}
       - WORDPRESS_CONFIG_EXTRA=define('DISALLOW_FILE_EDIT', true); define('WP_ENVIRONMENT_TYPE', 'staging'); define('FORCE_SSL_ADMIN', true);
+    ports:
+      - "127.0.0.1:${HOST_PORT:-8095}:80"
     volumes:
       - wordpress-files:/var/www/html
     depends_on:
