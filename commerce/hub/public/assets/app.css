@@ -332,10 +332,10 @@ dialog.drawer::backdrop { background: rgba(17, 17, 19, .28); animation: fade-in 
 .preset.on, .preset:hover { border-color: var(--ink); color: var(--ink); }
 .table-wrap { position: relative; overflow-x: auto; } /* positioned, so screen-reader-only labels in cells stay inside the scroller */
 table { width: 100%; border-collapse: collapse; }
-th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); padding: 9px 14px; border-bottom: 1px solid var(--line); background: var(--surface-2); white-space: nowrap; position: sticky; top: 0; }
+th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); padding: 9px 11px; border-bottom: 1px solid var(--line); background: var(--surface-2); white-space: nowrap; position: sticky; top: 0; }
 th a { display: inline-flex; gap: 4px; align-items: center; }
 th a.sorted { color: var(--ink); }
-td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; font-size: 13.5px; }
+td { padding: 10px 11px; border-bottom: 1px solid var(--line); vertical-align: middle; font-size: 13.5px; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover td { background: #fcfcfb; }
 .sub { display: block; font-size: 12px; color: var(--muted); margin-top: 1px; }
@@ -353,6 +353,10 @@ tbody tr:hover td { background: #fcfcfb; }
 .levels .v { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
 .levels .is-key { background: #fbfbfa; }
 .tip { display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; border: 1px solid var(--line-strong); color: var(--muted); font-size: 10px; font-weight: 700; cursor: help; }
+
+td.items-cell .item-line { display: block; font-size: 12px; }
+td.status-stack .badge { display: flex; width: max-content; }
+td.status-stack .badge + .badge { margin-top: 4px; }
 
 /* ── Badges ────────────────────────────────────────────────────────────── */
 .badge { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 11px; font-size: 12px; font-weight: 500; white-space: nowrap; }
@@ -504,3 +508,4 @@ progress::-moz-progress-bar { background: var(--ok); }
   *, *::before, *::after { transition: none !important; animation: none !important; }
   .route-marker { display: none; }
 }
+.inv-table th, .inv-table td { padding-left: 9px; padding-right: 9px; }

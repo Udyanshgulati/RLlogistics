@@ -30,17 +30,14 @@
       <?php else: ?><h3>No orders yet</h3><p>Orders appear here automatically once a storefront is connected. Connecting a storefront is set up under Settings.</p><?php endif; ?></div>
   <?php else: ?>
   <div class="table-wrap"><table>
-    <thead><tr><?php if ($v->can('orders.fulfil')): ?><th><label class="sr-only" for="pick-all">Select all</label><input type="checkbox" id="pick-all" data-check-all="pick"></th><?php endif; ?><th>Order</th><th>Brand</th><?php if ($canPii): ?><th>Customer</th><?php endif; ?><th>Placed</th><th class="hide-sm">Items</th><th>Payment</th><th>Fulfilment</th><th class="hide-sm">Destination</th><th class="hide-sm">Shipping</th><th class="num">Total</th><th>Next step</th></tr></thead>
+    <thead><tr><?php if ($v->can('orders.fulfil')): ?><th><label class="sr-only" for="pick-all">Select all</label><input type="checkbox" id="pick-all" data-check-all="pick"></th><?php endif; ?><th>Order</th><th>Placed</th><th class="hide-sm">Items</th><th>Status</th><th class="hide-sm">Ship to</th><th class="num">Total</th><th>Next step</th></tr></thead>
     <tbody><?php foreach ($orders as $o): ?><tr>
       <?php if ($v->can('orders.fulfil')): ?><td><input type="checkbox" name="pick" value="<?= (int) $o['id'] ?>" aria-label="Select order <?= View::e($o['order_number']) ?>"></td><?php endif; ?>
-      <td class="nowrap"><a class="link" href="/orders/<?= (int) $o['id'] ?>">#<?= View::e($o['order_number']) ?></a><?php if ($o['attention']): ?><span class="sub attn">● <?= View::e(View::ATTENTION[$o['attention']] ?? 'Needs attention') ?></span><?php endif; ?></td>
-      <td><?= $v->brand($o['brand_id']) ?></td>
-      <?php if ($canPii): ?><td><?= $v->can('orders.view_customer', (int) $o['brand_id']) ? View::e($o['customer_name'] ?? '—') : '<span class="muted">Hidden</span>' ?></td><?php endif; ?>
-      <td class="nowrap small"><?= $v->date($o['placed_at']) ?></td>
-      <td class="hide-sm small"><?= View::e(mb_strimwidth((string) $o['items'], 0, 60, '…')) ?><span class="sub"><?= (int) $o['units'] ?> unit<?= (int) $o['units'] === 1 ? '' : 's' ?></span></td>
-      <td><?= $v->badge($o['payment_status']) ?></td><td><?= $v->badge($o['fulfilment_status']) ?></td>
-      <td class="hide-sm"><?= View::e($o['ship_country'] ?? '—') ?></td>
-      <td class="hide-sm small"><?= View::e($o['shipped_with'] ?? $o['shipping_service_requested'] ?? '—') ?><?php if ($o['tracking']): ?><span class="sub mono"><?= View::e($o['tracking']) ?></span><?php endif; ?></td>
+      <td class="nowrap"><a class="link" href="/orders/<?= (int) $o['id'] ?>">#<?= View::e($o['order_number']) ?></a><span class="sub"><?= $v->brand($o['brand_id']) ?></span><?php if ($canPii): ?><span class="sub"><?= $v->can('orders.view_customer', (int) $o['brand_id']) ? View::e($o['customer_name'] ?? '—') : 'Customer hidden' ?></span><?php endif; ?><?php if ($o['attention']): ?><span class="sub attn">● <?= View::e(View::ATTENTION[$o['attention']] ?? 'Needs attention') ?></span><?php endif; ?></td>
+      <td class="nowrap small"><?= $v->date($o['placed_at'], short: true) ?></td>
+      <td class="hide-sm small items-cell"><?php $its = explode("\n", (string) $o['items']); foreach (array_slice($its, 0, 2) as $it): ?><span class="mono nowrap item-line"><?= View::e($it) ?></span><?php endforeach; ?><span class="sub"><?= count($its) > 2 ? '+' . (count($its) - 2) . ' more · ' : '' ?><?= (int) $o['units'] ?> unit<?= (int) $o['units'] === 1 ? '' : 's' ?></span></td>
+      <td class="status-stack"><?= $v->badge($o['payment_status']) ?><?= $o['payment_status'] === 'paid' || $o['fulfilment_status'] !== 'unfulfilled' ? $v->badge($o['fulfilment_status']) : '' ?></td>
+      <td class="hide-sm small nowrap"><b class="mono"><?= View::e($o['ship_country'] ?? '—') ?></b> · <?= View::e($o['shipped_with'] ?? $o['shipping_service_requested'] ?? '—') ?><?php if ($o['tracking']): ?><span class="sub mono"><?= View::e($o['tracking']) ?></span><?php endif; ?></td>
       <td class="num"><?= $v->money($o['total_minor'], $o['currency']) ?></td>
       <td class="nowrap small"><?= $o['next'] ? View::e(View::ACTIONS[$o['next']] ?? $o['next']) : '<span class="muted">—</span>' ?></td>
     </tr><?php endforeach; ?></tbody>

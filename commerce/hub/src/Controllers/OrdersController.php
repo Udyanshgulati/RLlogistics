@@ -22,7 +22,7 @@ final class OrdersController extends Controller
         $orders = $this->db->all(
             "SELECT o.*, s.brand_id,
                     (SELECT SUM(qty) FROM order_lines WHERE order_id = o.id) AS units,
-                    (SELECT GROUP_CONCAT(CONCAT(qty, ' × ', COALESCE(sku, name)) ORDER BY id SEPARATOR ', ') FROM order_lines WHERE order_id = o.id) AS items,
+                    (SELECT GROUP_CONCAT(CONCAT(qty, ' × ', COALESCE(sku, name)) ORDER BY id SEPARATOR '\n') FROM order_lines WHERE order_id = o.id) AS items,
                     (SELECT tracking_number FROM shipments WHERE order_id = o.id ORDER BY id DESC LIMIT 1) AS tracking,
                     (SELECT CONCAT(carrier, ' ', service) FROM shipments WHERE order_id = o.id ORDER BY id DESC LIMIT 1) AS shipped_with
              FROM orders o JOIN stores s ON s.id = o.store_id WHERE {$where} ORDER BY o.placed_at DESC LIMIT " . self::PER_PAGE . ' OFFSET ' . (($page - 1) * self::PER_PAGE),

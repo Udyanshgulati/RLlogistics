@@ -88,14 +88,16 @@ final class View
         return self::e(Currency::format((int) $minor, $currency));
     }
 
-    public function date(?string $ts, bool $time = true): string
+    public function date(?string $ts, bool $time = true, bool $short = false): string
     {
         if ($ts === null || $ts === '') {
             return '—';
         }
         $d = new \DateTimeImmutable($ts, new \DateTimeZone('UTC'));
         $d = $d->setTimezone(new \DateTimeZone($this->app->env['DISPLAY_TZ'] ?? 'Asia/Kolkata'));
-        return self::e($d->format($time ? 'j M Y, H:i' : 'j M Y'));
+        // Short form drops the year inside the current year, for dense tables.
+        $year = $short && $d->format('Y') === $this->app->clock->now()->setTimezone($d->getTimezone())->format('Y') ? '' : ' Y';
+        return self::e($d->format($time ? "j M{$year}, H:i" : "j M{$year}"));
     }
 
     public function badge(?string $status): string
