@@ -35,6 +35,40 @@
     row.addEventListener('scroll', () => { out.textContent = String(Math.round(row.scrollLeft / row.clientWidth) + 1); }, { passive: true });
   });
 
+  // Drop countdown.
+  $$('[data-deadline]').forEach((clock) => {
+    const end = Number(clock.dataset.deadline);
+    const set = (k, v) => { const el = clock.querySelector(`[data-u="${k}"]`); if (el) el.textContent = String(v).padStart(2, '0'); };
+    const tick = () => {
+      const left = Math.max(0, end - Date.now());
+      set('d', Math.floor(left / 864e5)); set('h', Math.floor(left / 36e5) % 24); set('m', Math.floor(left / 6e4) % 60); set('s', Math.floor(left / 1e3) % 60);
+      if (left === 0) { clearInterval(timer); clock.closest('.drop').hidden = true; }
+    };
+    const timer = setInterval(tick, 1000); tick();
+  });
+
+  // Free-shipping progress in the block cart, kept in step with the cart's own data store.
+  const bar = $('.ship-bar');
+  if (bar) window.addEventListener('load', () => {
+    const data = window.wp && window.wp.data;
+    if (!data || !data.select('wc/store/cart')) return;
+    const min = Number(bar.dataset.freeMin);
+    const render = () => {
+      const t = data.select('wc/store/cart').getCartTotals();
+      if (!t || t.total_items === undefined) return;
+      const unit = 10 ** (t.currency_minor_unit || 0);
+      const have = (Number(t.total_items) + Number(t.total_items_tax || 0)) / unit;
+      const left = Math.max(0, min - have);
+      $('.ship-fill', bar).style.width = `${Math.min(100, (have / min) * 100)}%`;
+      $('.ship-msg', bar).textContent = left > 0
+        ? bar.dataset.tplMore.replace('%s', bar.dataset.currency + left.toLocaleString(undefined, { maximumFractionDigits: 0 }))
+        : bar.dataset.tplDone;
+      bar.classList.toggle('is-done', left === 0);
+    };
+    render();
+    data.subscribe(render, 'wc/store/cart');
+  });
+
   // Search panel.
   const searchBtn = $('[data-search-open]');
   const panel = $('#site-search');

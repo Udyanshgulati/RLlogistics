@@ -28,6 +28,8 @@ $cats = class_exists('WooCommerce') ? get_terms(['taxonomy' => 'product_cat', 'p
     </div>
   </section>
 
+  <?php do_action('brandhouse_home_after_hero'); ?>
+
   <?php if ($cats && !is_wp_error($cats)): ?>
   <section class="home-section container" aria-labelledby="cats-title">
     <div class="section-head"><h2 id="cats-title"><?php esc_html_e('Shop by category', 'schermo'); ?></h2></div>
