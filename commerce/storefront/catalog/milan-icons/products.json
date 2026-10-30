@@ -1,0 +1,358 @@
+{
+ "collection": "Milan Icons",
+ "note": "Supplied by the owner. Prices and stock are not set until the owner provides them.",
+ "products": [
+  {
+   "sku": "MI-001",
+   "name": "Milan Icons Playing Jersey",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Black collared playing jersey with gold Milan Duomo skyline print, gold pinstripes and gold-trimmed collar and cuffs. Milan Icons crest on the chest; Italian flag and “Sempre Avanti” at the back of the collar.",
+   "images": [
+    "mi-playing-jersey-1.jpg",
+    "mi-playing-jersey-2.jpg",
+    "mi-playing-jersey-3.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 2"
+  },
+  {
+   "sku": "MI-002",
+   "name": "Milan Icons Playing Trouser",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Black playing trousers with gold side stripes and a gold marble-pattern side panel. Milan Icons crest on the front.",
+   "images": [
+    "mi-playing-trouser-1.jpg",
+    "mi-playing-trouser-2.jpg",
+    "mi-playing-trouser-3.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 3"
+  },
+  {
+   "sku": "MI-003",
+   "name": "Milan Icons Playing Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black cricket cap with gold piping, gold lattice side panels and the embroidered Milan Icons crest on the front.",
+   "images": [
+    "mi-playing-cap-1.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 4"
+  },
+  {
+   "sku": "MI-004",
+   "name": "Milan Icons Practice Kit",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Black crew-neck practice jersey with a tonal Duomo architecture print, gold-striped collar and cuffs, and the Milan Icons crest.",
+   "images": [
+    "mi-practice-kit-1.jpg",
+    "mi-practice-kit-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 5"
+  },
+  {
+   "sku": "MI-005",
+   "name": "Milan Icons Practice Kit Sleeveless",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Sleeveless black practice top with a tonal Duomo architecture print, gold-trimmed neck and armholes, and the Milan Icons crest.",
+   "images": [
+    "mi-practice-kit-sleeveless-1.jpg",
+    "mi-practice-kit-sleeveless-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 6"
+  },
+  {
+   "sku": "MI-006",
+   "name": "Milan Icons Practice Shorts",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Black drawstring practice shorts with gold side piping, a tonal Duomo print and the Milan Icons crest.",
+   "images": [
+    "mi-practice-shorts-1.jpg",
+    "mi-practice-shorts-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 7"
+  },
+  {
+   "sku": "MI-007",
+   "name": "Milan Icons Cricket Helmet",
+   "category": "Cricket Gear",
+   "sizes": false,
+   "description": "Matte black cricket helmet with black grille and the gold Milan Icons crest on the front.",
+   "images": [
+    "mi-cricket-helmet-1.jpg",
+    "mi-cricket-helmet-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 8"
+  },
+  {
+   "sku": "MI-008",
+   "name": "Milan Icons Batting Pads",
+   "category": "Cricket Gear",
+   "sizes": false,
+   "description": "All-black batting pads with ribbed knee roll and three straps.",
+   "images": [
+    "mi-batting-pads-1.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 9"
+  },
+  {
+   "sku": "MI-009",
+   "name": "Milan Icons Batting Gloves",
+   "category": "Cricket Gear",
+   "sizes": false,
+   "description": "All-black batting gloves with segmented finger protection and Milan Icons on the wrist strap.",
+   "images": [
+    "mi-batting-gloves-1.jpg",
+    "mi-batting-gloves-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 10"
+  },
+  {
+   "sku": "MI-010",
+   "name": "Milan Icons Kit Bag",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black wheeled cricket kit bag with gold zips and piping, backpack straps and the Milan Icons crest on the front.",
+   "images": [
+    "mi-kit-bag-1.jpg",
+    "mi-kit-bag-2.jpg",
+    "mi-kit-bag-3.jpg",
+    "mi-kit-bag-4.jpg",
+    "mi-kit-bag-5.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 11"
+  },
+  {
+   "sku": "MI-011",
+   "name": "Milan Icons Backpack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black backpack with red and black stripes, a Duomo print on the front panel and the Milan Icons crest.",
+   "images": [
+    "mi-backpack-1.jpg",
+    "mi-backpack-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 12"
+  },
+  {
+   "sku": "MI-012",
+   "name": "Milan Icons Winter Warmer Full Sleeve",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Black V-neck cricket sweater with red and cream stripes at the neck, cuffs and hem, and the Milan Icons crest.",
+   "images": [
+    "mi-winter-warmer-full-sleeve-1.jpg",
+    "mi-winter-warmer-full-sleeve-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 13"
+  },
+  {
+   "sku": "MI-013",
+   "name": "Milan Icons Winter Warmer Sleeveless",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Sleeveless black V-neck cricket sweater with red and cream striped trims and the Milan Icons crest.",
+   "images": [
+    "mi-winter-warmer-sleeveless-1.jpg",
+    "mi-winter-warmer-sleeveless-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 14"
+  },
+  {
+   "sku": "MI-014",
+   "name": "Milan Icons Tracksuit",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Black and cream zip hoodie and track pants. “Play Beyond” script and Milan Icons crest on the front, Milan Icons varsity lettering on the back.",
+   "images": [
+    "mi-tracksuit-1.jpg",
+    "mi-tracksuit-2.jpg",
+    "mi-tracksuit-3.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 15"
+  },
+  {
+   "sku": "MI-015",
+   "name": "Milan Icons Winter Travel Hoodie",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Black pullover hoodie with gold piping, gold sleeve graphics, the Milan Icons crest and “Play Beyond” on the sleeve.",
+   "images": [
+    "mi-winter-travel-hoodie-1.jpg",
+    "mi-winter-travel-hoodie-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 16"
+  },
+  {
+   "sku": "MI-016",
+   "name": "Milan Icons Travel Kit T-Shirt",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Maroon ribbed T-shirt with cream collar, cuffs and shoulder stripes, and the Milan Icons crest.",
+   "images": [
+    "mi-travel-kit-t-shirt-1.jpg",
+    "mi-travel-kit-t-shirt-2.jpg",
+    "mi-travel-kit-t-shirt-3.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 17"
+  },
+  {
+   "sku": "MI-017",
+   "name": "Milan Icons Round Neck Travel T-Shirt",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Black round-neck T-shirt with a large grey graphic print and Milan Icons on the chest.",
+   "images": [
+    "mi-round-neck-travel-t-shirt-1.jpg",
+    "mi-round-neck-travel-t-shirt-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 18"
+  },
+  {
+   "sku": "MI-018",
+   "name": "Milan Icons Polo T-Shirt",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Cream polo with maroon collar and sleeve stripes, Milan Icons lettering on the front and an illustrated print on the back.",
+   "images": [
+    "mi-polo-t-shirt-1.jpg",
+    "mi-polo-t-shirt-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 19"
+  },
+  {
+   "sku": "MI-019",
+   "name": "Milan Icons Fashion Cap 01",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Off-white cap with black Milan Icons lettering, a red and black stripe and a tonal Duomo print.",
+   "images": [
+    "mi-fashion-cap-01-1.jpg",
+    "mi-fashion-cap-01-2.jpg",
+    "mi-fashion-cap-01-3.jpg",
+    "mi-fashion-cap-01-4.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 20"
+  },
+  {
+   "sku": "MI-020",
+   "name": "Milan Icons Fashion Cap 02",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black cap with white Milan Icons lettering and a maroon Duomo print.",
+   "images": [
+    "mi-fashion-cap-02-1.jpg",
+    "mi-fashion-cap-02-2.jpg",
+    "mi-fashion-cap-02-3.jpg",
+    "mi-fashion-cap-02-4.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 21"
+  },
+  {
+   "sku": "MI-021",
+   "name": "Milan Icons Bucket Hat",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black bucket hat with gold piping, gold eyelets and the Milan Icons crest.",
+   "images": [
+    "mi-bucket-hat-1.jpg",
+    "mi-bucket-hat-2.jpg",
+    "mi-bucket-hat-3.jpg",
+    "mi-bucket-hat-4.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 22"
+  },
+  {
+   "sku": "MI-022",
+   "name": "Milan Icons Winter Beanie",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black ribbed beanie with the gold Milan Icons crest.",
+   "images": [
+    "mi-winter-beanie-1.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 23"
+  },
+  {
+   "sku": "MI-023",
+   "name": "Milan Icons Socks",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Crew socks with the Milan Icons crest. Designs include Italian-flag stripes, a Duomo skyline, a lattice pattern and gold stripes.",
+   "images": [
+    "mi-socks-1.jpg",
+    "mi-socks-2.jpg",
+    "mi-socks-3.jpg",
+    "mi-socks-4.jpg",
+    "mi-socks-5.jpg",
+    "mi-socks-6.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 24"
+  },
+  {
+   "sku": "MI-024",
+   "name": "Milan Icons Bag Tag",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black and gold Milan Icons bag tag with Duomo artwork; the front has space for a player name and number.",
+   "images": [
+    "mi-bag-tag-1.jpg",
+    "mi-bag-tag-2.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 25"
+  },
+  {
+   "sku": "MI-025",
+   "name": "Milan Icons Travel Duffel Bag",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black travel duffel with gold zips, a gold Duomo outline print, shoulder strap and the Milan Icons crest.",
+   "images": [
+    "mi-travel-duffel-bag-1.jpg",
+    "mi-travel-duffel-bag-2.jpg",
+    "mi-travel-duffel-bag-3.jpg",
+    "mi-travel-duffel-bag-4.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 26"
+  },
+  {
+   "sku": "MI-026",
+   "name": "Milan Icons Travel Bag 02",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Structured black leather-look travel bag with gold hardware, gold edge piping and the Milan Icons crest.",
+   "images": [
+    "mi-travel-bag-02-1.jpg",
+    "mi-travel-bag-02-2.jpg",
+    "mi-travel-bag-02-3.jpg",
+    "mi-travel-bag-02-4.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 27"
+  },
+  {
+   "sku": "MI-027",
+   "name": "Milan Icons Sipper",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black insulated sipper with a gold rim, gold Duomo print and the Milan Icons crest.",
+   "images": [
+    "mi-sipper-1.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 28"
+  },
+  {
+   "sku": "MI-028",
+   "name": "Milan Icons Medal",
+   "category": "Fan Merch",
+   "sizes": false,
+   "description": "Gold medal with the Milan Icons crest on a black centre and Duomo spires around the rim, on a black and gold ribbon.",
+   "images": [
+    "mi-medal-1.jpg"
+   ],
+   "source": "Milan_Icons_Merchandise.pdf, page 29"
+  }
+ ]
+}

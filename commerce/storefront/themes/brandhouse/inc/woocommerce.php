@@ -34,6 +34,15 @@ add_action('woocommerce_before_main_content', static function (): void {
     }
 }, 1);
 
+// Products the owner has not priced yet say so instead of showing nothing.
+$brandhouse_no_price = static fn (): string => '<span class="price-soon">' . esc_html__('Price coming soon', 'brandhouse') . '</span>';
+add_filter('woocommerce_empty_price_html', $brandhouse_no_price);
+add_filter('woocommerce_variable_empty_price_html', $brandhouse_no_price);
+add_filter('woocommerce_out_of_stock_message', static function (string $msg): string {
+    global $product;
+    return $product instanceof WC_Product && $product->get_price() === '' ? __('Not available to order yet — price coming soon.', 'brandhouse') : $msg;
+});
+
 add_filter('loop_shop_per_page', static fn (): int => 24);
 add_filter('loop_shop_columns', static fn (): int => 4);
 

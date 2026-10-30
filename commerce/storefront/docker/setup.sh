@@ -46,5 +46,8 @@ else
   wp wc update >/dev/null 2>&1 || true
   [ "$(wp option get stylesheet)" = schermo ] || wp theme activate schermo
 fi
+log "importing catalog"
+wp eval-file /opt/schermo/import-catalog.php
+chown -R www-data:www-data wp-content/uploads 2>/dev/null || true
 wp cache flush >/dev/null 2>&1 || true
 log "ready"

@@ -17,8 +17,9 @@ RUN set -eux; \
 
 # Themes live in the image and are re-synced into the persistent volume on every start, so a redeploy ships theme changes.
 COPY themes /opt/schermo/themes
+COPY catalog /opt/schermo/catalog
 COPY docker/php.ini /usr/local/etc/php/conf.d/schermo.ini
-COPY docker/start.sh docker/setup.sh docker/seed-demo.php /opt/schermo/
+COPY docker/start.sh docker/setup.sh docker/seed-demo.php docker/import-catalog.php /opt/schermo/
 RUN chmod +x /opt/schermo/start.sh /opt/schermo/setup.sh
 
 ENTRYPOINT ["/opt/schermo/start.sh"]
