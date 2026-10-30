@@ -396,3 +396,8 @@ ul.products.gx-rail { grid-template-columns: none; grid-auto-flow: column; grid-
 .gx-notch .i { width: 46px; height: 46px; padding: 13px; margin: 0 0 6px 6px; }
 .gx-notch { right: -2px; top: -2px; width: calc(var(--n) + 2px); height: calc(var(--n) + 2px); } .gx-notch::after { right: 2px; }
 .gx-tile a { border-top-right-radius: 0; }
+
+/* Skeleton-hand cursor on anything clickable (owner's choice), with a soft red glow ring on round buttons. */
+@media (hover: hover) and (pointer: fine) {
+  a, button, summary, label, select, [role="button"], .card-media, .size-opt, .market-opt { cursor: url("../img/cursor-skeleton.svg") 13 2, pointer; }
+}
