@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-const SCHERMO_VERSION = '0.1.0';
+const SCHERMO_VERSION = '0.2.0';
 
 add_action('wp_enqueue_scripts', static function (): void {
     $uri = get_stylesheet_directory_uri();
@@ -96,3 +96,66 @@ add_filter('brandhouse_icon_paths', static fn (array $paths): array => array_mer
     'ruler' => '<polygon points="4 16,16 4,20 8,8 20"/><line x1="8" y1="12" x2="10" y2="14" stroke-width="1.5"/><line x1="11" y1="9" x2="14" y2="12"/><line x1="14" y1="6" x2="16" y2="8" stroke-width="1.5"/>',
     'bell' => '<line x1="12" y1="3" x2="12" y2="5" stroke-width="2"/><path d="M6 17H18L17 10L14 6H10L7 10L6 17Z"/><line x1="4" y1="17" x2="20" y2="17" stroke-width="2"/><polygon points="10 19,14 19,13 21,11 21"/>',
 ]));
+
+/**
+ * Hero slides: product cut-outs with feature labels taken from what is visible on each product.
+ * Words are the collection's own lines (Sempre Avanti, Play Beyond) or the product's name. A slide is
+ * skipped if its product is not in the store. Spots: [label, x%, y%, side of the label].
+ */
+function schermo_hero_slides(): array
+{
+    if (!class_exists('WooCommerce')) {
+        return [];
+    }
+    $dir = get_stylesheet_directory_uri() . '/assets/img/hero/';
+    $defs = [
+        ['MI-001', 'playing-jersey.webp', ['Sempre', 'Avanti'], [[__('Gold-trimmed collar', 'schermo'), 50, 11, 'left'], [__('Milan Icons crest', 'schermo'), 69, 33, 'right'], [__('Duomo skyline print', 'schermo'), 40, 78, 'left']]],
+        ['MI-004', 'practice-kit.webp', ['Practice', 'Kit'], [[__('Gold-striped collar', 'schermo'), 51, 7, 'left'], [__('Milan Icons crest', 'schermo'), 67, 33, 'right'], [__('Tonal Duomo print', 'schermo'), 33, 72, 'left']]],
+        ['MI-005', 'practice-kit-sleeveless.webp', ['Play', 'Beyond'], [[__('Gold-trimmed armholes', 'schermo'), 11, 26, 'left'], [__('Milan Icons crest', 'schermo'), 74, 30, 'right'], [__('Tonal Duomo print', 'schermo'), 48, 76, 'left']]],
+        ['MI-006', 'practice-shorts.webp', ['Milan', 'Icons'], [[__('Drawstring waist', 'schermo'), 49, 24, 'right'], [__('Gold side piping', 'schermo'), 92, 49, 'right'], [__('Milan Icons crest', 'schermo'), 23, 80, 'left']]],
+    ];
+    $slides = [];
+    foreach ($defs as [$sku, $img, $words, $spots]) {
+        $id = wc_get_product_id_by_sku($sku);
+        $p = $id ? wc_get_product($id) : null;
+        if (!$p || $p->get_status() !== 'publish') {
+            continue;
+        }
+        $coll = get_term_by('slug', 'milan-icons', 'product_cat');
+        $slides[] = [
+            'name' => $p->get_name(),
+            'url' => $p->get_permalink(),
+            'price' => $p->get_price_html(),
+            'collection' => $coll ? $coll->name : '',
+            'image' => $dir . $img,
+            'words' => $words,
+            'spots' => $spots,
+        ];
+    }
+    return $slides;
+}
+
+/** Category tile image: the category's own thumbnail, else the newest product's photo in it. */
+function schermo_category_image(WP_Term $cat): string
+{
+    static $used = [];
+    $thumb = (int) get_term_meta($cat->term_id, 'thumbnail_id', true);
+    if (!$thumb) {
+        foreach (wc_get_products(['category' => [$cat->slug], 'limit' => 12, 'status' => 'publish', 'return' => 'ids', 'orderby' => 'date', 'order' => 'DESC']) as $pid) {
+            $t = (int) get_post_thumbnail_id($pid);
+            if ($t && !in_array($t, $used, true)) {
+                $thumb = $t;
+                break;
+            }
+        }
+    }
+    $used[] = $thumb;
+    return $thumb ? (string) wp_get_attachment_image($thumb, 'woocommerce_thumbnail', false, ['loading' => 'lazy']) : '';
+}
+
+add_action('wp_enqueue_scripts', static function (): void {
+    if (is_front_page()) {
+        wp_enqueue_script('schermo-home', get_stylesheet_directory_uri() . '/assets/js/schermo.js', [], SCHERMO_VERSION, ['strategy' => 'defer', 'in_footer' => true]);
+        wp_localize_script('schermo-home', 'schermoHero', array_map(static fn ($s) => ['name' => $s['name'], 'url' => $s['url'], 'price' => wp_strip_all_tags($s['price'])], schermo_hero_slides()));
+    }
+}, 21);

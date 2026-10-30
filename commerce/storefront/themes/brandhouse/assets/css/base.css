@@ -290,7 +290,7 @@ main.page { padding-top: 40px; padding-bottom: 80px; }
   ul.products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .nav-primary ul { gap: 18px; }
 }
-@media (max-width: 1240px) {
+@media (max-width: 1500px) {
   .menu-toggle { display: inline-grid; }
   .nav-primary { display: none; }
 }
