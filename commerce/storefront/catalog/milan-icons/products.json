@@ -76,41 +76,6 @@
    "source": "Milan_Icons_Merchandise.pdf, page 7"
   },
   {
-   "sku": "MI-007",
-   "name": "Milan Icons Cricket Helmet",
-   "category": "Cricket Gear",
-   "sizes": false,
-   "description": "Matte black cricket helmet with black grille and the gold Milan Icons crest on the front.",
-   "images": [
-    "mi-cricket-helmet-1.jpg",
-    "mi-cricket-helmet-2.jpg"
-   ],
-   "source": "Milan_Icons_Merchandise.pdf, page 8"
-  },
-  {
-   "sku": "MI-008",
-   "name": "Milan Icons Batting Pads",
-   "category": "Cricket Gear",
-   "sizes": false,
-   "description": "All-black batting pads with ribbed knee roll and three straps.",
-   "images": [
-    "mi-batting-pads-1.jpg"
-   ],
-   "source": "Milan_Icons_Merchandise.pdf, page 9"
-  },
-  {
-   "sku": "MI-009",
-   "name": "Milan Icons Batting Gloves",
-   "category": "Cricket Gear",
-   "sizes": false,
-   "description": "All-black batting gloves with segmented finger protection and Milan Icons on the wrist strap.",
-   "images": [
-    "mi-batting-gloves-1.jpg",
-    "mi-batting-gloves-2.jpg"
-   ],
-   "source": "Milan_Icons_Merchandise.pdf, page 10"
-  },
-  {
    "sku": "MI-010",
    "name": "Milan Icons Kit Bag",
    "category": "Accessories",
@@ -354,5 +319,10 @@
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 29"
   }
+ ],
+ "removed": [
+  "MI-007",
+  "MI-008",
+  "MI-009"
  ]
 }

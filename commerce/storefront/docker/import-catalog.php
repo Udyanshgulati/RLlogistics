@@ -30,6 +30,14 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
             wp_update_nav_menu_item($loc['primary'], 0, ['menu-item-object' => 'product_cat', 'menu-item-object-id' => $collection, 'menu-item-type' => 'taxonomy', 'menu-item-status' => 'publish', 'menu-item-position' => 0]);
         }
     }
+    // Products the owner removed from the catalogue go to the trash (restorable from Products → Trash).
+    foreach ($data['removed'] ?? [] as $sku) {
+        $pid = wc_get_product_id_by_sku($sku);
+        if ($pid && get_post_status($pid) !== 'trash') {
+            wp_trash_post($pid);
+            echo "catalog: removed {$sku}\n";
+        }
+    }
     foreach ($data['products'] as $p) {
         if (wc_get_product_id_by_sku($p['sku'])) {
             continue;
