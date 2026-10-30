@@ -401,3 +401,8 @@ ul.products.gx-rail { grid-template-columns: none; grid-auto-flow: column; grid-
 @media (hover: hover) and (pointer: fine) {
   a, button, summary, label, select, [role="button"], .card-media, .size-opt, .market-opt { cursor: url("../img/cursor-skeleton.svg") 13 2, pointer; }
 }
+
+/* Owner's choice: the system's own cursor everywhere (the custom arrow and skeleton hand are switched off). */
+html, body { cursor: auto !important; }
+a, button, summary, label, select, [role="button"], .card-media, .size-opt, .market-opt { cursor: pointer !important; }
+input[type=text], input[type=email], input[type=search], input[type=tel], input[type=password], input[type=number], textarea { cursor: text !important; }
