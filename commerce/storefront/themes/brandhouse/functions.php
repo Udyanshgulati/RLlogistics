@@ -25,6 +25,8 @@ add_action('after_setup_theme', static function (): void {
         'single_image_width' => 1000,
         'product_grid' => ['default_columns' => 4, 'default_rows' => 4, 'min_columns' => 2, 'max_columns' => 4],
     ]);
+    // Product cards are 4:5 portrait; WooCommerce's default square crop would cut the top and bottom off.
+    add_filter('woocommerce_get_image_size_thumbnail', static fn (array $s): array => ['width' => 600, 'height' => 750, 'crop' => 1]);
     register_nav_menus([
         'primary' => __('Main menu', 'brandhouse'),
         'footer-shop' => __('Footer: shop', 'brandhouse'),
@@ -37,7 +39,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     $uri = get_template_directory_uri();
     wp_enqueue_style('brandhouse', $uri . '/assets/css/base.css', [], BRANDHOUSE_VERSION);
     wp_enqueue_script('brandhouse', $uri . '/assets/js/theme.js', [], BRANDHOUSE_VERSION, ['strategy' => 'defer', 'in_footer' => true]);
-    wp_localize_script('brandhouse', 'brandhouse', ['sizeAttribute' => 'attribute_pa_size']);
+    wp_localize_script('brandhouse', 'brandhouse', ['sizeAttribute' => 'attribute_pa_size', 'viewLabel' => __('View', 'brandhouse')]);
 });
 
 // Lean front end: no emoji script, no oEmbed discovery on a shop.

@@ -39,7 +39,26 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
         }
     }
     foreach ($data['products'] as $p) {
-        if (wc_get_product_id_by_sku($p['sku'])) {
+        $ver = (int) ($data['image_version'] ?? 1);
+        $existing = wc_get_product_id_by_sku($p['sku']);
+        if ($existing) {
+            // Existing products keep everything the owner edited; only their photos are replaced when the
+            // catalogue's image_version goes up.
+            if ((int) get_post_meta($existing, '_bh_img_ver', true) < $ver) {
+                $prod = wc_get_product($existing);
+                $old = array_filter(array_merge([(int) $prod->get_image_id()], array_map('intval', $prod->get_gallery_image_ids())));
+                $new = array_values(array_filter(array_map(static fn ($i, $img) => $attach(dirname($json) . '/' . $img, $existing, $p['name'] . ' — view ' . ($i + 1)), array_keys($p['images']), $p['images'])));
+                if ($new) {
+                    $prod->set_image_id($new[0]);
+                    $prod->set_gallery_image_ids(array_slice($new, 1));
+                    $prod->save();
+                    foreach ($old as $oid) {
+                        wp_delete_attachment($oid, true);
+                    }
+                    update_post_meta($existing, '_bh_img_ver', $ver);
+                    echo "catalog: new photos for {$p['sku']}\n";
+                }
+            }
             continue;
         }
         $product = $p['sizes'] ? new WC_Product_Variable() : new WC_Product_Simple();
@@ -63,6 +82,7 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
             $images[] = $attach(dirname($json) . '/' . $img, $id, $p['name'] . ' — view ' . ($i + 1));
         }
         $images = array_values(array_filter($images));
+        update_post_meta($id, '_bh_img_ver', (int) ($data['image_version'] ?? 1));
         if ($images) {
             $product->set_image_id($images[0]);
             $product->set_gallery_image_ids(array_slice($images, 1));
