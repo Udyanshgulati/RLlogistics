@@ -424,3 +424,14 @@ input[type=text], input[type=email], input[type=search], input[type=tel], input[
 /* product page gallery and hero tiles use the same studio background behind transparent images */
 .pdp-hero, .pdp-shot { background: radial-gradient(70% 60% at 50% 42%, #f6f6f3, #e6e6e2); }
 @media (prefers-reduced-motion: reduce) { .card-media::before, .card-media img { transition: none !important; } }
+
+/* Category tiles: the whole product on the studio background (no zoomed crops); red behind it on hover. */
+.gx-tile a { background: radial-gradient(70% 60% at 50% 40%, #f6f6f3, #e3e3df); }
+.gx-tile a::before { content: ""; position: absolute; inset: 0; background: radial-gradient(75% 65% at 50% 40%, #c41d33, var(--red) 45%, var(--red-deep)); opacity: 0; transition: opacity .55s var(--ease); }
+.gx-tile a:hover::before { opacity: 1; }
+.gx-tile img { position: relative; z-index: 1; object-fit: contain; padding: 6% 8% 16%; }
+.gx-tile.is-wide img { padding: 6% 12% 14%; }
+.gx-tile a::after { background: linear-gradient(to top, rgba(8, 8, 9, .82), rgba(8, 8, 9, .35) 26%, transparent 46%); z-index: 1; }
+.gx-tile a:hover img { transform: scale(1.04); }
+.gx-tile-name, .gx-notch { z-index: 3; }
+.gx-tile:not(.is-wide) img { padding: 3% 6% 20%; } .gx-tile:not(.is-wide) a:hover img { transform: scale(1.05); }

@@ -139,7 +139,13 @@ function schermo_hero_slides(): array
 function schermo_category_image(WP_Term $cat): string
 {
     static $used = [];
-    $thumb = (int) get_term_meta($cat->term_id, 'thumbnail_id', true);
+    // A representative product per category (full cut-out), else the category's own image, else the newest product.
+    $featured = ['accessories' => 'MI-010', 'clothing' => 'MI-018', 'fan-merch' => 'MI-028', 'milan-icons' => 'MI-001', 'sportswear' => 'MI-014'];
+    $thumb = 0;
+    if (isset($featured[$cat->slug]) && ($fid = wc_get_product_id_by_sku($featured[$cat->slug])) && get_post_status($fid) === 'publish') {
+        $thumb = (int) get_post_thumbnail_id($fid);
+    }
+    $thumb = $thumb ?: (int) get_term_meta($cat->term_id, 'thumbnail_id', true);
     if (!$thumb) {
         foreach (wc_get_products(['category' => [$cat->slug], 'limit' => 12, 'status' => 'publish', 'return' => 'ids', 'orderby' => 'date', 'order' => 'DESC']) as $pid) {
             $t = (int) get_post_thumbnail_id($pid);
