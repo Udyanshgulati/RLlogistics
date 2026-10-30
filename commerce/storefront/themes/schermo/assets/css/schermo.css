@@ -406,3 +406,21 @@ ul.products.gx-rail { grid-template-columns: none; grid-auto-flow: column; grid-
 html, body { cursor: auto !important; }
 a, button, summary, label, select, [role="button"], .card-media, .size-opt, .market-opt { cursor: pointer !important; }
 input[type=text], input[type=email], input[type=search], input[type=tel], input[type=password], input[type=number], textarea { cursor: text !important; }
+
+/* Cards v4: product images are transparent cut-outs. The card paints the studio background; on hover the
+   background (behind the product) turns deep red with a glow, and the second view crossfades in on top. */
+.card-media { background: radial-gradient(70% 60% at 50% 42%, #f6f6f3, #e6e6e2); transition: box-shadow .5s var(--ease), transform .5s var(--ease); }
+.card-media::before { content: ""; position: absolute; inset: 0; z-index: 0; background: radial-gradient(75% 65% at 50% 42%, #c41d33, var(--red) 45%, var(--red-deep)); opacity: 0; transition: opacity .55s var(--ease); }
+.card-media::after { display: none !important; }
+.card-media img { position: relative; z-index: 1; mix-blend-mode: normal; filter: none; }
+.card-media img.alt { position: absolute; inset: 0; z-index: 2; clip-path: none; opacity: 0; filter: none; mix-blend-mode: normal; transform: translateX(14px); transition: opacity .55s var(--ease), transform .7s var(--ease); }
+.card:hover .card-media::before { opacity: 1; }
+.card:hover .card-media img.alt { opacity: 1; transform: none; }
+.card:hover .card-media:has(img.alt) img:not(.alt) { opacity: 0; transform: translateX(-14px); }
+.card:hover .card-media img:not(.alt) { transform: scale(1.04); }
+.card .card-media img:not(.alt) { transition: opacity .55s var(--ease), transform .7s var(--ease); }
+.card:hover .card-media { box-shadow: 0 0 0 1px rgba(214, 32, 52, .5), 0 18px 60px -10px var(--red-glow); transform: translateY(-3px); }
+.card-media .tag { z-index: 3; }
+/* product page gallery and hero tiles use the same studio background behind transparent images */
+.pdp-hero, .pdp-shot { background: radial-gradient(70% 60% at 50% 42%, #f6f6f3, #e6e6e2); }
+@media (prefers-reduced-motion: reduce) { .card-media::before, .card-media img { transition: none !important; } }
