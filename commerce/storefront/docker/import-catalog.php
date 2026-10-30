@@ -39,7 +39,7 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
         }
     }
     foreach ($data['products'] as $p) {
-        $ver = (int) ($data['image_version'] ?? 1);
+        $ver = (int) ($p['image_version'] ?? $data['image_version'] ?? 1);
         $existing = wc_get_product_id_by_sku($p['sku']);
         if ($existing) {
             // Existing products keep everything the owner edited; only their photos are replaced when the
@@ -82,7 +82,7 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
             $images[] = $attach(dirname($json) . '/' . $img, $id, $p['name'] . ' — view ' . ($i + 1));
         }
         $images = array_values(array_filter($images));
-        update_post_meta($id, '_bh_img_ver', (int) ($data['image_version'] ?? 1));
+        update_post_meta($id, '_bh_img_ver', (int) ($p['image_version'] ?? $data['image_version'] ?? 1));
         if ($images) {
             $product->set_image_id($images[0]);
             $product->set_gallery_image_ids(array_slice($images, 1));

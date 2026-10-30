@@ -159,3 +159,6 @@ add_action('wp_enqueue_scripts', static function (): void {
         wp_localize_script('schermo-home', 'schermoHero', array_map(static fn ($s) => ['name' => $s['name'], 'url' => $s['url'], 'price' => wp_strip_all_tags($s['price'])], schermo_hero_slides()));
     }
 }, 21);
+
+// Show the whole collection on one page (25 pieces) instead of spilling one product onto page 2.
+add_filter('loop_shop_per_page', static fn (): int => 48, 20);

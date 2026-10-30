@@ -69,30 +69,6 @@
     data.subscribe(render, 'wc/store/cart');
   });
 
-  // Product cards: a round "View" cursor follows the pointer over product photos (mouse/trackpad only).
-  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (fine && document.querySelector('.card-media')) {
-    const dot = document.createElement('div');
-    dot.className = 'cursor-view';
-    dot.setAttribute('aria-hidden', 'true');
-    dot.textContent = (window.brandhouse && window.brandhouse.viewLabel) || 'View';
-    document.body.appendChild(dot);
-    let x = 0, y = 0, cx = 0, cy = 0, raf = 0;
-    const move = () => {
-      cx += (x - cx) * (still ? 1 : 0.22); cy += (y - cy) * (still ? 1 : 0.22);
-      dot.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
-      raf = Math.abs(x - cx) + Math.abs(y - cy) > 0.3 ? requestAnimationFrame(move) : 0;
-    };
-    document.addEventListener('pointermove', (e) => {
-      x = e.clientX; y = e.clientY;
-      if (!dot.classList.contains('is-on')) { cx = x; cy = y; }
-      if (!raf) raf = requestAnimationFrame(move);
-    }, { passive: true });
-    document.addEventListener('pointerover', (e) => dot.classList.toggle('is-on', !!e.target.closest('.card-media')));
-    document.addEventListener('pointerleave', () => dot.classList.remove('is-on'));
-  }
-
   // Search panel.
   const searchBtn = $('[data-search-open]');
   const panel = $('#site-search');
