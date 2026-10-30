@@ -385,3 +385,14 @@ ul.products.gx-rail { grid-template-columns: none; grid-auto-flow: column; grid-
   .icon-btn:hover, .gx-round:hover, .market-btn:hover { background: rgba(255, 255, 255, .16); box-shadow: 0 0 0 4px rgba(255, 255, 255, .06), 0 0 18px rgba(214, 32, 52, .35); }
 }
 .cursor-view { display: none !important; }
+
+/* Category tile notch, rebuilt: the notch is page-coloured with a rounded inner corner, and two concave
+   fillets (radial gradients, not box-shadows) blend it into the tile's top and right edges. */
+.gx-tile a { border: 0; }
+.gx-notch { --n: 66px; --r: 20px; width: var(--n); height: var(--n); right: 0; top: 0; border-bottom-left-radius: var(--r); background: var(--bg); }
+.gx-notch::before, .gx-notch::after { width: var(--r); height: var(--r); box-shadow: none; border-radius: 0; background: radial-gradient(circle at 0 100%, transparent calc(var(--r) - .5px), var(--bg) var(--r)); }
+.gx-notch::before { left: calc(var(--r) * -1); top: 0; }
+.gx-notch::after { right: 0; bottom: calc(var(--r) * -1); left: auto; top: auto; }
+.gx-notch .i { width: 46px; height: 46px; padding: 13px; margin: 0 0 6px 6px; }
+.gx-notch { right: -2px; top: -2px; width: calc(var(--n) + 2px); height: calc(var(--n) + 2px); } .gx-notch::after { right: 2px; }
+.gx-tile a { border-top-right-radius: 0; }
