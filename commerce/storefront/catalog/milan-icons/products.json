@@ -14,7 +14,7 @@
     "mi-playing-jersey-3.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 2",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-002",
@@ -28,7 +28,7 @@
     "mi-playing-trouser-3.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 3",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-003",
@@ -40,7 +40,7 @@
     "mi-playing-cap-1.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 4",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-004",
@@ -53,7 +53,7 @@
     "mi-practice-kit-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 5",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-005",
@@ -66,7 +66,7 @@
     "mi-practice-kit-sleeveless-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 6",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-006",
@@ -79,7 +79,7 @@
     "mi-practice-shorts-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 7",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-010",
@@ -94,7 +94,7 @@
     "mi-kit-bag-4.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 11",
-   "image_version": 5
+   "image_version": 6
   },
   {
    "sku": "MI-011",
@@ -107,7 +107,7 @@
     "mi-backpack-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 12",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-012",
@@ -120,7 +120,7 @@
     "mi-winter-warmer-full-sleeve-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 13",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-013",
@@ -133,7 +133,7 @@
     "mi-winter-warmer-sleeveless-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 14",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-014",
@@ -147,7 +147,7 @@
     "mi-tracksuit-3.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 15",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-015",
@@ -160,7 +160,7 @@
     "mi-winter-travel-hoodie-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 16",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-016",
@@ -174,7 +174,7 @@
     "mi-travel-kit-t-shirt-3.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 17",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-017",
@@ -187,7 +187,7 @@
     "mi-round-neck-travel-t-shirt-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 18",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-018",
@@ -200,7 +200,7 @@
     "mi-polo-t-shirt-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 19",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-019",
@@ -215,7 +215,7 @@
     "mi-fashion-cap-01-4.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 20",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-020",
@@ -230,7 +230,7 @@
     "mi-fashion-cap-02-4.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 21",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-021",
@@ -244,7 +244,7 @@
     "mi-bucket-hat-3.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 22",
-   "image_version": 5
+   "image_version": 6
   },
   {
    "sku": "MI-022",
@@ -256,7 +256,7 @@
     "mi-winter-beanie-1.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 23",
-   "image_version": 4
+   "image_version": 6
   },
   {
    "sku": "MI-023",
@@ -265,14 +265,15 @@
    "sizes": false,
    "description": "Crew socks with the Milan Icons crest. Designs include Italian-flag stripes, a Duomo skyline, a lattice pattern and gold stripes.",
    "images": [
-    "mi-socks-1.jpg",
-    "mi-socks-2.jpg",
-    "mi-socks-3.jpg",
-    "mi-socks-4.jpg",
-    "mi-socks-5.jpg",
-    "mi-socks-6.jpg"
+    "mi-socks-1.webp",
+    "mi-socks-2.webp",
+    "mi-socks-3.webp",
+    "mi-socks-4.webp",
+    "mi-socks-5.webp",
+    "mi-socks-6.webp"
    ],
-   "source": "Milan_Icons_Merchandise.pdf, page 24"
+   "source": "Milan_Icons_Merchandise.pdf, page 24",
+   "image_version": 6
   },
   {
    "sku": "MI-024",
@@ -281,10 +282,11 @@
    "sizes": false,
    "description": "Black and gold Milan Icons bag tag with Duomo artwork; the front has space for a player name and number.",
    "images": [
-    "mi-bag-tag-1.jpg",
-    "mi-bag-tag-2.jpg"
+    "mi-bag-tag-1.webp",
+    "mi-bag-tag-2.webp"
    ],
-   "source": "Milan_Icons_Merchandise.pdf, page 25"
+   "source": "Milan_Icons_Merchandise.pdf, page 25",
+   "image_version": 6
   },
   {
    "sku": "MI-025",
@@ -293,12 +295,10 @@
    "sizes": false,
    "description": "Black travel duffel with gold zips, a gold Duomo outline print, shoulder strap and the Milan Icons crest.",
    "images": [
-    "mi-travel-duffel-bag-1.jpg",
-    "mi-travel-duffel-bag-2.jpg",
-    "mi-travel-duffel-bag-3.jpg",
-    "mi-travel-duffel-bag-4.jpg"
+    "mi-travel-duffel-bag-1.webp"
    ],
-   "source": "Milan_Icons_Merchandise.pdf, page 26"
+   "source": "Milan_Icons_Merchandise.pdf, page 26",
+   "image_version": 6
   },
   {
    "sku": "MI-026",
@@ -307,12 +307,13 @@
    "sizes": false,
    "description": "Structured black leather-look travel bag with gold hardware, gold edge piping and the Milan Icons crest.",
    "images": [
-    "mi-travel-bag-02-1.jpg",
-    "mi-travel-bag-02-2.jpg",
-    "mi-travel-bag-02-3.jpg",
-    "mi-travel-bag-02-4.jpg"
+    "mi-travel-bag-02-1.webp",
+    "mi-travel-bag-02-2.webp",
+    "mi-travel-bag-02-3.webp",
+    "mi-travel-bag-02-4.webp"
    ],
-   "source": "Milan_Icons_Merchandise.pdf, page 27"
+   "source": "Milan_Icons_Merchandise.pdf, page 27",
+   "image_version": 6
   },
   {
    "sku": "MI-027",
@@ -321,9 +322,10 @@
    "sizes": false,
    "description": "Black insulated sipper with a gold rim, gold Duomo print and the Milan Icons crest.",
    "images": [
-    "mi-sipper-1.jpg"
+    "mi-sipper-1.webp"
    ],
-   "source": "Milan_Icons_Merchandise.pdf, page 28"
+   "source": "Milan_Icons_Merchandise.pdf, page 28",
+   "image_version": 6
   },
   {
    "sku": "MI-028",
@@ -332,9 +334,10 @@
    "sizes": false,
    "description": "Gold medal with the Milan Icons crest on a black centre and Duomo spires around the rim, on a black and gold ribbon.",
    "images": [
-    "mi-medal-1.jpg"
+    "mi-medal-1.webp"
    ],
-   "source": "Milan_Icons_Merchandise.pdf, page 29"
+   "source": "Milan_Icons_Merchandise.pdf, page 29",
+   "image_version": 6
   }
  ],
  "removed": [
