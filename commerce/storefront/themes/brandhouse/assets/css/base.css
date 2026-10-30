@@ -321,3 +321,5 @@ main.page { padding-top: 40px; padding-bottom: 80px; }
 .size-guide-open, .notify-open { display: inline-flex; align-items: center; gap: 6px; }
 .size-guide-open .i, .notify-open .i { width: 16px; height: 16px; }
 .price-soon { color: var(--muted); font-size: .92em; letter-spacing: .02em; }
+.flag { width: 21px; height: 14px; display: block; flex: none; box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
+.market-btn .flag { margin-right: 2px; }

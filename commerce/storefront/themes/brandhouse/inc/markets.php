@@ -151,6 +151,16 @@ function brandhouse_currency_label(string $code): string
     return html_entity_decode(get_woocommerce_currency_symbol($code)) . ' ' . $code;
 }
 
+/** Small flag for a market (globe icon for "rest of the world"). */
+function brandhouse_market_flag(string $id): string
+{
+    $file = strtolower($id) . '.svg';
+    if (!is_file(get_template_directory() . '/assets/flags/' . $file)) {
+        return brandhouse_icon('globe');
+    }
+    return sprintf('<img class="flag" src="%s" width="21" height="14" alt="" decoding="async">', esc_url(get_template_directory_uri() . '/assets/flags/' . $file));
+}
+
 /** Header/footer/drawer button showing the active market; opens the selector. */
 function brandhouse_market_button(string $class = ''): string
 {
@@ -158,7 +168,7 @@ function brandhouse_market_button(string $class = ''): string
     return sprintf(
         '<button type="button" class="market-btn %s" data-dialog="market-picker" aria-haspopup="dialog">%s<span>%s · %s</span></button>',
         esc_attr($class),
-        brandhouse_icon('globe'),
+        brandhouse_market_flag(brandhouse_market()),
         esc_html($m['label']),
         esc_html(brandhouse_currency_label(brandhouse_display_currency()))
     );
@@ -187,7 +197,7 @@ add_action('wp_footer', static function (): void {
             <?php foreach (brandhouse_markets() as $id => $m): ?>
               <label class="market-opt">
                 <input type="radio" name="bh_market" value="<?php echo esc_attr($id); ?>"<?php checked($id, $active); ?><?php echo $id === $active ? ' autofocus' : ''; ?>>
-                <span class="market-name"><?php echo esc_html($m['label']); ?></span>
+                <?php echo brandhouse_market_flag($id); ?><span class="market-name"><?php echo esc_html($m['label']); ?></span>
                 <span class="market-cur"><?php echo esc_html(brandhouse_currency_label($m['currency'])); ?></span>
               </label>
             <?php endforeach; ?>
