@@ -335,3 +335,13 @@ main.page { padding-top: 40px; padding-bottom: 80px; }
 .cursor-view { position: fixed; left: 0; top: 0; z-index: 90; width: 88px; height: 88px; margin: 0; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--bg); font: 700 10px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; pointer-events: none; opacity: 0; scale: .2; transition: opacity .2s, scale .35s cubic-bezier(.2, .9, .3, 1.3); }
 .cursor-view.is-on { opacity: 1; scale: 1; }
 @media (prefers-reduced-motion: reduce) { .card-media img.alt { transition: none; } .cursor-view { transition: none; } }
+
+.preorder-preview { margin: 6px 0 4px; }
+.preview-label { font: 700 11px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.preorder-preview .size-options { margin-bottom: 12px; }
+.preview-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.preview-actions .button { flex: 1; min-width: 180px; }
+.preview-actions .button:disabled { opacity: .45; cursor: not-allowed; }
+.preview-note { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+.single-product .stock:empty { display: none; }
+.single-product .related, .single-product .upsells { max-width: var(--max); margin: 0 auto; padding: 72px var(--gutter) 0; }

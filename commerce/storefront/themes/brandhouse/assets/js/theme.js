@@ -69,6 +69,13 @@
     data.subscribe(render, 'wc/store/cart');
   });
 
+  // Size buttons on products not yet on sale: selectable, for a feel of the page.
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-preview-size]');
+    if (!b) return;
+    b.parentElement.querySelectorAll('[data-preview-size]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+  });
+
   // Search panel.
   const searchBtn = $('[data-search-open]');
   const panel = $('#site-search');
