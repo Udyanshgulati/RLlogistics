@@ -439,3 +439,12 @@ input[type=text], input[type=email], input[type=search], input[type=tel], input[
 /* Plain, upright icons (no slant, rounded strokes) so they read at a glance. */
 .i { transform: none !important; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .tools .icon-btn .i, .menu-toggle .i { width: 21px; height: 21px; }
+
+/* Header: logo on the top left (owner's request), menu button before it, tools on the right. */
+.site-header .bar { grid-template-columns: auto auto 1fr auto; column-gap: 18px; }
+.site-header .menu-toggle { grid-column: 1; grid-row: 1; }
+.site-header .brand { grid-column: 2; grid-row: 1; justify-self: start; }
+.site-header .nav-primary { grid-column: 3; grid-row: 1; justify-self: center; }
+.site-header .tools { grid-column: 4; grid-row: 1; }
+.logo-header .logo-svg { width: 140px; }
+@media (min-width: 1501px) { .site-header .bar { grid-template-columns: 0 auto 1fr auto; column-gap: 0; } .site-header .nav-primary { padding: 0 24px; } }

@@ -326,24 +326,13 @@
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 28",
    "image_version": 6
-  },
-  {
-   "sku": "MI-028",
-   "name": "Milan Icons Medal",
-   "category": "Fan Merch",
-   "sizes": false,
-   "description": "Gold medal with the Milan Icons crest on a black centre and Duomo spires around the rim, on a black and gold ribbon.",
-   "images": [
-    "mi-medal-1.webp"
-   ],
-   "source": "Milan_Icons_Merchandise.pdf, page 29",
-   "image_version": 6
   }
  ],
  "removed": [
   "MI-007",
   "MI-008",
-  "MI-009"
+  "MI-009",
+  "MI-028"
  ],
  "image_version": 2
 }

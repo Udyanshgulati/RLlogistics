@@ -43,6 +43,15 @@ add_filter('woocommerce_out_of_stock_message', static function (string $msg): st
     return $product instanceof WC_Product && $product->get_price() === '' ? '' : $msg;
 });
 
+// Menu links to product categories that have no products are hidden (e.g. after products are removed).
+add_filter('wp_nav_menu_objects', static fn (array $items): array => array_values(array_filter($items, static function ($i): bool {
+    if ($i->object !== 'product_cat') {
+        return true;
+    }
+    $t = get_term((int) $i->object_id, 'product_cat');
+    return $t instanceof WP_Term && $t->count > 0;
+})));
+
 add_filter('loop_shop_per_page', static fn (): int => 24);
 add_filter('loop_shop_columns', static fn (): int => 4);
 
