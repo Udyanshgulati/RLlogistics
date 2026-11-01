@@ -435,3 +435,7 @@ input[type=text], input[type=email], input[type=search], input[type=tel], input[
 .gx-tile a:hover img { transform: scale(1.04); }
 .gx-tile-name, .gx-notch { z-index: 3; }
 .gx-tile:not(.is-wide) img { padding: 3% 6% 20%; } .gx-tile:not(.is-wide) a:hover img { transform: scale(1.05); }
+
+/* Plain, upright icons (no slant, rounded strokes) so they read at a glance. */
+.i { transform: none !important; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tools .icon-btn .i, .menu-toggle .i { width: 21px; height: 21px; }
