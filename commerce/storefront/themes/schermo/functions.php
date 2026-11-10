@@ -11,6 +11,7 @@ const SCHERMO_VERSION = '0.2.0';
 
 require_once __DIR__ . '/inc/shop-filters.php';
 require_once __DIR__ . '/inc/product.php';
+require_once __DIR__ . '/inc/checkout.php';
 
 add_action('wp_enqueue_scripts', static function (): void {
     $uri = get_stylesheet_directory_uri();
