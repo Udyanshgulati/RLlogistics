@@ -114,7 +114,7 @@ function tli_movements(int $limit = 50, int $product_id = 0): array
     return $wpdb->get_results($sql, ARRAY_A) ?: [];
 }
 
-// Changes made elsewhere (orders, WooCommerce screens) are logged too, unless TL Inventory made them itself.
+// Changes made elsewhere (orders, WooCommerce screens) are logged too, unless TL Commerce Hub made them itself.
 function tli_without_auto_log(callable $fn)
 {
     $GLOBALS['tli_quiet'] = true;

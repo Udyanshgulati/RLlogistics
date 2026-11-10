@@ -34,7 +34,7 @@ add_action('admin_bar_menu', static function (WP_Admin_Bar $bar): void {
 }, 1);
 add_action('admin_bar_menu', static fn (WP_Admin_Bar $bar) => $bar->remove_node('wp-logo'), 999);
 add_filter('admin_footer_text', static fn (): string => '<span class="tl-footer">' . tli_brand_mark(18) . ' Built and managed by <b>' . TLI_BRAND . '</b></span>');
-add_filter('update_footer', static fn (): string => 'TL Inventory ' . TLI_VERSION, 11);
+add_filter('update_footer', static fn (): string => 'TL Commerce Hub ' . TLI_VERSION, 11);
 add_filter('admin_title', static fn ($t) => str_replace(['&lsaquo; ', ' &#8212; WordPress', ' — WordPress'], ['· ', ' · ' . TLI_BRAND, ' · ' . TLI_BRAND], $t));
 
 // Dashboard: replace WordPress news widgets with a TL welcome card.
@@ -48,7 +48,7 @@ add_action('wp_dashboard_setup', static function (): void {
         if ($s) {
             printf('<p>%d sizes in the catalogue · %d low · %d out of stock</p>', $s['skus'], $s['low'], $s['out']);
         }
-        printf('<p><a class="button button-primary" href="%s">Open TL Inventory</a> <a class="button" href="%s">Orders</a></p>', esc_url(admin_url('admin.php?page=tl-inventory')), esc_url(admin_url('admin.php?page=tl-orders')));
+        printf('<p><a class="button button-primary" href="%s">Open TL Commerce Hub</a> <a class="button" href="%s">Orders</a></p>', esc_url(admin_url('admin.php?page=tl-inventory')), esc_url(admin_url('admin.php?page=tl-orders')));
     });
     global $wp_meta_boxes;
     $w = $wp_meta_boxes['dashboard']['normal']['core']['tl_welcome'] ?? null;

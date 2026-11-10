@@ -1,4 +1,4 @@
-// TL Inventory: expand product rows, Adjust stock side panel with a live before → after preview.
+// TL Commerce Hub: expand product rows, Adjust stock side panel with a live before → after preview.
 (() => {
   document.querySelectorAll('[data-toggle]').forEach((b) => b.addEventListener('click', () => {
     const g = b.closest('[data-group]'); const open = !g.classList.contains('open');

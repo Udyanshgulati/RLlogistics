@@ -1,5 +1,5 @@
 <?php
-/** TL Inventory screens in WordPress admin. */
+/** TL Commerce Hub screens in WordPress admin. */
 
 declare(strict_types=1);
 
@@ -7,11 +7,15 @@ defined('ABSPATH') || exit;
 
 add_action('admin_menu', static function (): void {
     $cap = 'manage_woocommerce';
-    add_menu_page('TL Inventory', 'TL Inventory', $cap, 'tl-inventory', 'tli_page_overview', 'data:image/svg+xml;base64,' . base64_encode(tli_menu_icon()), 3);
+    add_menu_page('TL Commerce Hub', 'TL Commerce Hub', $cap, 'tl-inventory', 'tli_page_overview', 'data:image/svg+xml;base64,' . base64_encode(tli_menu_icon()), 3);
     add_submenu_page('tl-inventory', 'Overview', 'Overview', $cap, 'tl-inventory', 'tli_page_overview');
     add_submenu_page('tl-inventory', 'Inventory', 'Inventory', $cap, 'tl-stock', 'tli_page_inventory');
     add_submenu_page('tl-inventory', 'Orders', 'Orders', 'edit_shop_orders', 'tl-orders', 'tli_page_orders');
     add_submenu_page('tl-inventory', 'Stock movements', 'Stock movements', $cap, 'tl-movements', 'tli_page_movements');
+    if (tli_mode() === 'hub') {
+        add_submenu_page('tl-inventory', 'Stores', 'Stores', $cap, 'tl-stores', 'tli_page_stores');
+    }
+    add_submenu_page('tl-inventory', 'Connection', 'Connection', $cap, 'tl-connection', 'tli_page_connection');
     add_submenu_page('tl-inventory', 'Settings', 'Settings', $cap, 'tl-settings', 'tli_page_settings');
 });
 
@@ -45,7 +49,7 @@ function tli_state_badge(string $state): string
 
 function tli_head(string $title, string $sub, string $actions = ''): void
 {
-    echo '<div class="tli-wrap"><div class="tli-top"><div class="tli-brandline"><span class="tli-mark">TL</span><span>TL Inventory <em>by Thoda Logic</em></span></div></div>';
+    echo '<div class="tli-wrap"><div class="tli-top"><div class="tli-brandline"><span class="tli-mark">TL</span><span>TL Commerce Hub <em>by Thoda Logic</em></span><span class="tli-mode">' . (tli_mode() === 'hub' ? 'Hub · central stock' : 'Storefront · sells from hub stock') . '</span></div></div>';
     echo '<div class="tli-page-head"><div><h1>' . esc_html($title) . '</h1><p>' . esc_html($sub) . '</p></div><div class="tli-actions">' . $actions . '</div></div>';
     if (!empty($_GET['tli_msg'])) { // phpcs:ignore WordPress.Security.NonceVerification
         $ok = ($_GET['tli_ok'] ?? '1') === '1'; // phpcs:ignore WordPress.Security.NonceVerification
@@ -65,24 +69,32 @@ function tli_page_overview(): void
     $days = ['today' => 0, '7d' => 7, '30d' => 30][$range] ?? 7;
     $from = $days === 0 ? wp_date('Y-m-d 00:00:00') : wp_date('Y-m-d H:i:s', time() - $days * DAY_IN_SECONDS);
     $count = static fn (array $status, ?string $after = null): int => count(wc_get_orders(['status' => $status, 'limit' => -1, 'return' => 'ids'] + ($after ? ['date_created' => '>=' . strtotime($after)] : [])));
-    $new = $count(['processing', 'tl-packed', 'tl-dispatched', 'completed', 'on-hold'], $from);
-    $topack = $count(['processing']);
-    $packed = $count(['tl-packed']);
-    $transit = $count(['tl-dispatched']);
+    global $wpdb;
+    $hub = tli_mode() === 'hub';
+    $rt = $wpdb->prefix . 'tl_remote_orders';
+    $rcount = static fn (array $st, ?string $after = null): int => $hub ? (int) $wpdb->get_var("SELECT COUNT(*) FROM {$rt} WHERE status IN ('" . implode("','", array_map('esc_sql', $st)) . "')" . ($after ? $wpdb->prepare(' AND placed_at >= %s', get_gmt_from_date($after)) : '')) : 0;
+    $paid = ['processing', 'tl-packed', 'tl-dispatched', 'completed', 'on-hold'];
+    $new = $count($paid, $from) + $rcount($paid, $from);
+    $topack = $count(['processing']) + $rcount(['processing']);
+    $packed = $count(['tl-packed']) + $rcount(['tl-packed']);
+    $transit = $count(['tl-dispatched']) + $rcount(['tl-dispatched']);
     $sales = 0.0;
     foreach (wc_get_orders(['status' => ['processing', 'tl-packed', 'tl-dispatched', 'completed'], 'limit' => -1, 'date_created' => '>=' . strtotime($from)]) as $o) {
         $sales += (float) $o->get_total();
+    }
+    if ($hub) {
+        $sales += (float) $wpdb->get_var($wpdb->prepare("SELECT COALESCE(SUM(total),0) FROM {$rt} WHERE currency = 'INR' AND status IN ('processing','tl-packed','tl-dispatched','completed') AND placed_at >= %s", get_gmt_from_date($from)));
     }
     $s = tli_stock_summary();
     $seg = '';
     foreach (['today' => 'Today', '7d' => 'Last 7 days', '30d' => 'Last 30 days'] as $k => $l) {
         $seg .= sprintf('<a class="%s" href="%s">%s</a>', $range === $k ? 'on' : '', esc_url(admin_url('admin.php?page=tl-inventory&range=' . $k)), $l);
     }
-    tli_head('Overview', get_bloginfo('name') . ' · Delhi warehouse', '<nav class="tli-seg">' . $seg . '</nav>');
+    tli_head('Overview', ($hub ? 'All stores' : get_bloginfo('name')) . ' · Delhi warehouse', '<nav class="tli-seg">' . $seg . '</nav>');
     $k = static fn ($label, $value, $hint, $href, $tone = '') => printf('<a class="tli-kpi %s" href="%s"><span class="k-label">%s</span><span class="k-value">%s</span><span class="k-hint">%s</span></a>', esc_attr($tone), esc_url($href), esc_html($label), esc_html((string) $value), esc_html($hint));
     echo '<div class="tli-kpis">';
     $k('New orders', $new, ['today' => 'Placed today', '7d' => 'Last 7 days', '30d' => 'Last 30 days'][$range] ?? '', admin_url('admin.php?page=tl-orders'));
-    $k('Sales', tli_money($sales), 'Paid orders in the period', admin_url('admin.php?page=tl-orders'));
+    $k('Sales', tli_money($sales), $hub ? 'Paid orders, all stores (INR)' : 'Paid orders in the period', admin_url('admin.php?page=tl-orders'));
     $k('To pack', $topack, 'Paid, waiting to be packed', admin_url('admin.php?page=tl-orders&stage=processing'), $topack ? 'is-warn' : '');
     $k('Ready to dispatch', $packed, 'Packed at the warehouse', admin_url('admin.php?page=tl-orders&stage=tl-packed'));
     $k('In transit', $transit, 'With the courier', admin_url('admin.php?page=tl-orders&stage=tl-dispatched'));
@@ -91,7 +103,7 @@ function tli_page_overview(): void
     echo '</div>';
 
     echo '<section class="tli-card tli-route"><div class="tli-card-head"><div><h2>Shipment journey</h2><p>Orders by stage. Counts change as the team marks orders packed, dispatched and delivered.</p></div></div>';
-    $delivered = $count(['completed']);
+    $delivered = $count(['completed']) + $rcount(['completed']);
     printf('<ol class="tli-stops"><li class="%s"><b>%d</b><span>To pack</span></li><li class="%s"><b>%d</b><span>Packed · Delhi</span></li><li class="%s"><b>%d</b><span>With courier</span></li><li class="%s"><b>%d</b><span>Delivered (all time)</span></li></ol></section>',
         $topack ? 'done' : '', $topack, $packed ? 'done' : '', $packed, $transit ? 'live' : '', $transit, $delivered ? 'done' : '', $delivered);
 
@@ -127,7 +139,26 @@ function tli_page_overview(): void
     // Recent orders
     echo '<section class="tli-card"><div class="tli-card-head"><h2>Recent orders</h2><a class="tli-btn sm ghost" href="' . esc_url(admin_url('admin.php?page=tl-orders')) . '">View all</a></div>';
     tli_orders_table(wc_get_orders(['limit' => 8, 'orderby' => 'date', 'order' => 'DESC']), true);
-    echo '</section></div><div class="tli-stack">';
+    echo '</section>';
+    if ($hub && ($remote = tli_remote_orders('', 6))) {
+        echo '<section class="tli-card flush"><div class="tli-card-head" style="padding:16px 18px 0"><h2>Recent orders from other stores</h2></div>';
+        tli_remote_table($remote);
+        echo '</section>';
+    }
+    echo '</div><div class="tli-stack">';
+    if ($hub) {
+        echo '<section class="tli-card"><div class="tli-card-head"><div><h2>Stores</h2><p>Connection health of every storefront.</p></div><a class="tli-btn sm ghost" href="' . esc_url(admin_url('admin.php?page=tl-stores')) . '">Manage</a></div><ul class="tli-moves">';
+        printf('<li><div><b>%s</b><span class="small muted">This site · hub</span></div>%s</li>', esc_html(get_bloginfo('name')), tli_badge('Hub', 'info'));
+        foreach (tli_stores() as $st) {
+            $seen = $st['last_seen'] ? strtotime($st['last_seen'] . ' UTC') : 0;
+            $b = !(int) $st['active'] ? tli_badge('Paused', 'neutral') : (!$seen ? tli_badge('Not connected yet', 'warn') : ($st['last_error'] !== '' ? tli_badge('Needs attention', 'bad') : tli_badge('Connected', 'ok')));
+            printf('<li><div><b>%s</b><span class="small muted">%s</span></div>%s</li>', esc_html($st['name']), $seen ? esc_html('Last contact ' . human_time_diff($seen) . ' ago') : 'No contact yet', $b);
+        }
+        if (!tli_stores()) {
+            echo '<li><span class="small muted">No other stores connected yet. Add one on the Stores page.</span></li>';
+        }
+        echo '</ul></section>';
+    }
     // Stock at a glance
     printf('<section class="tli-card"><div class="tli-card-head"><div><h2>Stock at a glance</h2><p>Counted units only.</p></div></div><div class="tli-flow"><div><b>%s</b><span>Units in stock</span></div><div><b>%d</b><span>Sizes / SKUs</span></div><div><b>%s</b><span>Stock value at selling price</span></div></div></section>',
         esc_html(number_format_i18n($s['units'])), $s['skus'], esc_html(tli_money($s['value'])));
@@ -147,6 +178,9 @@ function tli_page_inventory(): void
     $base = admin_url('admin.php?page=tl-stock');
     tli_head('Inventory', 'Stock for every product and size, held at the Delhi warehouse.',
         '<a class="tli-btn" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_export'), 'tli_export')) . '">Export CSV</a><a class="tli-btn primary" href="' . esc_url(admin_url('post-new.php?post_type=product')) . '">Add product</a>');
+    if (tli_mode() === 'store') {
+        echo '<div class="tli-flash is-ok">This storefront sells from the hub\'s central stock. Numbers here are synced from the hub every 5 minutes; record stock changes at the hub.</div>';
+    }
     echo '<div class="tli-legend"><div><b>In stock</b><span>Counted and available to sell</span></div><div><b>Low stock</b><span>At or below ' . (int) get_option('tli_low_stock', 5) . ' (change in Settings)</span></div><div><b>Out of stock</b><span>Nothing left to sell</span></div><div><b>Not counted yet</b><span>Sold without a limit until you record a count</span></div></div>';
     echo '<form class="tli-filters" method="get"><input type="hidden" name="page" value="tl-stock"><nav class="tli-seg">';
     foreach (['all' => 'All', 'low' => 'Low stock', 'out' => 'Out of stock', 'untracked' => 'Not counted'] as $k => $l) {
@@ -166,7 +200,7 @@ function tli_page_inventory(): void
             $i === 0 && $q !== '' ? ' open' : '', $i === 0 && $q !== '' ? 'true' : 'false', $img, esc_url(get_edit_post_link($p->get_id())), esc_html($p->get_name()), esc_html($p->get_sku()),
             esc_html($g['cats']), count($g['rows']), $g['total'] === null ? '—' : esc_html(number_format_i18n($g['total'])), tli_state_badge($worst), esc_url(get_edit_post_link($p->get_id())));
         foreach ($g['rows'] as $r) {
-            printf('<tr class="tli-vrow"><td></td><td><span class="tli-size">%s</span> <span class="mono">%s</span></td><td></td><td></td><td class="num"><b>%s</b></td><td>%s</td><td class="num"><button type="button" class="tli-btn sm" data-adjust data-id="%d" data-name="%s" data-qty="%s">Adjust</button></td></tr>',
+            printf('<tr class="tli-vrow"><td></td><td><span class="tli-size">%s</span> <span class="mono">%s</span></td><td></td><td></td><td class="num"><b>%s</b></td><td>%s</td><td class="num"><button type="button" class="tli-btn sm" ' . (tli_mode() === 'store' ? 'disabled title="Record changes at the hub"' : '') . ' data-adjust data-id="%d" data-name="%s" data-qty="%s">Adjust</button></td></tr>',
                 esc_html($r['size']), esc_html($r['sku']), $r['qty'] === null ? '—' : (int) $r['qty'], tli_state_badge($r['state']), $r['id'], esc_attr($p->get_name() . ($r['size'] !== '—' ? ' · ' . $r['size'] : '')), $r['qty'] === null ? '' : (int) $r['qty']);
         }
         echo '</tbody>';
@@ -270,6 +304,30 @@ function tli_orders_table(array $orders, bool $compact = false): void
     echo '</tbody></table>';
 }
 
+function tli_remote_table(array $rows): void
+{
+    if (!$rows) {
+        return;
+    }
+    $names = array_column(tli_stores(), 'name', 'id');
+    echo '<table class="tli-table"><thead><tr><th>Order</th><th>Store</th><th>Customer</th><th>Items</th><th>Ship to</th><th>Stage</th><th class="num">Total</th><th>Next step</th></tr></thead><tbody>';
+    foreach ($rows as $o) {
+        [$label, $tone] = TLI_STAGES[$o['status']] ?? [ucfirst($o['status']), 'neutral'];
+        $items = implode(', ', array_map(static fn ($l) => $l['qty'] . '× ' . ($l['name'] ?: $l['sku']), json_decode($o['lines_json'], true) ?: []));
+        printf('<tr><td class="nowrap"><b>#%s</b><span class="muted small">%s</span></td><td><span class="tli-store-chip">%s</span></td><td>%s</td><td class="small">%s</td><td class="mono">%s</td><td>%s</td><td class="num">%s %s</td><td>',
+            esc_html($o['number']), esc_html(wp_date('d M, H:i', strtotime($o['placed_at'] . ' UTC'))), esc_html($names[$o['store_id']] ?? $o['store_id']), esc_html($o['customer'] ?: '—'),
+            esc_html(mb_strimwidth($items, 0, 80, '…')), esc_html($o['country'] ?: '—'), tli_badge($label, $tone), esc_html($o['currency']), esc_html(number_format_i18n((float) $o['total'])));
+        if (isset(TLI_NEXT[$o['status']])) {
+            printf('<form method="post" action="%s"><input type="hidden" name="action" value="tli_remote_next"><input type="hidden" name="remote" value="%d">%s<button class="tli-btn sm primary">%s</button></form>',
+                esc_url(admin_url('admin-post.php')), (int) $o['id'], wp_nonce_field('tli_remote_' . $o['id'], '_wpnonce', true, false), esc_html(TLI_NEXT[$o['status']][1]));
+        } else {
+            echo '<span class="muted small">—</span>';
+        }
+        echo '</td></tr>';
+    }
+    echo '</tbody></table>';
+}
+
 function tli_page_orders(): void
 {
     $stage = sanitize_key($_GET['stage'] ?? ''); // phpcs:ignore WordPress.Security.NonceVerification
@@ -277,14 +335,24 @@ function tli_page_orders(): void
     if ($stage !== '' && isset(TLI_STAGES[$stage])) {
         $args['status'] = [$stage];
     }
-    tli_head('Orders', 'Every order, its stage and the next step.', '<a class="tli-btn" href="' . esc_url(admin_url('admin.php?page=wc-orders')) . '">WooCommerce order list</a>');
+    tli_head('Orders', tli_mode() === 'hub' ? 'Orders from every store, their stage and the next step.' : 'Every order, its stage and the next step.', '<a class="tli-btn" href="' . esc_url(admin_url('admin.php?page=wc-orders')) . '">WooCommerce order list</a>');
     echo '<nav class="tli-seg mb">';
     foreach (['' => 'All', 'processing' => 'To pack', 'tl-packed' => 'Packed', 'tl-dispatched' => 'Dispatched', 'completed' => 'Delivered', 'pending' => 'Awaiting payment', 'cancelled' => 'Cancelled'] as $k => $l) {
         printf('<a class="%s" href="%s">%s</a>', $stage === $k ? 'on' : '', esc_url(admin_url('admin.php?page=tl-orders' . ($k ? '&stage=' . $k : ''))), esc_html($l));
     }
-    echo '</nav><div class="tli-card flush">';
+    echo '</nav><h2 class="tli-sec">' . esc_html(get_bloginfo('name')) . '</h2><div class="tli-card flush">';
     tli_orders_table(wc_get_orders($args));
     echo '</div>';
+    if (tli_mode() === 'hub') {
+        $remote = tli_remote_orders($stage);
+        echo '<h2 class="tli-sec">Other stores</h2><div class="tli-card flush">';
+        if ($remote) {
+            tli_remote_table($remote);
+        } else {
+            echo '<div class="tli-empty"><p>' . (tli_stores() ? 'No orders from other stores' . ($stage ? ' at this stage' : ' yet') . '.' : 'No other stores connected yet. Connect one on the Stores page.') . '</p></div>';
+        }
+        echo '</div>';
+    }
     tli_foot();
 }
 
@@ -292,7 +360,7 @@ function tli_page_orders(): void
 function tli_movements_list(array $rows): void
 {
     if (!$rows) {
-        echo '<div class="tli-empty"><p>No stock changes recorded yet. Changes made in Inventory, orders and the product screens appear here.</p></div>';
+        echo '<div class="tli-empty"><p>No stock changes recorded yet. Changes from Inventory, orders from every store and the product screens appear here.</p></div>';
         return;
     }
     echo '<ul class="tli-moves">';
@@ -332,11 +400,11 @@ function tli_page_settings(): void
         update_option('tli_low_stock', max(0, (int) $_POST['tli_low_stock']));
         echo '<div class="notice notice-success"><p>Saved.</p></div>';
     }
-    tli_head('Settings', 'How TL Inventory works for this store.');
+    tli_head('Settings', 'How TL Commerce Hub works for this store.');
     echo '<div class="tli-card"><form method="post">';
     wp_nonce_field('tli_settings');
     printf('<label class="tli-field"><span>Low stock level (pieces per size)</span><input class="tli-input" type="number" min="0" name="tli_low_stock" value="%d" style="max-width:120px"></label>', (int) get_option('tli_low_stock', 5));
     echo '<p class="muted small">A size at or below this number shows as Low stock on the Overview and Inventory screens.</p><p><button class="tli-btn primary">Save</button></p></form></div>';
-    echo '<div class="tli-card"><h2>How it works</h2><ul class="tli-help"><li>WooCommerce holds the stock numbers the shop sells from; TL Inventory reads and writes those same numbers.</li><li>Every change is written to Stock movements with who, when and why: adjustments here, orders (sold / cancelled) and edits in the WooCommerce product screen.</li><li>Order stages: Paid → Packed → Dispatched → Delivered. Use the Next step button on Orders.</li><li>Sizes marked "Not counted yet" are sold without a limit until you record a count with Adjust → Stocktake.</li></ul></div>';
+    echo '<div class="tli-card"><h2>How it works</h2><ul class="tli-help"><li>The hub site holds the central stock (WooCommerce stock on the hub). Storefronts connected on the Stores page send their paid orders to the hub, which takes the stock once, and read stock back every 5 minutes.</li><li>Every change is written to Stock movements with who, when and why: adjustments here, orders (sold / cancelled) and edits in the WooCommerce product screen.</li><li>Order stages: Paid → Packed → Dispatched → Delivered. Use the Next step button on Orders.</li><li>Sizes marked "Not counted yet" are sold without a limit until you record a count with Adjust → Stocktake.</li></ul></div>';
     tli_foot();
 }

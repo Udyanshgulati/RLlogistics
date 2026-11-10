@@ -51,7 +51,7 @@ add_action('admin_post_tli_next_stage', static function (): void {
     $o = wc_get_order($id);
     if ($o && isset(TLI_NEXT[$o->get_status()])) {
         [$to] = TLI_NEXT[$o->get_status()];
-        $o->update_status($to, sprintf('TL Inventory: %s by %s.', TLI_STAGES[$to][0], wp_get_current_user()->display_name));
+        $o->update_status($to, sprintf('TL Commerce Hub: %s by %s.', TLI_STAGES[$to][0], wp_get_current_user()->display_name));
     }
     wp_safe_redirect(wp_get_referer() ?: admin_url('admin.php?page=tl-orders'));
     exit;
