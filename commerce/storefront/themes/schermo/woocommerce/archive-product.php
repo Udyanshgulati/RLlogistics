@@ -63,11 +63,19 @@ $active = count($chips);
       <p class="sx-line"><?php echo esc_html($line); ?></p>
       <p class="sx-count" aria-live="polite"><span><?php echo (int) $total; ?></span> <?php echo esc_html(_n('product', 'products', $total, 'schermo')); ?></p>
     </div>
+    <?php
+    // Editorial photo from the owner's deck for the team collections (photo only, no slide text).
+    $banner = ['milan-icons' => 'banner-milan-icons.webp', 'glasgow-cosmic' => 'banner-glasgow-cosmic.webp'][$current ? $current->slug : ''] ?? '';
+    if ($banner):
+    ?>
+    <div class="sx-banner" aria-hidden="true"><img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/img/' . $banner); ?>" alt="" width="1183" height="1400" fetchpriority="high"></div>
+    <?php else: ?>
     <div class="sx-stack" aria-hidden="true">
       <img class="sx-a" src="<?php echo esc_url($stack[0] ?: $hero . 'practice-shorts.webp'); ?>" alt="">
       <img class="sx-b" src="<?php echo esc_url($stack[1] ?: $hero . 'playing-jersey.webp'); ?>" alt="">
       <img class="sx-c" src="<?php echo esc_url($stack[2] ?: $hero . 'practice-kit-sleeveless.webp'); ?>" alt="">
     </div>
+    <?php endif; ?>
   </div>
 </section>
 

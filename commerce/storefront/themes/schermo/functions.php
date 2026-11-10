@@ -130,8 +130,11 @@ function schermo_hero_slides(): array
             'image' => $src,
             'words' => $words,
             'spots' => $spots,
+            'ready' => $p->is_purchasable() && $p->is_in_stock(),
         ];
     }
+    // Pieces that can be ordered now lead; the rest keep their order.
+    usort($slides, static fn ($a, $b) => (int) $b['ready'] <=> (int) $a['ready']);
     return $slides;
 }
 
@@ -158,7 +161,9 @@ function schermo_collections(): array
         if (!$term || is_wp_error($term) || !$term->count) {
             continue;
         }
-        $out[] = ['slug' => $slug, 'key' => $key, 'term' => $term, 'label' => $label, 'sub' => $sub, 'line' => $line, 'crest' => $crest, 'image' => schermo_category_image($term)];
+        $ids = wc_get_products(['status' => 'publish', 'limit' => -1, 'return' => 'ids', 'category' => [$slug]]);
+        $ready = function_exists('schermo_available_ids') ? count(array_intersect($ids, schermo_available_ids())) : 0;
+        $out[] = ['slug' => $slug, 'key' => $key, 'term' => $term, 'label' => $label, 'sub' => $sub, 'line' => $line, 'crest' => $crest, 'image' => schermo_category_image($term), 'ready' => $ready];
     }
     return $out;
 }
