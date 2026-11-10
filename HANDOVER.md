@@ -186,6 +186,10 @@ fee, courier plugin, footer/contact details, full returns page.
 - Plugin `commerce/storefront/plugins/tl-commerce-hub` (installed and activated on every deploy). wp-admin → **TL Commerce Hub**:
   Overview, Inventory (Adjust stock panel), Orders (all stores, next-step button), Stock movements (permanent log), Stores, Connection, Settings.
   Thoda Logic branding across admin and login.
+- 1.3.0 adds **warehouse printouts** (Orders → tick orders or "all to pack" → Pick list / Packing slips; works for orders from
+  every connected store — storefronts now send ship-to address, phone and note) and **Purchasing** (hub only: supplier POs,
+  reorder-low-stock prefill, receive in parts — good units into stock via the ledger, damaged only recorded — printable PO,
+  overdue alert, "+N incoming" on Inventory and an Incoming stock card on Overview). Tables `tl_purchase_orders`, `tl_po_lines`.
 - **schermo.thodalogic.com is the Hub** (central stock). To add a storefront: Hub → Stores → *Create connection key*; on the
   storefront (any WooCommerce site with this plugin) → Connection → *A storefront* → paste hub address, store ID, secret.
   Storefronts send paid orders/cancellations (signed, retried) and pull stock every 5 minutes; Packed/Dispatched/Delivered set at
