@@ -246,3 +246,27 @@ if (!empty($loc['primary']) && (int) get_option('schermo_menu_v') < 4) {
     update_option('schermo_menu_v', 4, false);
     echo "catalog: menu rebuilt (New In, Shop by type, Collections)\n";
 }
+
+
+// Collections page (v5): a real /collections/ page (theme template page-collections.php), and the menu's
+// "Collections" points to it instead of the homepage section. Runs once.
+if ((int) get_option('schermo_menu_v') < 5) {
+    $page = get_page_by_path('collections', OBJECT, 'page');
+    $pid = $page ? (int) $page->ID : (int) wp_insert_post(['post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Collections', 'post_name' => 'collections', 'post_content' => '']);
+    if ($page && $page->post_status !== 'publish') {
+        wp_update_post(['ID' => $pid, 'post_status' => 'publish']);
+    }
+    $loc = get_nav_menu_locations();
+    if (!empty($loc['primary']) && $pid) {
+        foreach (wp_get_nav_menu_items((int) $loc['primary']) ?: [] as $item) {
+            if ($item->type === 'custom' && $item->title === 'Collections' && !$item->menu_item_parent) {
+                wp_update_nav_menu_item((int) $loc['primary'], $item->ID, [
+                    'menu-item-title' => 'Collections', 'menu-item-type' => 'post_type', 'menu-item-object' => 'page',
+                    'menu-item-object-id' => $pid, 'menu-item-status' => 'publish', 'menu-item-position' => (int) $item->menu_order, 'menu-item-parent-id' => 0,
+                ]);
+            }
+        }
+    }
+    update_option('schermo_menu_v', 5, false);
+    echo "catalog: Collections page ready\n";
+}

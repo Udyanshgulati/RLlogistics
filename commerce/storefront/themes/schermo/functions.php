@@ -136,8 +136,9 @@ function schermo_hero_slides(): array
             'spots' => $spots,
             'ready' => $p->is_purchasable() && $p->is_in_stock(),
             // Orderable pieces get "Shop now" to the product; others are a preview of their collection.
-            'cta' => $p->is_purchasable() && $p->is_in_stock() ? __('Shop now', 'schermo') : __('Preview the collection', 'schermo'),
-            'cta_url' => $p->is_purchasable() && $p->is_in_stock() ? $p->get_permalink() : (($t = $coll_slug ? get_term_by('slug', $coll_slug, 'product_cat') : null) ? get_term_link($t) : $p->get_permalink()),
+            'coll_name' => ($ct = $coll_slug ? get_term_by('slug', $coll_slug, 'product_cat') : null) ? $ct->name : $coll,
+            'cta' => sprintf($p->is_purchasable() && $p->is_in_stock() ? __('Shop %s', 'schermo') : __('Preview %s', 'schermo'), $ct ? $ct->name : __('the collection', 'schermo')),
+            'cta_url' => $ct ? get_term_link($ct) : $p->get_permalink(),
         ];
     }
     // Pieces that can be ordered now lead; the rest keep their order.
@@ -205,7 +206,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     }
     if (is_front_page()) {
         wp_enqueue_script('schermo-home', get_stylesheet_directory_uri() . '/assets/js/schermo.js', [], brandhouse_asset_ver('/assets/js/schermo.js', true), ['strategy' => 'defer', 'in_footer' => true]);
-        wp_localize_script('schermo-home', 'schermoHero', array_map(static fn ($s) => ['name' => $s['name'], 'url' => $s['cta_url'], 'cta' => $s['cta'], 'coll' => $s['collection'], 'price' => wp_strip_all_tags($s['price'])], schermo_hero_slides()));
+        wp_localize_script('schermo-home', 'schermoHero', array_map(static fn ($s) => ['name' => $s['name'], 'url' => $s['url'], 'cta' => $s['cta'], 'ctaUrl' => $s['cta_url'], 'ready' => (bool) $s['ready'], 'coll' => $s['coll_name'], 'price' => trim(wp_strip_all_tags(preg_replace('#<span class="screen-reader-text">.*?</span>#', '', $s['price'])))], schermo_hero_slides()));
     }
 }, 21);
 
@@ -260,8 +261,8 @@ function schermo_menu_media(): array
         'glasgow-cosmic' => ['img' => $img . 'banner-glasgow-cosmic.webp', 'line' => __('Cosmic navy, electric blue', 'schermo'), 'kind' => 'photo'],
         'clothing' => ['img' => $cut('SC-001'), 'line' => '', 'kind' => 'cut'],
         'accessories' => ['img' => $cut('SC-029'), 'line' => '', 'kind' => 'cut'],
-        'sportswear' => ['img' => $cut('MI-001'), 'line' => __('Match and practice kits, track trousers and playing gear.', 'schermo'), 'kind' => 'cut'],
-        'fan-merch' => ['img' => $cut('GC-026'), 'line' => __('Bag tags, lanyards and keychains.', 'schermo'), 'kind' => 'photo'],
+        'sportswear' => ['img' => $cut('MI-001'), 'line' => '', 'kind' => 'cut', 'by_collection' => true],
+        'fan-merch' => ['img' => $cut('GC-026'), 'line' => '', 'kind' => 'photo', 'by_collection' => true],
     ];
     if (function_exists('schermo_collections')) {
         foreach (schermo_collections() as $c) {
@@ -284,5 +285,19 @@ add_filter('walker_nav_menu_start_el', static function (string $html, $item, int
     }
     $media = '<span class="nm-media nm-' . esc_attr($m['kind']) . '" aria-hidden="true"><img src="' . esc_url($m['img']) . '" alt="" loading="lazy" decoding="async" width="300" height="375"></span>';
     $extra = ($m['line'] !== '' ? '<span class="nm-line">' . esc_html($m['line']) . '</span>' : '') . (!empty($m['state']) ? '<span class="nm-state">' . esc_html($m['state']) . '</span>' : '');
-    return (string) preg_replace('#(<a\b[^>]*>)(.*?)(</a>)#s', '$1' . $media . '<span class="nm-text"><span class="nm-name">$2</span>' . str_replace('$', '\$', $extra) . '</span>$3', $html, 1);
+    $html = (string) preg_replace('#(<a\b[^>]*>)(.*?)(</a>)#s', '$1' . $media . '<span class="nm-text"><span class="nm-name">$2</span>' . str_replace('$', '\$', $extra) . '</span>$3', $html, 1);
+    // Types without sub-types (Sportswear, Fan Merch): list the collections that have pieces of this type, as real
+    // filtered views, so the column reads like the others instead of a description.
+    if (!empty($m['by_collection']) && $t instanceof WP_Term) {
+        $ids = wc_get_products(['status' => 'publish', 'limit' => -1, 'return' => 'ids', 'category' => [$t->slug]]);
+        $links = '';
+        foreach (schermo_collection_labels() as $slug => $label) {
+            if ($ids && array_intersect($ids, wc_get_products(['status' => 'publish', 'limit' => -1, 'return' => 'ids', 'category' => [$slug]]))) {
+                $links .= '<li class="menu-item"><a href="' . esc_url(add_query_arg('collection', $slug, get_term_link($t))) . '">' . esc_html($label) . '</a></li>';
+            }
+        }
+        $links .= '<li class="menu-item"><a href="' . esc_url(get_term_link($t)) . '">' . esc_html(sprintf(__('All %s', 'schermo'), $t->name)) . '</a></li>';
+        $html .= '<ul class="sub-menu nm-sub">' . $links . '</ul>';
+    }
+    return $html;
 }, 5, 4);
