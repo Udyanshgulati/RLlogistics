@@ -3,6 +3,8 @@ FROM wordpress:7.1.4-php8.3-apache
 
 ARG WOOCOMMERCE_VERSION=11.2.1
 ARG WOOCOMMERCE_SHA256=5317434cb381b5fdc7c1dd6ee258324f08c390976aaf8d1199f2a0e9a3ab8586
+ARG RAZORPAY_VERSION=4.8.9
+ARG RAZORPAY_SHA256=9fd83c6861a4a505c9e951d908c7a76ce807e694963cc933745f9bf8b77a7d31
 ARG WPCLI_VERSION=2.12.0
 ARG WPCLI_SHA256=ce34ddd838f7351d6759068d09793f26755463b4a4610a5a5c0a97b68220d85c
 
@@ -11,6 +13,9 @@ RUN set -eux; \
     curl -fsSL -o /tmp/wc.zip "https://downloads.wordpress.org/plugin/woocommerce.${WOOCOMMERCE_VERSION}.zip"; \
     echo "${WOOCOMMERCE_SHA256}  /tmp/wc.zip" | sha256sum -c -; \
     mkdir -p /opt/schermo/plugins; unzip -q /tmp/wc.zip -d /opt/schermo/plugins; rm /tmp/wc.zip; \
+    curl -fsSL -o /tmp/rzp.zip "https://downloads.wordpress.org/plugin/woo-razorpay.${RAZORPAY_VERSION}.zip"; \
+    echo "${RAZORPAY_SHA256}  /tmp/rzp.zip" | sha256sum -c -; \
+    unzip -q /tmp/rzp.zip -d /opt/schermo/plugins; rm /tmp/rzp.zip; \
     curl -fsSL -o /usr/local/bin/wp "https://github.com/wp-cli/wp-cli/releases/download/v${WPCLI_VERSION}/wp-cli-${WPCLI_VERSION}.phar"; \
     echo "${WPCLI_SHA256}  /usr/local/bin/wp" | sha256sum -c -; \
     chmod +x /usr/local/bin/wp
@@ -19,7 +24,7 @@ RUN set -eux; \
 COPY themes /opt/schermo/themes
 COPY catalog /opt/schermo/catalog
 COPY docker/php.ini /usr/local/etc/php/conf.d/schermo.ini
-COPY docker/start.sh docker/setup.sh docker/seed-demo.php docker/import-catalog.php /opt/schermo/
+COPY docker/start.sh docker/setup.sh docker/seed-demo.php docker/import-catalog.php docker/store-setup.php docker/import-sheet.php /opt/schermo/
 RUN chmod +x /opt/schermo/start.sh /opt/schermo/setup.sh
 
 ENTRYPOINT ["/opt/schermo/start.sh"]
