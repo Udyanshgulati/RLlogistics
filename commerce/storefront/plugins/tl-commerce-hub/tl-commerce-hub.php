@@ -35,7 +35,8 @@ require_once TLI_DIR . '/includes/tracking.php';
 require_once TLI_DIR . '/includes/invoice.php';
 
 register_activation_hook(__FILE__, 'tli_install');
-add_action('admin_init', static function (): void {
+// Upgrades run on the first request after a deploy (front end or admin), not only when someone opens wp-admin.
+add_action('init', static function (): void {
     if (get_option('tli_db_version') !== TLI_DB_VERSION) {
         tli_install();
     }
