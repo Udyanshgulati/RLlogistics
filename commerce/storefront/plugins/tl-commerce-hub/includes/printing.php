@@ -137,7 +137,7 @@ function tli_render_slips(array $orders): void
         echo '<section class="slip">';
         printf('<header class="doc-head"><div><img class="logo" src="%s" alt=""><p class="muted">%s</p></div><div class="right"><h1>Packing slip</h1><p>Order <b>#%s</b><br>%s</p></div></header>',
             esc_url($logo), esc_html($o['store']), esc_html($o['number']), esc_html(wp_date('d M Y', (int) $o['date'])));
-        printf('<div class="cols"><div><h2>Ship to</h2><p class="addr">%s</p>%s</div><div><h2>Ships from</h2><p class="addr">%s<br>Delhi warehouse, India</p>%s</div></div>',
+        printf('<div class="cols"><div><h2>Ship to</h2><p class="addr">%s</p>%s</div><div><h2>Ships from</h2><p class="addr">%s<br>India</p>%s</div></div>',
             nl2br(esc_html($o['ship_to'] !== '' ? $o['ship_to'] : $o['customer'])), $o['phone'] !== '' ? '<p>Phone: ' . esc_html($o['phone']) . '</p>' : '',
             esc_html($o['store']), $o['shipping'] ? '<p>Service: ' . esc_html($o['shipping']) . '</p>' : '');
         echo '<table><thead><tr><th class="chk">✓</th><th>Item</th><th>SKU</th><th class="n">Qty</th></tr></thead><tbody>';

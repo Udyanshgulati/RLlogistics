@@ -552,17 +552,9 @@ if (isset($book['Store details & policies'])) {
         }
     }
 
-    if (($cod = $q('Cash on Delivery')) !== null) {
-        $on = stripos((string) $cod, 'yes') === 0;
-        $cur = get_option('woocommerce_cod_settings', []);
-        $new = array_merge(['title' => 'Cash on delivery', 'description' => 'Pay in cash when your order is delivered.'], $cur, ['enabled' => $on ? 'yes' : 'no']);
-        if ($new !== $cur) {
-            update_option('woocommerce_cod_settings', $new);
-            $store('cash on delivery ' . ($on ? 'on' : 'off'));
-        }
-        if ($on && preg_match('/\d/', (string) $cod)) {
-            $manual[] = "COD extra charge ('{$cod}') — WooCommerce has no COD fee built in; needs a small plugin or code";
-        }
+    // The owner decided: prepaid only, no Cash on Delivery anywhere — a "Yes" in the sheet is reported, not applied.
+    if (($cod = $q('Cash on Delivery')) !== null && stripos((string) $cod, 'yes') === 0) {
+        $manual[] = "Sheet says Cash on Delivery '{$cod}', but the store is prepaid only (owner's decision) — COD stays off";
     }
 
     // Where we sell. EU expands to its member states.
@@ -604,17 +596,9 @@ if (isset($book['Store details & policies'])) {
         $manual[] = "Courier: {$v} — install and connect its WooCommerce plugin";
     }
 
-    $ret = array_filter([
-        'Returns' => $q('Returns allowed'), 'Size exchanges' => $q('Exchanges'), 'Not returnable' => $q('Items that cannot be returned'),
-        'Return shipping' => $q('Who pays return shipping'), 'Refunds' => $q('Refund method'),
-    ]);
-    if ($ret) {
-        $text = implode("\n", array_map(static fn ($k, $v) => "{$k}: {$v}", array_keys($ret), $ret));
-        if ($text !== get_theme_mod('brandhouse_returns_text')) {
-            set_theme_mod('brandhouse_returns_text', $text);
-            $store('returns text');
-        }
-        $manual[] = 'Returns: also publish a full Refund and Returns page (Pages → Refund and Returns Policy)';
+    // The owner decided: no returns or exchanges (worldwide delivery); the sheet's returns answers are reported only.
+    if ($q('Returns allowed') || $q('Exchanges')) {
+        $manual[] = 'Sheet has returns/exchange answers, but the store policy is no returns (owner\'s decision) — the Refunds & Cancellations page was not changed';
     }
 
     if ($v = $q('Launch date')) {

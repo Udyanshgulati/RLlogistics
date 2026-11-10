@@ -152,8 +152,9 @@ function brandhouse_product_details(): void
         }
         echo '</dl>';
     }
-    $sections[] = [__('Delivery', 'brandhouse'), wpautop(esc_html(brandhouse_mod('brandhouse_delivery_text', __('Delivery options, estimates and any import charges are shown at checkout for your address.', 'brandhouse')))), false];
-    $sections[] = [__('Returns', 'brandhouse'), wpautop(esc_html(brandhouse_mod('brandhouse_returns_text', __('Returns policy to be confirmed.', 'brandhouse')))), false];
+    $more = static fn (string $slug, string $text): string => get_page_by_path($slug) && get_post_status(get_page_by_path($slug)) === 'publish' ? '<p><a href="' . esc_url(home_url('/' . $slug . '/')) . '">' . esc_html($text) . '</a></p>' : '';
+    $sections[] = [__('Delivery', 'brandhouse'), wpautop(esc_html(brandhouse_mod('brandhouse_delivery_text', __('We deliver worldwide. Shipping charges for your address are shown at checkout. Orders outside India may be charged import duties and taxes by the destination country, paid by the recipient.', 'brandhouse')))) . $more('shipping-policy', __('Shipping policy', 'brandhouse')), false];
+    $sections[] = [__('Returns', 'brandhouse'), wpautop(esc_html(brandhouse_mod('brandhouse_returns_text', __('All sales are final — as we ship worldwide, we do not accept returns or exchanges, so please check the size guide. If your item arrives damaged, defective or wrong, we replace it or refund you in full.', 'brandhouse')))) . $more('returns-and-refunds', __('Refunds & cancellations', 'brandhouse')), false];
     echo '<div class="accordions">';
     foreach ($sections as [$title, $html, $open]) {
         printf('<details class="acc"%s><summary>%s</summary><div class="acc-body">%s</div></details>', $open ? ' open' : '', esc_html($title), $html); // phpcs:ignore -- built from escaped parts

@@ -286,3 +286,9 @@ add_filter('walker_nav_menu_start_el', static function (string $html, $item, int
     $extra = ($m['line'] !== '' ? '<span class="nm-line">' . esc_html($m['line']) . '</span>' : '') . (!empty($m['state']) ? '<span class="nm-state">' . esc_html($m['state']) . '</span>' : '');
     return (string) preg_replace('#(<a\b[^>]*>)(.*?)(</a>)#s', '$1' . $media . '<span class="nm-text"><span class="nm-name">$2</span>' . str_replace('$', '\$', $extra) . '</span>$3', $html, 1);
 }, 5, 4);
+
+// Prepaid only: Cash on Delivery is never offered, even if someone switches it on in WooCommerce.
+add_filter('woocommerce_available_payment_gateways', static function ($gateways) {
+    unset($gateways['cod']);
+    return $gateways;
+});

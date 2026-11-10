@@ -122,7 +122,7 @@ add_action('woocommerce_order_details_before_order_table', static function ($o):
 
 function tli_customer_timeline(WC_Order $o): string
 {
-    $steps = ['processing' => 'Order confirmed', 'tl-packed' => 'Packed at our Delhi warehouse', 'tl-dispatched' => 'Handed to the courier', 'completed' => 'Delivered'];
+    $steps = ['processing' => 'Order confirmed', 'tl-packed' => 'Packed at our warehouse', 'tl-dispatched' => 'Handed to the courier', 'completed' => 'Delivered'];
     $status = $o->get_status();
     if (!isset($steps[$status])) {
         return '';

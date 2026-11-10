@@ -11,6 +11,67 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
+/** Extra business details kept with the invoice details and shown on the store's pages. */
+const TLI_STORE_FIELDS = ['hours', 'grievance', 'jurisdiction', 'dispatch', 'eta_in', 'eta_world', 'instagram'];
+
+/**
+ * [tl_store field="email" before="Email: " after="" fallback=""] — a business detail for policy/contact pages.
+ * Prints nothing (or the fallback) when the detail is not filled in, so pages never show blanks.
+ */
+add_shortcode('tl_store', static function ($a): string {
+    $a = shortcode_atts(['field' => '', 'before' => '', 'after' => '', 'fallback' => '', 'link' => ''], $a);
+    $c = tli_invoice_conf();
+    $v = trim((string) ($a['field'] === 'name' ? get_bloginfo('name') : ($c[$a['field']] ?? '')));
+    if ($v === '') {
+        return esc_html($a['fallback']);
+    }
+    $out = $a['field'] === 'address' ? nl2br(esc_html($v)) : esc_html($v);
+    if ($a['field'] === 'email') {
+        $out = '<a href="mailto:' . esc_attr(antispambot($v)) . '">' . esc_html(antispambot($v)) . '</a>';
+    } elseif ($a['field'] === 'phone') {
+        $out = '<a href="tel:' . esc_attr(preg_replace('/[^\d+]/', '', $v)) . '">' . esc_html($v) . '</a>';
+    } elseif ($a['field'] === 'instagram' && wp_http_validate_url($v)) {
+        $out = '<a href="' . esc_url($v) . '" rel="noopener" target="_blank">' . esc_html(preg_replace('#^https?://(www\.)?#', '', $v)) . '</a>';
+    }
+    return wp_kses_post($a['before']) . $out . wp_kses_post($a['after']);
+});
+
+/**
+ * [tl_store_block type="operator|contact|grievance"] — composite blocks for the policy pages, built only from details
+ * that are filled in (TL Commerce Hub → Settings), so nothing incomplete is ever shown to customers.
+ */
+add_shortcode('tl_store_block', static function ($a): string {
+    $type = sanitize_key((shortcode_atts(['type' => 'contact'], $a))['type']);
+    $c = tli_invoice_conf();
+    $name = get_bloginfo('name');
+    $sc = static fn (string $field): string => do_shortcode('[tl_store field="' . $field . '"]');
+    if ($type === 'operator') {
+        if ($c['legal_name'] === '') {
+            return '<p>' . esc_html(sprintf('This website and the %s store are operated by %s.', $name, $name)) . '</p>';
+        }
+        $bits = esc_html($c['legal_name']) . ($c['gstin'] !== '' ? ' (GSTIN ' . esc_html($c['gstin']) . ')' : '') . ($c['address'] !== '' ? ', ' . esc_html(preg_replace('/\s*\R\s*/', ', ', $c['address'])) : '');
+        return '<p>' . sprintf('This website and the %s store are operated by %s ("we", "us").', esc_html($name), $bits) . '</p>';
+    }
+    if ($type === 'grievance') {
+        $who = $c['grievance'] !== '' ? 'Our Grievance Officer is <strong>' . esc_html($c['grievance']) . '</strong>' . ($c['email'] !== '' ? ', reachable at ' . $sc('email') : '') . '.' : 'For any complaint, write to us using the details on our Contact page.';
+        return '<p>' . $who . ' We acknowledge every complaint within 48 hours and resolve it within one month of receiving it.</p>';
+    }
+    $rows = [];
+    foreach (['email' => 'Email', 'phone' => 'Phone / WhatsApp', 'hours' => 'Hours', 'instagram' => 'Instagram', 'address' => 'Registered address', 'legal_name' => 'Business', 'gstin' => 'GSTIN'] as $k => $label) {
+        if ($c[$k] !== '') {
+            $rows[] = '<li><strong>' . esc_html($label) . ':</strong> ' . $sc($k) . '</li>';
+        }
+    }
+    if ($c['email'] === '' && $c['phone'] === '') {
+        array_unshift($rows, '<li>Our customer support email and phone number will be listed here before orders open.</li>');
+    }
+    $track = (int) get_option('tli_track_page');
+    if ($track) {
+        $rows[] = '<li><strong>Where is my order?</strong> <a href="' . esc_url(get_permalink($track)) . '">Track your order</a> with your order number and email.</li>';
+    }
+    return $rows ? '<ul class="tl-store-contact">' . implode('', $rows) . '</ul>' : '';
+});
+
 /** WooCommerce state code => GST state code. */
 const TLI_GST_STATE_CODES = [
     'JK' => '01', 'HP' => '02', 'PB' => '03', 'CH' => '04', 'UK' => '05', 'HR' => '06', 'DL' => '07', 'RJ' => '08', 'UP' => '09', 'BR' => '10',
@@ -25,7 +86,10 @@ function tli_invoice_conf(): array
     $c = (array) get_option('tli_invoice', []);
     $pick = static fn (string $k, string $d = ''): string => (string) (($c[$k] ?? '') !== '' ? $c[$k] : ($biz[$k] ?? $d));
     return ['legal_name' => $pick('legal_name'), 'gstin' => strtoupper($pick('gstin')), 'address' => $pick('address'), 'prefix' => $pick('prefix', 'INV'),
-        'lut' => $pick('lut'), 'email' => $pick('email'), 'phone' => $pick('phone')];
+        'lut' => $pick('lut'), 'email' => $pick('email'), 'phone' => $pick('phone'),
+        // Store details used on the policy and contact pages ([tl_store field="…"]).
+        'hours' => $pick('hours'), 'grievance' => $pick('grievance'), 'jurisdiction' => $pick('jurisdiction'), 'dispatch' => $pick('dispatch'),
+        'eta_in' => $pick('eta_in'), 'eta_world' => $pick('eta_world'), 'instagram' => $pick('instagram', (string) ($biz['social'] ?? ''))];
 }
 
 function tli_gstin_valid(string $g): bool
@@ -511,7 +575,10 @@ add_action('admin_post_tli_invoice_settings', static function (): void {
         'legal_name' => sanitize_text_field(wp_unslash($_POST['legal_name'] ?? '')), 'gstin' => $gstin, 'address' => sanitize_textarea_field(wp_unslash($_POST['address'] ?? '')),
         'prefix' => substr($prefix, 0, 5), 'lut' => sanitize_text_field(wp_unslash($_POST['lut'] ?? '')),
         'email' => sanitize_email(wp_unslash($_POST['email'] ?? '')), 'phone' => sanitize_text_field(wp_unslash($_POST['phone'] ?? '')),
-    ], false);
+    ] + array_map(static fn ($k) => sanitize_text_field(wp_unslash($_POST[$k] ?? '')), array_combine(TLI_STORE_FIELDS, TLI_STORE_FIELDS)), false);
+    if (function_exists('schermo_cache_clear')) {
+        schermo_cache_clear(); // policy and contact pages show these details
+    }
     update_option('tli_couriers', sanitize_textarea_field(wp_unslash($_POST['couriers'] ?? '')) ?: TLI_COURIERS_DEFAULT);
     $msg = $gstin !== '' && !tli_gstin_valid($gstin) ? 'Saved, but the GSTIN does not look valid (15 characters, e.g. 07ABCDE1234F1Z5) — invoices stay as drafts.' : 'Saved.';
     wp_safe_redirect(add_query_arg(['tli_msg' => rawurlencode($msg), 'tli_ok' => $msg === 'Saved.' ? '1' : '0'], admin_url('admin.php?page=tl-settings')));
@@ -522,7 +589,7 @@ function tli_settings_invoice_card(): void
 {
     $c = tli_invoice_conf();
     $missing = tli_invoice_missing();
-    echo '<div class="tli-card"><h2>GST invoice</h2><p class="muted">Printed on every tax invoice. Invoices are numbered when an order is paid; until these details are complete only drafts can be printed.</p>';
+    echo '<div class="tli-card"><h2>Business details &amp; GST invoice</h2><p class="muted">Printed on every tax invoice and shown on the Contact, Terms, Privacy, Shipping and Returns pages. A line whose detail is empty is simply left out of those pages. Invoices are numbered when an order is paid; until the GST details are complete only drafts can be printed.</p>';
     echo $missing ? '<div class="tli-flash is-bad">Missing: ' . esc_html(implode(', ', $missing)) . '.</div>' : '<div class="tli-flash is-ok">Ready — paid orders get a GST invoice number. Business state: ' . esc_html(tli_state_name(tli_business_state())) . '.</div>';
     printf('<form method="post" action="%s"><input type="hidden" name="action" value="tli_invoice_settings">%s<div class="tli-po-head">', esc_url(admin_url('admin-post.php')), wp_nonce_field('tli_invoice_settings', '_wpnonce', true, false));
     printf('<label class="tli-field"><span>Legal business name</span><input class="tli-input" name="legal_name" value="%s" placeholder="As on the GST certificate"></label>', esc_attr($c['legal_name']));
@@ -531,6 +598,10 @@ function tli_settings_invoice_card(): void
     printf('<label class="tli-field"><span>Registered address</span><textarea class="tli-input tli-textarea" name="address" rows="3">%s</textarea></label>', esc_textarea($c['address']));
     printf('<div class="tli-po-head"><label class="tli-field"><span>Support email on invoice</span><input class="tli-input" type="email" name="email" value="%s"></label><label class="tli-field"><span>Support phone on invoice</span><input class="tli-input" name="phone" value="%s"></label><label class="tli-field"><span>LUT reference (exports, optional)</span><input class="tli-input" name="lut" value="%s" placeholder="Only if you export under LUT"></label></div>',
         esc_attr($c['email']), esc_attr($c['phone']), esc_attr($c['lut']));
+    $f = static fn (string $k, string $label, string $ph) => sprintf('<label class="tli-field"><span>%s</span><input class="tli-input" name="%s" value="%s" placeholder="%s"></label>', esc_html($label), esc_attr($k), esc_attr($c[$k]), esc_attr($ph));
+    echo '<h2 style="margin-top:20px">Shown on the website pages</h2><div class="tli-po-head">' . $f('hours', 'Support hours', 'Mon–Sat, 10 am – 6 pm IST') . $f('grievance', 'Grievance officer (name)', 'Required by India\'s e-commerce rules') . $f('jurisdiction', 'Courts at (city)', 'e.g. New Delhi') . '</div>';
+    echo '<div class="tli-po-head">' . $f('dispatch', 'Dispatch time', 'e.g. 2–3 working days') . $f('eta_in', 'Delivery time in India', 'e.g. 3–7 working days') . $f('eta_world', 'Delivery time abroad', 'e.g. 7–14 working days') . '</div>';
+    echo '<div class="tli-po-head">' . $f('instagram', 'Instagram link', 'https://instagram.com/…') . '</div>';
     echo '<p class="muted small">Numbers look like <code>' . esc_html($c['prefix'] . '/' . tli_fy(time()) . '/0001') . '</code> and restart each financial year (April). GST rate per product comes from its tax class (set by the client sheet\'s "GST rate" column); HSN from the sheet\'s "HSN" column. Have your CA check the first invoice.</p>';
     printf('<h2 style="margin-top:24px">Couriers</h2><p class="muted">One per line. Add a tracking link with <code>{awb}</code> where the tracking number goes, e.g. <code>Courier name | https://courier-site/track/{awb}</code> — copy the exact link format from your courier. Without a link the customer still gets the courier name and AWB.</p><textarea class="tli-input tli-textarea" name="couriers" rows="6">%s</textarea>',
         esc_textarea((string) get_option('tli_couriers', TLI_COURIERS_DEFAULT)));

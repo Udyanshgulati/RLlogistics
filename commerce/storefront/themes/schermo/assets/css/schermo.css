@@ -899,3 +899,7 @@ dialog.qa-sheet { width: min(440px, calc(100vw - 24px)); border-radius: var(--r-
 .sx-copy .crumbs { margin-bottom: 14px; }
 @media (max-width: 760px) { .sx-title { font-size: clamp(28px, 9vw, 40px); } }
 .nav-primary li.is-closed > .sub-menu { opacity: 0 !important; visibility: hidden !important; }
+
+/* Policy and info pages: room above each section heading */
+.page .wp-block-heading { margin-top: 1.8em; margin-bottom: .4em; }
+.page .wp-block-heading:first-child { margin-top: 0; }

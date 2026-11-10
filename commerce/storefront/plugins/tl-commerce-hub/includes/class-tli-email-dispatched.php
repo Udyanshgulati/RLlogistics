@@ -58,7 +58,7 @@ class TLI_Email_Dispatched extends WC_Email
     {
         ob_start();
         do_action('woocommerce_email_header', $this->get_heading(), $this);
-        printf('<p>Hi %s,</p><p>Good news — your order #%s has left our Delhi warehouse and is with the courier.</p>', esc_html($this->object->get_billing_first_name() ?: 'there'), esc_html($this->object->get_order_number()));
+        printf('<p>Hi %s,</p><p>Good news — your order #%s has left our warehouse and is with the courier.</p>', esc_html($this->object->get_billing_first_name() ?: 'there'), esc_html($this->object->get_order_number()));
         echo tli_tracking_html($this->object, true); // phpcs:ignore WordPress.Security.EscapeOutput
         if (function_exists('tli_invoice_link') && ($link = tli_invoice_link($this->object))) {
             printf('<p>Your GST invoice: <a href="%s">download / print</a></p>', esc_url($link));
@@ -75,7 +75,7 @@ class TLI_Email_Dispatched extends WC_Email
     public function get_content_plain()
     {
         $t = tli_tracking($this->object);
-        $out = sprintf("Your order #%s has left our Delhi warehouse and is with the courier.\n\nCourier: %s\nTracking number (AWB): %s\n", $this->object->get_order_number(), $t['courier'], $t['awb']);
+        $out = sprintf("Your order #%s has left our warehouse and is with the courier.\n\nCourier: %s\nTracking number (AWB): %s\n", $this->object->get_order_number(), $t['courier'], $t['awb']);
         if ($t['url']) {
             $out .= 'Track your parcel: ' . $t['url'] . "\n";
         }
