@@ -119,8 +119,12 @@ function schermo_hero_slides(): array
             continue;
         }
         $coll = '';
+        $coll_slug = '';
         foreach (wp_get_post_terms($id, 'product_cat', ['fields' => 'slugs']) as $slug) {
-            $coll = $names[$slug] ?? $coll;
+            if (isset($names[$slug])) {
+                $coll = $names[$slug];
+                $coll_slug = $slug;
+            }
         }
         $slides[] = [
             'name' => $p->get_name(),
@@ -131,6 +135,9 @@ function schermo_hero_slides(): array
             'words' => $words,
             'spots' => $spots,
             'ready' => $p->is_purchasable() && $p->is_in_stock(),
+            // Orderable pieces get "Shop now" to the product; others are a preview of their collection.
+            'cta' => $p->is_purchasable() && $p->is_in_stock() ? __('Shop now', 'schermo') : __('Preview the collection', 'schermo'),
+            'cta_url' => $p->is_purchasable() && $p->is_in_stock() ? $p->get_permalink() : (($t = $coll_slug ? get_term_by('slug', $coll_slug, 'product_cat') : null) ? get_term_link($t) : $p->get_permalink()),
         ];
     }
     // Pieces that can be ordered now lead; the rest keep their order.
@@ -198,9 +205,84 @@ add_action('wp_enqueue_scripts', static function (): void {
     }
     if (is_front_page()) {
         wp_enqueue_script('schermo-home', get_stylesheet_directory_uri() . '/assets/js/schermo.js', [], brandhouse_asset_ver('/assets/js/schermo.js', true), ['strategy' => 'defer', 'in_footer' => true]);
-        wp_localize_script('schermo-home', 'schermoHero', array_map(static fn ($s) => ['name' => $s['name'], 'url' => $s['url'], 'price' => wp_strip_all_tags($s['price'])], schermo_hero_slides()));
+        wp_localize_script('schermo-home', 'schermoHero', array_map(static fn ($s) => ['name' => $s['name'], 'url' => $s['cta_url'], 'cta' => $s['cta'], 'coll' => $s['collection'], 'price' => wp_strip_all_tags($s['price'])], schermo_hero_slides()));
     }
 }, 21);
 
 // Show the whole collection on one page (25 pieces) instead of spilling one product onto page 2.
 add_filter('loop_shop_per_page', static fn (): int => 48, 20);
+
+/** "Shop by category" tiles: the shopper-facing types that have products, each with a representative cut-out. */
+function schermo_home_types(): array
+{
+    $pick = ['t-shirts-polos' => 'SC-001', 'trousers' => 'SC-016', 'shorts' => 'SC-045', 'caps-hats' => 'SC-029', 'bags-backpacks' => 'SC-037', 'sportswear' => 'MI-001'];
+    $out = [];
+    foreach ($pick as $slug => $sku) {
+        $t = get_term_by('slug', $slug, 'product_cat');
+        if (!$t || !$t->count) {
+            continue;
+        }
+        $pid = wc_get_product_id_by_sku($sku);
+        $img = $pid && get_post_status($pid) === 'publish' ? (string) wp_get_attachment_image((int) get_post_thumbnail_id($pid), 'woocommerce_thumbnail', false, ['loading' => 'lazy', 'alt' => '']) : '';
+        $out[] = ['name' => $t->name, 'url' => get_term_link($t), 'count' => (int) $t->count, 'image' => $img ?: schermo_category_image($t)];
+    }
+    return $out;
+}
+
+/** Product IDs that can be ordered now (real price and stock), newest first. */
+function schermo_home_available(int $limit): array
+{
+    $ids = wc_get_products(['status' => 'publish', 'limit' => -1, 'return' => 'ids', 'orderby' => 'date', 'order' => 'DESC']);
+    return array_slice(array_values(array_intersect($ids, schermo_available_ids())), 0, $limit);
+}
+
+/**
+ * Dropdown imagery. Collections (second level under "Collections"): an image card with the collection's own line and
+ * whether it can be ordered now. Shop groups (second level under "Shop"): a small cut-out above each group, plus a
+ * short line for groups without sub-types (Sportswear, Fan Merch) so no column is left empty. Images are decorative
+ * (alt="") because the link text names the destination.
+ */
+function schermo_menu_media(): array
+{
+    static $m = null;
+    if ($m !== null) {
+        return $m;
+    }
+    $img = get_stylesheet_directory_uri() . '/assets/img/';
+    $cut = static function (string $sku): string {
+        $pid = wc_get_product_id_by_sku($sku);
+        return $pid ? (string) wp_get_attachment_image_url((int) get_post_thumbnail_id($pid), 'woocommerce_thumbnail') : '';
+    };
+    $m = [
+        'schermo-core' => ['img' => $cut('SC-006'), 'line' => __('Schermo Essentials', 'schermo'), 'kind' => 'cut'],
+        'schermo-atelier' => ['img' => $cut('SA-003'), 'line' => __('Limited drops', 'schermo'), 'kind' => 'cut'],
+        'milan-icons' => ['img' => $img . 'banner-milan-icons.webp', 'line' => __('Black and gold, from the Duomo', 'schermo'), 'kind' => 'photo'],
+        'glasgow-cosmic' => ['img' => $img . 'banner-glasgow-cosmic.webp', 'line' => __('Cosmic navy, electric blue', 'schermo'), 'kind' => 'photo'],
+        'clothing' => ['img' => $cut('SC-001'), 'line' => '', 'kind' => 'cut'],
+        'accessories' => ['img' => $cut('SC-029'), 'line' => '', 'kind' => 'cut'],
+        'sportswear' => ['img' => $cut('MI-001'), 'line' => __('Match and practice kits, track trousers and playing gear.', 'schermo'), 'kind' => 'cut'],
+        'fan-merch' => ['img' => $cut('GC-026'), 'line' => __('Bag tags, lanyards and keychains.', 'schermo'), 'kind' => 'photo'],
+    ];
+    if (function_exists('schermo_collections')) {
+        foreach (schermo_collections() as $c) {
+            if (isset($m[$c['slug']])) {
+                $m[$c['slug']]['state'] = $c['ready'] ? sprintf(__('%d available now', 'schermo'), $c['ready']) : __('Coming soon', 'schermo');
+            }
+        }
+    }
+    return $m;
+}
+
+add_filter('walker_nav_menu_start_el', static function (string $html, $item, int $depth, $args): string {
+    if ($depth !== 1 || ($item->object ?? '') !== 'product_cat' || ($args->theme_location ?? '') !== 'primary') {
+        return $html;
+    }
+    $t = get_term((int) $item->object_id, 'product_cat');
+    $m = $t instanceof WP_Term ? (schermo_menu_media()[$t->slug] ?? null) : null;
+    if (!$m || $m['img'] === '') {
+        return $html;
+    }
+    $media = '<span class="nm-media nm-' . esc_attr($m['kind']) . '" aria-hidden="true"><img src="' . esc_url($m['img']) . '" alt="" loading="lazy" decoding="async" width="300" height="375"></span>';
+    $extra = ($m['line'] !== '' ? '<span class="nm-line">' . esc_html($m['line']) . '</span>' : '') . (!empty($m['state']) ? '<span class="nm-state">' . esc_html($m['state']) . '</span>' : '');
+    return (string) preg_replace('#(<a\b[^>]*>)(.*?)(</a>)#s', '$1' . $media . '<span class="nm-text"><span class="nm-name">$2</span>' . str_replace('$', '\$', $extra) . '</span>$3', $html, 1);
+}, 5, 4);

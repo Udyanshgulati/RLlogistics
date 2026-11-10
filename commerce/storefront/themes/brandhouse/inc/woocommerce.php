@@ -152,7 +152,7 @@ function brandhouse_product_details(): void
         }
         echo '</dl>';
     }
-    $sections[] = [__('Delivery', 'brandhouse'), wpautop(esc_html(brandhouse_mod('brandhouse_delivery_text', __('Ships from our warehouse in Delhi, India. Available express services, delivery estimates and any import charges are shown at checkout for your address.', 'brandhouse')))), false];
+    $sections[] = [__('Delivery', 'brandhouse'), wpautop(esc_html(brandhouse_mod('brandhouse_delivery_text', __('Delivery options, estimates and any import charges are shown at checkout for your address.', 'brandhouse')))), false];
     $sections[] = [__('Returns', 'brandhouse'), wpautop(esc_html(brandhouse_mod('brandhouse_returns_text', __('Returns policy to be confirmed.', 'brandhouse')))), false];
     echo '<div class="accordions">';
     foreach ($sections as [$title, $html, $open]) {

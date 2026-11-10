@@ -21,7 +21,7 @@ $ctx = schermo_shop_context($current);
 $chips = schermo_filter_chips();
 $total = (int) wc_get_loop_prop('total');
 $title = woocommerce_page_title(false);
-$line = $current && $current->description !== '' ? wp_strip_all_tags($current->description) : __('Sportswear, everyday pieces and team merchandise across four collections. Shipped from Delhi, India.', 'schermo');
+$line = $current && $current->description !== '' ? wp_strip_all_tags($current->description) : __('Sportswear, everyday pieces and team merchandise across four collections, designed in Milan.', 'schermo');
 $hero = get_stylesheet_directory_uri() . '/assets/img/hero/';
 $shop = wc_get_page_permalink('shop');
 $keep = array_filter(['orderby' => sanitize_key(wp_unslash($_GET['orderby'] ?? '')), 's' => get_search_query()]); // phpcs:ignore WordPress.Security.NonceVerification

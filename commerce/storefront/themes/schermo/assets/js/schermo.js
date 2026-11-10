@@ -16,6 +16,8 @@
       hero.querySelector('[data-hero-name]').textContent = d.name;
       hero.querySelector('[data-hero-price]').textContent = d.price;
       hero.querySelector('[data-hero-link]').href = d.url;
+      const cta = hero.querySelector('[data-hero-cta]'); if (cta && d.cta) cta.textContent = d.cta;
+      const coll = hero.querySelector('[data-hero-coll]'); if (coll && d.coll !== undefined) coll.textContent = d.coll;
     };
     const auto = () => { if (!still) { clearInterval(timer); timer = setInterval(() => show(cur + 1), 6000); } };
     buttons.forEach((b) => b.addEventListener('click', () => { show(Number(b.dataset.slide)); auto(); }));

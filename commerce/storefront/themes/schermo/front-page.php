@@ -11,7 +11,6 @@ get_header();
 $shop = class_exists('WooCommerce') ? wc_get_page_permalink('shop') : home_url('/');
 $slides = schermo_hero_slides();
 $collections = schermo_collections();
-$pieces = array_sum(array_map(static fn ($c) => (int) $c['term']->count, $collections));
 $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['crest'])));
 ?>
 <main id="main" class="home home-glass">
@@ -40,22 +39,12 @@ $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['cr
       </div>
     <?php endforeach; ?>
 
-    <div class="gx-cards">
-      <div class="gx-card glass">
-        <div class="gx-icons"><?php echo brandhouse_icon('truck') . brandhouse_icon('lock') . brandhouse_icon('return'); ?></div>
-        <p class="gx-strong"><?php esc_html_e('Ships from Delhi, India', 'schermo'); ?></p>
-        <p class="gx-soft"><?php esc_html_e('Delivery options and estimates are shown at checkout. Card details are handled by the payment provider.', 'schermo'); ?></p>
-      </div>
+    <div class="gx-cards gx-cards-one">
       <div class="gx-card gx-card-mid glass">
-        <a class="btn gx-cta" href="<?php echo esc_url($first['url']); ?>" data-hero-link><?php esc_html_e('Shop now', 'schermo'); ?><?php echo brandhouse_icon('arrow'); ?></a>
         <p class="eyebrow" data-hero-coll><?php echo esc_html($first['collection']); ?></p>
         <h1 class="gx-title" data-hero-name><?php echo esc_html($first['name']); ?></h1>
         <p class="gx-price" data-hero-price><?php echo wp_kses_post($first['price']); ?></p>
-      </div>
-      <div class="gx-card glass">
-        <p class="gx-big"><?php echo (int) count($collections); ?><span><?php esc_html_e('collections', 'schermo'); ?></span></p>
-        <p class="gx-soft"><?php printf(esc_html__('%d pieces. One language: sport, street and Milan in every piece.', 'schermo'), (int) $pieces); ?></p>
-        <a class="gx-link" href="<?php echo esc_url($shop); ?>"><?php esc_html_e('Shop all', 'schermo'); ?><?php echo brandhouse_icon('arrow'); ?></a>
+        <a class="btn gx-cta" href="<?php echo esc_url($first['cta_url']); ?>" data-hero-link><span data-hero-cta><?php echo esc_html($first['cta']); ?></span><?php echo brandhouse_icon('arrow'); ?></a>
       </div>
     </div>
   </section>
@@ -64,14 +53,21 @@ $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['cr
   <?php do_action('brandhouse_home_after_hero'); ?>
 
   <section class="sb-brand container" aria-labelledby="brand-title">
-    <p class="eyebrow"><?php esc_html_e('The brand', 'schermo'); ?></p>
+    <p class="eyebrow"><?php esc_html_e('Schermo · Milano · Est. 2021', 'schermo'); ?></p>
     <h2 id="brand-title" class="sb-display"><?php esc_html_e('A new expression of sport.', 'schermo'); ?> <span><?php esc_html_e('A new language of style.', 'schermo'); ?></span></h2>
-    <div class="sb-cols">
-      <p><?php esc_html_e('A contemporary sports, active and lifestyle brand for a generation that sees no boundaries between performance, fashion and everyday expression.', 'schermo'); ?></p>
-      <p><?php esc_html_e('Born from the belief that what you wear should reflect how you move, think and live, wherever life takes you.', 'schermo'); ?></p>
-      <p><?php esc_html_e('Not simply about what you wear. About how you present yourself, how you move through the world and define your identity.', 'schermo'); ?></p>
-    </div>
+    <p class="sb-lede"><?php esc_html_e('A contemporary sports, active and lifestyle label for a generation that sees no boundaries between performance, fashion and everyday expression.', 'schermo'); ?></p>
   </section>
+
+  <?php $types = schermo_home_types(); if ($types): ?>
+  <section class="home-section container" aria-labelledby="types-title">
+    <div class="section-head"><h2 id="types-title"><?php esc_html_e('Shop by category', 'schermo'); ?></h2><a class="section-link" href="<?php echo esc_url($shop); ?>"><?php esc_html_e('Shop all', 'schermo'); ?><?php echo brandhouse_icon('arrow'); ?></a></div>
+    <ul class="sb-types">
+      <?php foreach ($types as $t): ?>
+        <li><a href="<?php echo esc_url($t['url']); ?>"><span class="sb-type-media"><?php echo $t['image'] ?: brandhouse_placeholder($t['name']); ?></span><span class="sb-type-name"><?php echo esc_html($t['name']); ?></span><span class="sb-type-count"><?php echo esc_html(sprintf(_n('%d product', '%d products', $t['count'], 'schermo'), $t['count'])); ?></span></a></li>
+      <?php endforeach; ?>
+    </ul>
+  </section>
+  <?php endif; ?>
 
   <?php if ($collections): ?>
   <section class="home-section container" id="collections" aria-labelledby="coll-title">
@@ -87,7 +83,7 @@ $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['cr
               <span class="sb-sub"><?php echo esc_html($c['sub']); ?></span>
               <span class="sb-line"><?php echo esc_html($c['line']); ?></span>
               <span class="sb-state<?php echo $c['ready'] ? ' is-ready' : ''; ?>"><?php echo esc_html($c['ready'] ? sprintf(_n('%d piece available to order', '%d pieces available to order', $c['ready'], 'schermo'), $c['ready']) : __('Coming soon · prices to be announced', 'schermo')); ?></span>
-              <span class="sb-count"><?php echo esc_html(sprintf(_n('%d piece', '%d pieces', (int) $c['term']->count, 'schermo'), (int) $c['term']->count)); ?><?php echo brandhouse_icon('arrow'); ?></span>
+              <span class="sb-count"><?php echo esc_html($c['ready'] ? __('Shop the collection', 'schermo') : sprintf(_n('Preview %d piece', 'Preview %d pieces', (int) $c['term']->count, 'schermo'), (int) $c['term']->count)); ?><?php echo brandhouse_icon('arrow'); ?></span>
             </span>
           </a>
         </li>
@@ -97,22 +93,35 @@ $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['cr
   <?php endif; ?>
 
   <?php
-  $new = class_exists('WooCommerce') ? new WP_Query(['post_type' => 'product', 'posts_per_page' => 12, 'post_status' => 'publish', 'orderby' => 'rand', 'tax_query' => [['taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => ['schermo-core', 'schermo-atelier']]]]) : null;
-  if ($new && $new->have_posts()):
+  $ready = function_exists('schermo_available_ids') ? schermo_home_available(12) : [];
+  if ($ready):
   ?>
   <section class="home-section container" aria-labelledby="new-title">
     <div class="section-head">
-      <h2 id="new-title"><?php esc_html_e('New from Schermo', 'schermo'); ?></h2>
+      <h2 id="new-title"><?php esc_html_e('Available to order now', 'schermo'); ?></h2>
       <div class="gx-arrows">
         <button type="button" class="gx-round glass" data-rail-prev aria-label="<?php esc_attr_e('Previous', 'schermo'); ?>"><?php echo brandhouse_icon('arrow'); ?></button>
         <button type="button" class="gx-round glass" data-rail-next aria-label="<?php esc_attr_e('Next', 'schermo'); ?>"><?php echo brandhouse_icon('arrow'); ?></button>
       </div>
     </div>
     <ul class="products gx-rail" data-rail>
-      <?php while ($new->have_posts()): $new->the_post(); wc_get_template_part('content', 'product'); endwhile; wp_reset_postdata(); ?>
+      <?php foreach ($ready as $rid) { $GLOBALS['product'] = wc_get_product($rid); $GLOBALS['post'] = get_post($rid); setup_postdata($GLOBALS['post']); wc_get_template_part('content', 'product'); } wp_reset_postdata(); ?>
     </ul>
   </section>
   <?php endif; ?>
+
+  <section class="sb-milan container" aria-labelledby="milan-title">
+    <div class="sb-milan-inner">
+      <img class="sb-milan-img" src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/img/banner-milan-icons.webp'); ?>" alt="<?php esc_attr_e('Milan Cathedral (Duomo) at sunset', 'schermo'); ?>" width="1183" height="1400" loading="lazy">
+      <div class="sb-milan-copy">
+        <p class="eyebrow"><?php esc_html_e('Made in Milan', 'schermo'); ?></p>
+        <h2 id="milan-title"><?php esc_html_e('Milano.', 'schermo'); ?></h2>
+        <p class="sb-milan-lede"><?php esc_html_e('Italian design sensibility in every piece.', 'schermo'); ?></p>
+        <p><?php esc_html_e('A city synonymous with design excellence, craftsmanship and fashion innovation. Every Schermo piece is made here, where form, function, proportion and detailing come together.', 'schermo'); ?></p>
+        <p class="sb-milan-founded"><?php esc_html_e('Founded in 2021 by Shazi Ahmad and Dr. Rashid Ali Khan.', 'schermo'); ?></p>
+      </div>
+    </div>
+  </section>
 
   <section class="home-section container" aria-labelledby="ways-title">
     <div class="section-head"><h2 id="ways-title"><?php esc_html_e('One brand, three ways to move.', 'schermo'); ?></h2></div>
@@ -141,7 +150,7 @@ $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['cr
   <?php endif; ?>
 
   <section class="home-section container" aria-labelledby="journey-title">
-    <div class="section-head"><h2 id="journey-title"><?php esc_html_e('From Milan to the world.', 'schermo'); ?></h2></div>
+    <div class="section-head"><h2 id="journey-title"><?php esc_html_e('From Milan to the world.', 'schermo'); ?></h2><p class="section-note"><?php esc_html_e('Our business journey', 'schermo'); ?></p></div>
     <ol class="sb-journey">
       <li><span class="sb-year">2021</span><strong><?php esc_html_e('Founded', 'schermo'); ?></strong><p><?php esc_html_e('By Shazi Ahmad and Dr. Rashid Ali Khan, to build a globally relevant brand where sport, fashion and lifestyle meet.', 'schermo'); ?></p></li>
       <li><span class="sb-year">UK · UAE</span><strong><?php esc_html_e('International foundations', 'schermo'); ?></strong><p><?php esc_html_e('The commercial journey begins through trading operations in the United Kingdom and the United Arab Emirates.', 'schermo'); ?></p></li>

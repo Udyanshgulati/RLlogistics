@@ -19,12 +19,21 @@
     const t = e.target.closest('.sub-toggle');
     if (t) {
       const li = t.closest('li'); const open = !li.classList.contains('is-open');
-      closeSubs(li); li.classList.toggle('is-open', open); t.setAttribute('aria-expanded', String(open));
+      closeSubs(li); li.classList.toggle('is-open', open); li.classList.toggle('is-closed', !open); t.setAttribute('aria-expanded', String(open));
       return;
     }
     if (!e.target.closest('.nav-primary .menu-item-has-children')) closeSubs();
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSubs(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    $$('.nav-primary .menu-item-has-children').forEach((li) => { if (li.contains(document.activeElement)) li.classList.add('is-closed'); });
+    closeSubs();
+  });
+  // A dropdown closed on purpose stays closed while focus is still inside it; it can open again once focus leaves.
+  document.addEventListener('focusout', (e) => {
+    const li = e.target.closest && e.target.closest('.nav-primary .menu-item-has-children');
+    if (li && !li.contains(e.relatedTarget)) li.classList.remove('is-closed');
+  });
   // In the phone drawer, the section holding the current page starts open.
   $$('#drawer-menu .current-menu-ancestor, #drawer-menu .current-menu-parent').forEach((li) => {
     li.classList.add('is-open'); const t = $('.sub-toggle', li); if (t) t.setAttribute('aria-expanded', 'true');

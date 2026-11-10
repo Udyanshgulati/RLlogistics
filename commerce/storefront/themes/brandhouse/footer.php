@@ -4,7 +4,7 @@
   <div class="foot-grid">
     <div class="foot-brand">
       <?php brandhouse_logo('footer'); ?>
-      <p><?php echo esc_html(brandhouse_mod('brandhouse_footer_note', __('Shipped from Delhi, India.', 'brandhouse'))); ?></p>
+      <p><?php echo esc_html(brandhouse_mod('brandhouse_footer_note', __('The art of dressing. Milano · Est. 2021.', 'brandhouse'))); ?></p>
     </div>
     <?php foreach (['footer-shop' => __('Shop', 'brandhouse'), 'footer-help' => __('Help', 'brandhouse'), 'footer-legal' => __('Policies', 'brandhouse')] as $loc => $title): ?>
       <?php $menu = has_nav_menu($loc) ? (string) wp_nav_menu(['theme_location' => $loc, 'container' => false, 'depth' => 1, 'echo' => false, 'fallback_cb' => false]) : ''; ?>
