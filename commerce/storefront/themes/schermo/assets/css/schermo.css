@@ -715,3 +715,18 @@ details.acc[open]::details-content { block-size: auto; }
   .pdp-media, .pdp-media:not(.is-single) { position: relative; top: auto; }
   .pdp-thumbs { display: none; }
 }
+
+/* Navigation v4: Shop ▾ opens a grouped panel (Clothing and Accessories with their types; Sportswear; Fan Merch). */
+.nav-primary .sub-menu .sub-menu { position: static; display: block; opacity: 1; visibility: visible; transform: none; min-width: 0; padding: 2px 0 0; margin: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.nav-primary .sub-menu .sub-menu::before { display: none; }
+.nav-primary .sub-menu .sub-menu a { padding: 7px 14px; color: var(--muted); font-weight: 600; letter-spacing: .08em; }
+.nav-primary .sub-menu .sub-menu a:hover, .nav-primary .sub-menu .sub-menu .current-menu-item > a { color: var(--ink); }
+.nav-primary > ul > li:has(.sub-menu .sub-menu) > .sub-menu { flex-direction: row; align-items: flex-start; gap: 8px; padding: 14px; min-width: 620px; }
+.nav-primary > ul > li:has(.sub-menu .sub-menu) > .sub-menu > li { flex: 1; flex-direction: column; align-items: stretch; }
+.nav-primary > ul > li:has(.sub-menu .sub-menu) > .sub-menu > li > a { color: var(--ink); }
+/* Phone drawer: groups inside Shop are indented lists, always shown once Shop is open. */
+.drawer-menu .sub-menu .sub-menu { display: block; padding: 0 0 4px 14px; }
+.drawer-menu .sub-menu .sub-menu a { font-size: 11px; padding: 11px 0; }
+/* Listing count: secondary, plain text under the line (not a badge). */
+.sx-count { display: block; margin: 14px 0 0; padding: 0; border: 0; background: none; font: 600 11px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--muted); }
+.sx-count span { font: inherit; color: var(--ink); }

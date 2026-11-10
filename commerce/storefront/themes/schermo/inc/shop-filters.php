@@ -16,7 +16,41 @@ defined('ABSPATH') || exit;
 /** Product types and collections: slug => short label. Both are product_cat terms, kept apart here. */
 function schermo_types(): array
 {
-    return ['clothing' => __('Clothing', 'schermo'), 'accessories' => __('Accessories', 'schermo'), 'sportswear' => __('Sportswear', 'schermo'), 'fan-merch' => __('Fan Merch', 'schermo')];
+    return schermo_leaf_types() + ['clothing' => __('Clothing', 'schermo'), 'accessories' => __('Accessories', 'schermo')];
+}
+
+/** The types shoppers browse by (what pills and cards show), in display order. */
+function schermo_leaf_types(): array
+{
+    return [
+        't-shirts-polos' => __('T-shirts & Polos', 'schermo'), 'trousers' => __('Trousers', 'schermo'), 'shorts' => __('Shorts', 'schermo'),
+        'knitwear-hoodies' => __('Knitwear & Hoodies', 'schermo'), 'sportswear' => __('Sportswear', 'schermo'), 'caps-hats' => __('Caps & Hats', 'schermo'),
+        'bags-backpacks' => __('Bags & Backpacks', 'schermo'), 'other-accessories' => __('Other Accessories', 'schermo'), 'fan-merch' => __('Fan Merch', 'schermo'),
+    ];
+}
+
+/**
+ * Type pills for a listing: the leaf types that have products in it (before any type filter). On a Clothing or
+ * Accessories page, that page's own sub-types.
+ */
+function schermo_type_pills(?WP_Term $current): array
+{
+    $f = schermo_filters();
+    $args = ['status' => 'publish', 'limit' => -1, 'return' => 'ids', 'visibility' => 'catalog'];
+    $leaf = $current && isset(schermo_leaf_types()[$current->slug]);
+    // On a leaf type page (e.g. Shorts) show every type, so shoppers can move sideways; elsewhere only what is here.
+    $base = $current && !$leaf ? wc_get_products($args + ['category' => [$current->slug]]) : wc_get_products($args);
+    if ($f['collection'] !== '') {
+        $base = array_intersect($base, wc_get_products($args + ['category' => [$f['collection']]]));
+    }
+    $out = [];
+    foreach (schermo_leaf_types() as $slug => $label) {
+        $t = get_term_by('slug', $slug, 'product_cat');
+        if ($t && array_intersect($base, wc_get_products($args + ['category' => [$slug]]))) {
+            $out[$slug] = $label;
+        }
+    }
+    return $out;
 }
 
 function schermo_collection_labels(): array

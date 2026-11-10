@@ -39,16 +39,18 @@ if ($current) {
     }
 }
 
-// Product-type links. On a collection page they narrow the collection (?type=); elsewhere they open the type page.
-$type_url = static function (string $slug) use ($is_coll, $current, $f, $shop, $keep): string {
-    if ($is_coll) {
+// Product-type links. On a collection page (and on Clothing/Accessories, which have sub-types) they narrow the page
+// with ?type=; elsewhere they open the type's own page.
+$narrow = $is_coll || ($is_type && in_array($current->slug, ['clothing', 'accessories'], true));
+$type_url = static function (string $slug) use ($narrow, $current, $f, $shop, $keep): string {
+    if ($narrow) {
         return $slug === '' ? remove_query_arg(['type', 'paged']) : add_query_arg('type', $slug, remove_query_arg('paged'));
     }
     $base = $slug === '' ? $shop : get_term_link($slug, 'product_cat');
     return add_query_arg(array_filter(['collection' => $f['collection']] + $keep), is_wp_error($base) ? $shop : $base);
 };
-$type_on = static fn (string $slug): bool => $is_coll ? $f['type'] === $slug : ($slug === '' ? !$is_type && $f['type'] === '' : (($is_type && $current->slug === $slug) || $f['type'] === $slug));
-$type_terms = array_filter($types, static fn ($slug) => ($t = get_term_by('slug', $slug, 'product_cat')) && $t->count, ARRAY_FILTER_USE_KEY);
+$type_on = static fn (string $slug): bool => $narrow ? $f['type'] === $slug : ($slug === '' ? !$is_type && $f['type'] === '' : $f['type'] === $slug || ($is_type && $current->slug === $slug));
+$type_terms = schermo_type_pills($current);
 $active = count($chips);
 ?>
 <section class="sx-hero container" aria-labelledby="sx-title">
@@ -59,13 +61,7 @@ $active = count($chips);
       <?php if ($is_coll): ?><p class="eyebrow sx-kicker"><?php esc_html_e('Collection', 'schermo'); ?></p><?php endif; ?>
       <h1 id="sx-title" class="sx-title"><?php echo esc_html($title); ?></h1>
       <p class="sx-line"><?php echo esc_html($line); ?></p>
-      <p class="sx-count" aria-live="polite"><span><?php echo (int) $total; ?></span><?php echo esc_html(_n('piece', 'pieces', $total, 'schermo')); ?></p>
-      <nav class="sx-colls" aria-label="<?php esc_attr_e('Collections', 'schermo'); ?>">
-        <span><?php esc_html_e('Collections', 'schermo'); ?></span>
-        <?php foreach ($colls as $slug => $label): $t = get_term_by('slug', $slug, 'product_cat'); if (!$t || !$t->count) { continue; } $on = $current && $current->slug === $slug; ?>
-          <a href="<?php echo esc_url(get_term_link($t)); ?>"<?php echo $on ? ' class="is-on" aria-current="page"' : ''; ?>><?php echo esc_html($label); ?></a>
-        <?php endforeach; ?>
-      </nav>
+      <p class="sx-count" aria-live="polite"><span><?php echo (int) $total; ?></span> <?php echo esc_html(_n('product', 'products', $total, 'schermo')); ?></p>
     </div>
     <div class="sx-stack" aria-hidden="true">
       <img class="sx-a" src="<?php echo esc_url($stack[0] ?: $hero . 'practice-shorts.webp'); ?>" alt="">
@@ -78,7 +74,7 @@ $active = count($chips);
 <div class="sx-bar-wrap container">
   <div class="sx-bar glass">
     <nav class="sx-cats" aria-label="<?php esc_attr_e('Product type', 'schermo'); ?>">
-      <a class="sx-pill<?php echo $type_on('') ? ' is-on' : ''; ?>" href="<?php echo esc_url($type_url('')); ?>"<?php echo $type_on('') ? ' aria-current="page"' : ''; ?>><?php echo esc_html($is_coll ? __('All pieces', 'schermo') : __('Shop all', 'schermo')); ?></a>
+      <a class="sx-pill<?php echo $type_on('') ? ' is-on' : ''; ?>" href="<?php echo esc_url($type_url('')); ?>"<?php echo $type_on('') ? ' aria-current="page"' : ''; ?>><?php echo esc_html($narrow ? sprintf(__('All %s', 'schermo'), $current->name) : __('Shop all', 'schermo')); ?></a>
       <?php foreach ($type_terms as $slug => $label): $on = $type_on($slug); ?>
         <a class="sx-pill<?php echo $on ? ' is-on' : ''; ?>" href="<?php echo esc_url($type_url($slug)); ?>"<?php echo $on ? ' aria-current="page"' : ''; ?>><?php echo esc_html($label); ?></a>
       <?php endforeach; ?>
