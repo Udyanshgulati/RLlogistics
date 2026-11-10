@@ -55,6 +55,8 @@ add_filter('wp_nav_menu_objects', static fn (array $items): array => array_value
 add_filter('loop_shop_per_page', static fn (): int => 24);
 add_filter('loop_shop_columns', static fn (): int => 4);
 
+// The struck-through MRP beside the price already shows a sale; WooCommerce's extra "Sale!" text is dropped.
+remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
 // Product page: description and service details in accordions instead of tabs.
 remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10);
 add_action('woocommerce_single_product_summary', 'brandhouse_product_details', 45);

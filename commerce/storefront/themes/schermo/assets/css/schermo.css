@@ -684,3 +684,17 @@ details.acc[open]::details-content { block-size: auto; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Cart (block) on phones: the item table stays inside the page; discounted prices are readable on dark. */
+.wc-block-cart-items { width: 100% !important; table-layout: fixed; }
+.wc-block-cart-items .wc-block-cart-item__image { width: 72px; }
+.wc-block-cart-items .wc-block-cart-item__total { width: 92px; overflow-wrap: anywhere; }
+@media (max-width: 480px) { .wc-block-cart-item__total .wc-block-components-sale-badge { white-space: normal; font-size: 10px; } }
+.wc-block-components-product-price__value.is-discounted, .price ins, .card-price ins, ins .woocommerce-Price-amount { color: var(--ink); text-decoration: none; }
+.price del, .card-price del, .wc-block-components-product-price__regular { color: var(--muted); }
+@media (max-width: 480px) {
+  .wc-block-cart-items .wc-block-cart-item__total { width: 84px; padding-right: 0 !important; }
+  .wc-block-cart-item__total-price-and-sale-badge-wrapper { align-items: flex-end; max-width: 100%; }
+  .wc-block-cart-item__total .wc-block-components-product-price { font-size: 13px; white-space: nowrap; }
+  .wc-block-cart-item__total .wc-block-components-sale-badge { max-width: 100%; padding: 2px 4px; }
+}
