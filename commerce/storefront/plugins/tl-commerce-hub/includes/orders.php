@@ -51,6 +51,15 @@ add_action('admin_post_tli_next_stage', static function (): void {
     $o = wc_get_order($id);
     if ($o && isset(TLI_NEXT[$o->get_status()])) {
         [$to] = TLI_NEXT[$o->get_status()];
+        if ($to === 'tl-dispatched') {
+            $t = tli_tracking_from_post();
+            if (!$t) {
+                wp_safe_redirect(add_query_arg(['tli_msg' => rawurlencode('Enter the courier and AWB number to mark the order as dispatched.'), 'tli_ok' => '0'], wp_get_referer() ?: admin_url('admin.php?page=tl-orders')));
+                exit;
+            }
+            tli_set_tracking($o, $t);
+            $o->add_order_note(sprintf('Shipped with %s, AWB %s.', $t['courier'], $t['awb']));
+        }
         $o->update_status($to, sprintf('TL Commerce Hub: %s by %s.', TLI_STAGES[$to][0], wp_get_current_user()->display_name));
     }
     wp_safe_redirect(wp_get_referer() ?: admin_url('admin.php?page=tl-orders'));

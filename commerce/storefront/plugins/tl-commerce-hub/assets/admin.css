@@ -139,3 +139,10 @@
 .tli-po-meta > div { display: grid; gap: 4px; justify-items: start; }
 .tli-inline-form { display: inline; margin: 0; }
 @media (max-width: 960px) { .tli-po-head, .tli-po-meta { grid-template-columns: 1fr 1fr; } }
+/* Dispatch + invoice */
+.tli-next { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tli-dispatch { display: flex; flex-wrap: wrap; gap: 6px; }
+.tli-dispatch .tli-input.sm { width: 140px; text-align: left; height: 30px; }
+.tli-awb { display: block; margin-top: 4px; font-size: 11.5px; color: var(--muted); }
+.tli-awb a { color: #1d4ed8; }
+.tli-mini { display: block; font-size: 11.5px; margin-top: 2px; }

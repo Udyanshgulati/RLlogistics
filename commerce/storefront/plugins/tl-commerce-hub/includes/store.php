@@ -147,6 +147,10 @@ add_action('rest_api_init', static function (): void {
         if (!$o || !in_array($to, ['tl-packed', 'tl-dispatched', 'completed'], true)) {
             return new WP_Error('tl_bad', 'Unknown order or stage.', ['status' => 400]);
         }
+        if ($to === 'tl-dispatched' && !empty($d['awb'])) {
+            $url = esc_url_raw((string) ($d['track_url'] ?? ''));
+            tli_set_tracking($o, ['courier' => sanitize_text_field((string) ($d['courier'] ?? '')), 'awb' => sanitize_text_field((string) $d['awb']), 'url' => wp_http_validate_url($url) ? $url : '']);
+        }
         $GLOBALS['tli_from_hub'] = true;
         $o->update_status($to, 'Updated by the hub: ' . TLI_STAGES[$to][0] . '.');
         $GLOBALS['tli_from_hub'] = false;

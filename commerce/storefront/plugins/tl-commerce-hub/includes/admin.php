@@ -309,15 +309,16 @@ function tli_orders_table(array $orders, bool $compact = false): void
         } else {
             echo '<tr>';
         }
-        printf('<td class="nowrap"><a class="tli-link" href="%s">#%s</a><span class="muted small">%s</span></td><td>%s</td>%s<td class="mono">%s</td><td>%s</td><td class="num">%s</td>',
-            esc_url(current_user_can('edit_shop_orders') ? $o->get_edit_order_url() : '#'), esc_html($o->get_order_number()), esc_html($o->get_date_created() ? wp_date('d M, H:i', $o->get_date_created()->getTimestamp()) : ''),
+        $inv = $compact || !$o->is_paid() ? '' : '<a class="tli-mini" target="_blank" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=invoice&o[]=L:' . $o->get_id()), 'tli_print')) . '">Invoice</a>';
+        printf('<td class="nowrap"><a class="tli-link" href="%s">#%s</a><span class="muted small">%s</span>%s</td><td>%s</td>%s<td class="mono">%s</td><td>%s</td><td class="num">%s</td>',
+            esc_url(current_user_can('edit_shop_orders') ? $o->get_edit_order_url() : '#'), esc_html($o->get_order_number()), esc_html($o->get_date_created() ? wp_date('d M, H:i', $o->get_date_created()->getTimestamp()) : ''), $inv,
             esc_html(trim($o->get_formatted_billing_full_name()) ?: '—'), $compact ? '' : '<td class="small">' . esc_html(mb_strimwidth($items, 0, 80, '…')) . '</td>',
-            esc_html($o->get_shipping_country() ?: $o->get_billing_country() ?: '—'), tli_badge($label, $tone), esc_html(wp_strip_all_tags($o->get_formatted_order_total())));
+            esc_html($o->get_shipping_country() ?: $o->get_billing_country() ?: '—'), tli_badge($label, $tone) . tli_tracking_line(...array_values(tli_tracking($o))), esc_html(wp_strip_all_tags($o->get_formatted_order_total())));
         if (!$compact) {
             echo '<td>';
             if (isset(TLI_NEXT[$o->get_status()]) && current_user_can('tl_fulfil')) {
-                printf('<form method="post" action="%s"><input type="hidden" name="action" value="tli_next_stage"><input type="hidden" name="order_id" value="%d">%s<button class="tli-btn sm primary">%s</button></form>',
-                    esc_url(admin_url('admin-post.php')), $o->get_id(), wp_nonce_field('tli_next_' . $o->get_id(), '_wpnonce', true, false), esc_html(TLI_NEXT[$o->get_status()][1]));
+                printf('<form method="post" action="%s" class="tli-next"><input type="hidden" name="action" value="tli_next_stage"><input type="hidden" name="order_id" value="%d">%s%s<button class="tli-btn sm primary">%s</button></form>',
+                    esc_url(admin_url('admin-post.php')), $o->get_id(), wp_nonce_field('tli_next_' . $o->get_id(), '_wpnonce', true, false), $o->get_status() === 'tl-packed' ? tli_dispatch_fields() : '', esc_html(TLI_NEXT[$o->get_status()][1]));
             } else {
                 echo '<span class="muted small">—</span>';
             }
@@ -353,10 +354,10 @@ function tli_remote_table(array $rows): void
         $items = implode(', ', array_map(static fn ($l) => $l['qty'] . '× ' . ($l['name'] ?: $l['sku']), json_decode($o['lines_json'], true) ?: []));
         printf('<tr><td class="tli-chk"><input type="checkbox" form="tli-print-form" name="o[]" value="R:%d" aria-label="Select order"></td><td class="nowrap"><b>#%s</b><span class="muted small">%s</span></td><td><span class="tli-store-chip">%s</span></td><td>%s</td><td class="small">%s</td><td class="mono">%s</td><td>%s</td><td class="num">%s %s</td><td>',
             (int) $o['id'], esc_html($o['number']), esc_html(wp_date('d M, H:i', strtotime($o['placed_at'] . ' UTC'))), esc_html($names[$o['store_id']] ?? $o['store_id']), esc_html($o['customer'] ?: '—'),
-            esc_html(mb_strimwidth($items, 0, 80, '…')), esc_html($o['country'] ?: '—'), tli_badge($label, $tone), esc_html($o['currency']), esc_html(number_format_i18n((float) $o['total'])));
+            esc_html(mb_strimwidth($items, 0, 80, '…')), esc_html($o['country'] ?: '—'), tli_badge($label, $tone) . tli_tracking_line((string) ($o['courier'] ?? ''), (string) ($o['awb'] ?? ''), (string) ($o['track_url'] ?? '')), esc_html($o['currency']), esc_html(number_format_i18n((float) $o['total'])));
         if (isset(TLI_NEXT[$o['status']]) && current_user_can('tl_fulfil')) {
-            printf('<form method="post" action="%s"><input type="hidden" name="action" value="tli_remote_next"><input type="hidden" name="remote" value="%d">%s<button class="tli-btn sm primary">%s</button></form>',
-                esc_url(admin_url('admin-post.php')), (int) $o['id'], wp_nonce_field('tli_remote_' . $o['id'], '_wpnonce', true, false), esc_html(TLI_NEXT[$o['status']][1]));
+            printf('<form method="post" action="%s" class="tli-next"><input type="hidden" name="action" value="tli_remote_next"><input type="hidden" name="remote" value="%d">%s%s<button class="tli-btn sm primary">%s</button></form>',
+                esc_url(admin_url('admin-post.php')), (int) $o['id'], wp_nonce_field('tli_remote_' . $o['id'], '_wpnonce', true, false), $o['status'] === 'tl-packed' ? tli_dispatch_fields() : '', esc_html(TLI_NEXT[$o['status']][1]));
         } else {
             echo '<span class="muted small">—</span>';
         }
@@ -379,7 +380,7 @@ function tli_page_orders(): void
     }
     echo '</nav>';
     // Printing: tick orders below (checkboxes belong to this form), or print everything waiting to be packed.
-    printf('<form id="tli-print-form" class="tli-printbar" method="get" action="%s" target="_blank"><input type="hidden" name="action" value="tli_print">%s<span class="muted">Warehouse printouts:</span><button class="tli-btn sm" name="what" value="pick">Pick list · ticked orders</button><button class="tli-btn sm" name="what" value="slips">Packing slips · ticked orders</button><span class="tli-sep"></span><a class="tli-btn sm primary" target="_blank" href="%s">Pick list · all to pack</a><a class="tli-btn sm" target="_blank" href="%s">Packing slips · all to pack</a></form>',
+    printf('<form id="tli-print-form" class="tli-printbar" method="get" action="%s" target="_blank"><input type="hidden" name="action" value="tli_print">%s<span class="muted">Warehouse printouts:</span><button class="tli-btn sm" name="what" value="pick">Pick list · ticked orders</button><button class="tli-btn sm" name="what" value="slips">Packing slips · ticked orders</button><button class="tli-btn sm" name="what" value="invoice">GST invoices · ticked orders</button><span class="tli-sep"></span><a class="tli-btn sm primary" target="_blank" href="%s">Pick list · all to pack</a><a class="tli-btn sm" target="_blank" href="%s">Packing slips · all to pack</a></form>',
         esc_url(admin_url('admin-post.php')), wp_nonce_field('tli_print', '_wpnonce', false, false),
         esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=pick&all_to_pack=1'), 'tli_print')), esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=slips&all_to_pack=1'), 'tli_print')));
     echo '<h2 class="tli-sec">' . esc_html(get_bloginfo('name')) . '</h2><div class="tli-card flush">';
@@ -456,6 +457,7 @@ function tli_page_settings(): void
     printf('<label class="tli-field"><span>Low stock level (pieces per size)</span><input class="tli-input" type="number" min="0" name="tli_low_stock" value="%d" style="max-width:120px"></label>', (int) get_option('tli_low_stock', 5));
     printf('<label class="tli-field"><span>Send daily alerts to</span><input class="tli-input" type="email" name="tli_alert_email" value="%s" placeholder="%s" style="max-width:320px"></label>', esc_attr((string) get_option('tli_alert_email', '')), esc_attr(get_option('admin_email')));
     echo '<p class="muted small">A size at or below the low stock level shows as Low stock. Every morning an email lists low and out-of-stock sizes and orders waiting more than 24 hours to be packed (only when there is something to report).</p><p><button class="tli-btn primary">Save</button></p></form></div>';
+    tli_settings_invoice_card();
     $bk = tli_last_backup();
     $mail = function_exists('schermo_mail_ready') && schermo_mail_ready();
     $me = get_option('schermo_mail_error');

@@ -59,6 +59,19 @@ add_action('admin_post_tli_print', static function (): void {
     if (!empty($_REQUEST['all_to_pack'])) {
         $keys = tli_to_pack_keys();
     }
+    if ($what === 'invoice') {
+        $list = [];
+        $skipped = [];
+        foreach ($keys as $k) {
+            if (str_starts_with($k, 'L:') && ($o = wc_get_order(absint(substr($k, 2))))) {
+                $list[] = $o;
+            } elseif (str_starts_with($k, 'R:')) {
+                $skipped[] = 'Orders from other stores are invoiced by the store that sold them (open the invoice in that store\'s admin).';
+            }
+        }
+        tli_invoice_document($list, array_unique($skipped));
+        exit;
+    }
     $orders = tli_print_orders($keys);
     nocache_headers();
     header('Content-Type: text/html; charset=utf-8');

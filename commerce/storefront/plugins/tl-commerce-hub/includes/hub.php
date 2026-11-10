@@ -140,9 +140,18 @@ add_action('admin_post_tli_remote_next', static function (): void {
     $ok = '0';
     if ($o && isset(TLI_NEXT[$o['status']]) && ($store = tli_store($o['store_id']))) {
         [$to, $label] = TLI_NEXT[$o['status']];
-        $wpdb->update($t, ['status' => $to, 'updated_at' => current_time('mysql', true)], ['id' => $id]);
+        $track = [];
+        if ($to === 'tl-dispatched') {
+            $tr = tli_tracking_from_post();
+            if (!$tr) {
+                wp_safe_redirect(add_query_arg(['tli_msg' => rawurlencode('Enter the courier and AWB number to mark the order as dispatched.'), 'tli_ok' => '0'], wp_get_referer() ?: admin_url('admin.php?page=tl-orders')));
+                exit;
+            }
+            $track = ['courier' => $tr['courier'], 'awb' => $tr['awb'], 'track_url' => $tr['url']];
+        }
+        $wpdb->update($t, ['status' => $to, 'updated_at' => current_time('mysql', true)] + $track, ['id' => $id]);
         try {
-            tli_call($store['url'], $store['id'], $store['secret'], 'POST', 'stage', ['remote_id' => $o['remote_id'], 'status' => $to]);
+            tli_call($store['url'], $store['id'], $store['secret'], 'POST', 'stage', ['remote_id' => $o['remote_id'], 'status' => $to] + $track);
             tli_store_seen($store['id']);
             $msg = sprintf('%s order #%s: %s.', $store['name'], $o['number'], TLI_STAGES[$to][0]);
             $ok = '1';
