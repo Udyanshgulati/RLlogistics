@@ -997,3 +997,12 @@ dialog.qa-sheet { width: min(440px, calc(100vw - 24px)); border-radius: var(--r-
 /* Policy and info pages: room above each section heading */
 .page .wp-block-heading { margin-top: 1.8em; margin-bottom: .4em; }
 .page .wp-block-heading:first-child { margin-top: 0; }
+
+/* Fix: closed dropdowns (and the lists inside them) must not catch the mouse. Nested lists inherit the panel's
+   visibility instead of forcing "visible", and closed panels ignore pointer events entirely. */
+.nav-primary .sub-menu .sub-menu { visibility: inherit; }
+.nav-primary .sub-menu { pointer-events: none; }
+@media (hover: hover) { .nav-primary li:hover > .sub-menu { pointer-events: auto; } }
+.nav-primary li:focus-within > .sub-menu, .nav-primary li.is-open > .sub-menu { pointer-events: auto; }
+.nav-primary li.is-closed > .sub-menu { pointer-events: none; }
+.nav-primary .sub-menu .sub-menu { pointer-events: inherit; }
