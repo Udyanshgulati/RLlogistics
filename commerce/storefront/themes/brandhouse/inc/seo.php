@@ -40,7 +40,7 @@ function brandhouse_share_data(): array
         $d['url'] = get_permalink(wc_get_page_id('shop'));
     }
     if ($d['desc'] === '') {
-        $d['desc'] = get_bloginfo('description') ?: sprintf('%s — official store. Shipped from Delhi, India.', $site);
+        $d['desc'] = get_bloginfo('description') ?: sprintf('%s — official store. A new expression of sport, a new language of style. Milano, est. 2021.', $site);
     }
     if ($d['image'] === '') {
         $file = get_stylesheet_directory() . '/assets/img/share.jpg';
