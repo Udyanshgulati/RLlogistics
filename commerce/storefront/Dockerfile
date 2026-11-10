@@ -24,6 +24,7 @@ RUN set -eux; \
 COPY themes /opt/schermo/themes
 COPY catalog /opt/schermo/catalog
 COPY plugins/tl-commerce-hub /opt/schermo/own-plugins/tl-commerce-hub
+COPY plugins/schermo-comms /opt/schermo/own-plugins/schermo-comms
 COPY docker/php.ini /usr/local/etc/php/conf.d/schermo.ini
 COPY docker/start.sh docker/setup.sh docker/seed-demo.php docker/import-catalog.php docker/store-setup.php docker/import-sheet.php docker/advanced-cache.php docker/schermo-cache.php docker/schermo-mail.php docker/store-pages.php docker/backup.sh docker/restore.sh /opt/schermo/
 RUN chmod +x /opt/schermo/start.sh /opt/schermo/setup.sh /opt/schermo/backup.sh /opt/schermo/restore.sh

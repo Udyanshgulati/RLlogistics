@@ -20,6 +20,7 @@ for p in woocommerce woo-razorpay; do
 done
 # Our own plugins ship with the image and are replaced on every deploy (like the themes).
 rm -rf wp-content/plugins/tl-inventory wp-content/plugins/tl-commerce-hub && cp -a /opt/schermo/own-plugins/tl-commerce-hub wp-content/plugins/
+rm -rf wp-content/plugins/schermo-comms && cp -a /opt/schermo/own-plugins/schermo-comms wp-content/plugins/
 chown -R www-data:www-data wp-content
 
 : "${WP_URL:?WP_URL must be set}"
@@ -59,6 +60,8 @@ wp option update woocommerce_default_customer_address base >/dev/null 2>&1 || tr
 if [ "$(wp option get schermo_migr_decimals 2>/dev/null)" != "1" ]; then wp option update woocommerce_price_num_decimals 0 >/dev/null && wp option update schermo_migr_decimals 1 >/dev/null; fi
 wp plugin is-active woo-razorpay || wp plugin activate woo-razorpay
 wp plugin is-active tl-commerce-hub || wp plugin activate tl-commerce-hub
+# Messages & reviews: starts in dry-run (nothing is sent) until the owner connects providers and switches to live.
+wp plugin is-active schermo-comms || wp plugin activate schermo-comms
 wp eval-file /opt/schermo/store-setup.php
 log "store pages and email branding"
 wp eval-file /opt/schermo/store-pages.php || log "store pages FAILED (site keeps running)"
