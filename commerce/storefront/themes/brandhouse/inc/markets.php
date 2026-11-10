@@ -66,7 +66,9 @@ function brandhouse_detected_country(): string
 /** Active market: chosen one, else the detected one (used until the visitor confirms in the popup). */
 function brandhouse_market(): string
 {
-    return brandhouse_chosen_market() ?? brandhouse_market_for_country(brandhouse_detected_country() ?: get_option('woocommerce_default_country', 'IN'));
+    // Rendering never waits on geolocation (an outside lookup that can take seconds): until the visitor confirms
+    // a market in the popup, the store's home market applies; the popup asks the server for the country separately.
+    return brandhouse_chosen_market() ?? brandhouse_market_for_country(substr((string) get_option('woocommerce_default_country', 'IN'), 0, 2));
 }
 
 /** Rates from the store currency, or null when unavailable or older than 48 hours. */
@@ -178,7 +180,7 @@ function brandhouse_market_button(string $class = ''): string
 add_action('wp_footer', static function (): void {
     $active = brandhouse_market();
     $first = brandhouse_chosen_market() === null;
-    $detected = brandhouse_detected_country();
+    $detected = '';
     $countries = WC()->countries->get_countries();
     $base = get_option('woocommerce_currency');
     ?>
@@ -189,9 +191,7 @@ add_action('wp_footer', static function (): void {
           <button type="button" class="icon-btn" data-dialog-close aria-label="<?php esc_attr_e('Close', 'brandhouse'); ?>"><?php echo brandhouse_icon('close'); ?></button>
         </div>
         <div class="sheet-body">
-          <?php if ($first && $detected !== '' && isset($countries[$detected])): ?>
-            <p class="market-detected"><?php printf(esc_html__('It looks like you are in %s.', 'brandhouse'), '<strong>' . esc_html($countries[$detected]) . '</strong>'); ?></p>
-          <?php endif; ?>
+          <?php if ($first): ?><p class="market-detected" data-detect-url="<?php echo esc_url(rest_url('brandhouse/v1/market')); ?>" data-tpl="<?php esc_attr_e('It looks like you are in %s.', 'brandhouse'); ?>" hidden></p><?php endif; ?>
           <fieldset class="market-list">
             <legend class="sr-only"><?php esc_html_e('Country or region', 'brandhouse'); ?></legend>
             <?php foreach (brandhouse_markets() as $id => $m): ?>
@@ -216,4 +216,19 @@ add_action('wp_body_open', static function (): void {
         return;
     }
     printf('<div class="announce market-charge"><p>%s</p></div>', esc_html(sprintf(__('Your order will be charged in %s.', 'brandhouse'), get_option('woocommerce_currency'))));
+});
+
+// Country lookup for the first-visit popup, called by the page after it has loaded (cached per IP by WooCommerce).
+add_action('rest_api_init', static function (): void {
+    register_rest_route('brandhouse/v1', '/market', [
+        'methods' => 'GET',
+        'permission_callback' => '__return_true',
+        'callback' => static function (): WP_REST_Response {
+            $c = brandhouse_detected_country();
+            $names = WC()->countries->get_countries();
+            $r = new WP_REST_Response(['country' => $c, 'name' => $names[$c] ?? '', 'market' => $c !== '' ? brandhouse_market_for_country($c) : null]);
+            $r->header('Cache-Control', 'private, no-store');
+            return $r;
+        },
+    ]);
 });

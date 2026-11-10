@@ -18,6 +18,28 @@ $attach = static function (string $file, int $post, string $title): int {
     return is_wp_error($id) ? 0 : (int) $id;
 };
 
+// Prices from the client's sheet: regular = MRP, sale = selling price. Applied once per price_version, so prices
+// changed later in WordPress admin are not overwritten on the next deploy.
+$apply_price = static function (int $id, array $p): void {
+    $ver = (int) ($p['price_version'] ?? 0);
+    if ($ver < 1 || (int) get_post_meta($id, '_bh_price_ver', true) >= $ver) {
+        return;
+    }
+    $product = wc_get_product($id);
+    $targets = $product->is_type('variable') ? array_map('wc_get_product', $product->get_children()) : [$product];
+    foreach (array_filter($targets) as $t) {
+        $t->set_regular_price((string) $p['regular_price']);
+        $t->set_sale_price((string) ($p['sale_price'] ?? ''));
+        $t->save();
+    }
+    if ($product->is_type('variable')) {
+        WC_Product_Variable::sync($id);
+    }
+    wc_delete_product_transients($id);
+    update_post_meta($id, '_bh_price_ver', $ver);
+    echo "catalog: price set for {$p['sku']}\n";
+};
+
 $added = 0;
 foreach (glob($root . '/*/products.json') ?: [] as $json) {
     $data = json_decode((string) file_get_contents($json), true);
@@ -42,6 +64,7 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
         $ver = (int) ($p['image_version'] ?? $data['image_version'] ?? 1);
         $existing = wc_get_product_id_by_sku($p['sku']);
         if ($existing) {
+            $apply_price($existing, $p);
             // Existing products keep everything the owner edited; only their photos are replaced when the
             // catalogue's image_version goes up.
             if ((int) get_post_meta($existing, '_bh_img_ver', true) < $ver) {
@@ -98,6 +121,7 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
             }
             WC_Product_Variable::sync($id);
         }
+        $apply_price($id, $p);
         $added++;
     }
 }

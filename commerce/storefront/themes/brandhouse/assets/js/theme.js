@@ -22,6 +22,13 @@
   const market = document.getElementById('market-picker');
   if (market && market.hasAttribute('data-autoopen')) {
     market.showModal();
+    const note = market.querySelector('[data-detect-url]');
+    if (note && window.fetch) fetch(note.dataset.detectUrl, { credentials: 'same-origin' }).then((r) => r.json()).then((d) => {
+      if (!d || !d.market) return;
+      const radio = market.querySelector(`input[name=bh_market][value="${d.market}"]`);
+      if (radio) radio.checked = true;
+      if (d.name) { note.textContent = note.dataset.tpl.replace('%s', d.name); note.hidden = false; }
+    }).catch(() => {});
     market.addEventListener('close', () => {
       if (document.cookie.includes('bh_market=')) return;
       const picked = market.querySelector('input[name=bh_market]:checked');

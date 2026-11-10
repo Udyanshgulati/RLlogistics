@@ -14,7 +14,10 @@
     "mi-playing-jersey-3.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 2",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "3999",
+   "sale_price": "2999",
+   "price_version": 1
   },
   {
    "sku": "MI-002",
@@ -28,7 +31,10 @@
     "mi-playing-trouser-3.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 3",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "2499",
+   "sale_price": "1999",
+   "price_version": 1
   },
   {
    "sku": "MI-003",
@@ -40,7 +46,10 @@
     "mi-playing-cap-1.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 4",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "1499",
+   "sale_price": "1111",
+   "price_version": 1
   },
   {
    "sku": "MI-004",
@@ -53,7 +62,10 @@
     "mi-practice-kit-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 5",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "1999",
+   "sale_price": "1499",
+   "price_version": 1
   },
   {
    "sku": "MI-005",
@@ -66,7 +78,10 @@
     "mi-practice-kit-sleeveless-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 6",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "1499",
+   "sale_price": "1111",
+   "price_version": 1
   },
   {
    "sku": "MI-006",
@@ -79,7 +94,10 @@
     "mi-practice-shorts-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 7",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "1299",
+   "sale_price": "999",
+   "price_version": 1
   },
   {
    "sku": "MI-010",
@@ -94,7 +112,10 @@
     "mi-kit-bag-4.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 11",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "9999",
+   "sale_price": "6999",
+   "price_version": 1
   },
   {
    "sku": "MI-011",
@@ -107,7 +128,10 @@
     "mi-backpack-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 12",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "6999",
+   "sale_price": "3999",
+   "price_version": 1
   },
   {
    "sku": "MI-012",
@@ -120,7 +144,10 @@
     "mi-winter-warmer-full-sleeve-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 13",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "5999",
+   "sale_price": "2999",
+   "price_version": 1
   },
   {
    "sku": "MI-013",
@@ -133,7 +160,10 @@
     "mi-winter-warmer-sleeveless-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 14",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "2999",
+   "sale_price": "1999",
+   "price_version": 1
   },
   {
    "sku": "MI-014",
@@ -147,7 +177,10 @@
     "mi-tracksuit-3.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 15",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "6999",
+   "sale_price": "4999",
+   "price_version": 1
   },
   {
    "sku": "MI-015",
@@ -160,7 +193,10 @@
     "mi-winter-travel-hoodie-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 16",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "4999",
+   "sale_price": "2999",
+   "price_version": 1
   },
   {
    "sku": "MI-016",
@@ -174,7 +210,10 @@
     "mi-travel-kit-t-shirt-3.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 17",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "1499",
+   "sale_price": "1199",
+   "price_version": 1
   },
   {
    "sku": "MI-017",
@@ -187,7 +226,10 @@
     "mi-round-neck-travel-t-shirt-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 18",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "1499",
+   "sale_price": "1199",
+   "price_version": 1
   },
   {
    "sku": "MI-018",
@@ -200,7 +242,10 @@
     "mi-polo-t-shirt-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 19",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "1499",
+   "sale_price": "1199",
+   "price_version": 1
   },
   {
    "sku": "MI-019",
@@ -215,7 +260,10 @@
     "mi-fashion-cap-01-4.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 20",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "999",
+   "sale_price": "699",
+   "price_version": 1
   },
   {
    "sku": "MI-020",
@@ -230,7 +278,10 @@
     "mi-fashion-cap-02-4.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 21",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "999",
+   "sale_price": "699",
+   "price_version": 1
   },
   {
    "sku": "MI-021",
@@ -256,7 +307,10 @@
     "mi-winter-beanie-1.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 23",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "1199",
+   "sale_price": "999",
+   "price_version": 1
   },
   {
    "sku": "MI-023",
@@ -273,7 +327,10 @@
     "mi-socks-6.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 24",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "399",
+   "sale_price": "299",
+   "price_version": 1
   },
   {
    "sku": "MI-024",
@@ -286,7 +343,10 @@
     "mi-bag-tag-2.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 25",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "399",
+   "sale_price": "299",
+   "price_version": 1
   },
   {
    "sku": "MI-025",
@@ -298,7 +358,10 @@
     "mi-travel-duffel-bag-1.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 26",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "3499",
+   "sale_price": "2999",
+   "price_version": 1
   },
   {
    "sku": "MI-026",
@@ -325,7 +388,10 @@
     "mi-sipper-1.webp"
    ],
    "source": "Milan_Icons_Merchandise.pdf, page 28",
-   "image_version": 6
+   "image_version": 6,
+   "regular_price": "999",
+   "sale_price": "",
+   "price_version": 1
   }
  ],
  "removed": [
@@ -334,5 +400,6 @@
   "MI-009",
   "MI-028"
  ],
- "image_version": 2
+ "image_version": 2,
+ "prices_source": "Client listing sheet (Google Sheets), imported 10 Nov 2026"
 }

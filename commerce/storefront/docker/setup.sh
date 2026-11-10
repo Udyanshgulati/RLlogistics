@@ -46,8 +46,16 @@ else
   wp wc update >/dev/null 2>&1 || true
   [ "$(wp option get stylesheet)" = schermo ] || wp theme activate schermo
 fi
+log "installing page cache"
+cp /opt/schermo/advanced-cache.php wp-content/advanced-cache.php
+mkdir -p wp-content/mu-plugins wp-content/cache/schermo-page && cp /opt/schermo/schermo-cache.php wp-content/mu-plugins/schermo-cache.php
+rm -f wp-content/cache/schermo-page/*.html
+wp option update woocommerce_default_customer_address base >/dev/null 2>&1 || true
+# One-time: whole-rupee prices (₹2,999 instead of ₹2,999.00).
+if [ "$(wp option get schermo_migr_decimals 2>/dev/null)" != "1" ]; then wp option update woocommerce_price_num_decimals 0 >/dev/null && wp option update schermo_migr_decimals 1 >/dev/null; fi
 log "importing catalog"
 wp eval-file /opt/schermo/import-catalog.php
 chown -R www-data:www-data wp-content/uploads 2>/dev/null || true
 wp cache flush >/dev/null 2>&1 || true
+chown -R www-data:www-data wp-content/cache wp-content/mu-plugins wp-content/advanced-cache.php
 log "ready"
