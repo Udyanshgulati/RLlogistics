@@ -13,6 +13,7 @@ require_once __DIR__ . '/inc/template-tags.php';
 require_once __DIR__ . '/inc/woocommerce.php';
 require_once __DIR__ . '/inc/markets.php';
 require_once __DIR__ . '/inc/extras.php';
+require_once __DIR__ . '/inc/seo.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');
