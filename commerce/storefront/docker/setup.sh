@@ -18,6 +18,8 @@ for p in woocommerce woo-razorpay; do
     rm -rf "wp-content/plugins/$p" && cp -a "/opt/schermo/plugins/$p" wp-content/plugins/
   fi
 done
+# Our own plugins ship with the image and are replaced on every deploy (like the themes).
+rm -rf wp-content/plugins/tl-inventory && cp -a /opt/schermo/own-plugins/tl-inventory wp-content/plugins/
 chown -R www-data:www-data wp-content
 
 : "${WP_URL:?WP_URL must be set}"
@@ -56,6 +58,7 @@ wp option update woocommerce_default_customer_address base >/dev/null 2>&1 || tr
 # One-time: whole-rupee prices (₹2,999 instead of ₹2,999.00).
 if [ "$(wp option get schermo_migr_decimals 2>/dev/null)" != "1" ]; then wp option update woocommerce_price_num_decimals 0 >/dev/null && wp option update schermo_migr_decimals 1 >/dev/null; fi
 wp plugin is-active woo-razorpay || wp plugin activate woo-razorpay
+wp plugin is-active tl-inventory || wp plugin activate tl-inventory
 wp eval-file /opt/schermo/store-setup.php
 log "importing catalog"
 wp eval-file /opt/schermo/import-catalog.php

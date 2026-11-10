@@ -1,0 +1,32 @@
+/* Thoda Logic branding for WordPress admin, admin bar and login. */
+:root { --tl-navy: #0b1f4d; --tl-navy-2: #24418f; --tl-amber: #f2a900; --tl-ink: #111113; }
+.tl-mark { display: inline-grid; place-items: center; border-radius: 22%; background: var(--tl-navy); color: #fff; font: 700 12px/1 Inter, -apple-system, "Segoe UI", sans-serif; letter-spacing: .02em; box-shadow: inset 0 -3px 0 var(--tl-amber); vertical-align: middle; }
+/* admin bar */
+#wpadminbar { background: var(--tl-ink); }
+#wpadminbar .tl-bar-brand > .ab-item { display: flex !important; align-items: center; gap: 8px; }
+#wpadminbar .tl-bar-mark { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 5px; background: var(--tl-navy); color: #fff; font-weight: 700; font-size: 10px; line-height: 1; box-shadow: inset 0 -2px 0 var(--tl-amber); }
+#wpadminbar .tl-bar-name { font-weight: 600; }
+/* left menu */
+#adminmenu, #adminmenuback, #adminmenuwrap { background: #0f1115; }
+#adminmenu .wp-submenu, #adminmenu .wp-has-current-submenu .wp-submenu, #adminmenu a.wp-has-current-submenu:focus + .wp-submenu { background: #171a20; }
+#adminmenu li.menu-top:hover, #adminmenu li.opensub > a.menu-top, #adminmenu li > a.menu-top:focus { background: #1b2030; color: #fff; }
+#adminmenu .wp-has-current-submenu a.wp-has-current-submenu, #adminmenu li.current a.menu-top, #adminmenu .current div.wp-menu-image::before { background: var(--tl-navy); color: #fff; }
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu { box-shadow: inset 3px 0 0 var(--tl-amber); }
+#adminmenu .wp-submenu a:hover, #adminmenu .wp-submenu a:focus, #adminmenu .wp-submenu li.current a { color: #fff; }
+#adminmenu .awaiting-mod, #adminmenu .update-plugins { background: var(--tl-amber); color: var(--tl-ink); }
+#adminmenu #toplevel_page_tl-inventory .wp-menu-image img { width: 18px; height: 18px; padding-top: 8px; opacity: .9; filter: invert(1); }
+.wp-core-ui .button-primary { background: var(--tl-navy); border-color: var(--tl-navy); }
+.wp-core-ui .button-primary:hover, .wp-core-ui .button-primary:focus { background: var(--tl-navy-2); border-color: var(--tl-navy-2); }
+a { color: var(--tl-navy-2); }
+#wpfooter .tl-footer { display: inline-flex; align-items: center; gap: 8px; }
+.tl-welcome { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.tl-welcome p { margin: 2px 0 0; color: #6e6e76; }
+/* login */
+body.login { background: radial-gradient(900px 500px at 50% -10%, #e9edf7, #f6f6f4); }
+body.login h1 a { display: none; }
+.login .tl-login-brand { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; padding: 16px; background: #fff; border: 1px solid #e8e6e1; border-radius: 10px; }
+.login .tl-login-brand b { display: block; font-size: 15px; color: var(--tl-ink); }
+.login .tl-login-brand span { color: #6e6e76; font-size: 12.5px; }
+.login form { border-radius: 10px; border-color: #e8e6e1; box-shadow: 0 12px 32px rgba(17,17,19,.08); }
+.login .button-primary { background: var(--tl-navy) !important; border-color: var(--tl-navy) !important; width: 100%; margin-top: 10px !important; min-height: 40px; }
+.login #nav a, .login #backtoblog a { color: var(--tl-navy-2); }
