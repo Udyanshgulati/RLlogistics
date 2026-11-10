@@ -15,37 +15,38 @@ $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['cr
 ?>
 <main id="main" class="home home-glass">
 
-  <?php if ($slides): $first = $slides[0]; ?>
-  <section class="gx-hero" aria-roledescription="carousel" aria-label="<?php esc_attr_e('Featured products', 'schermo'); ?>" data-hero>
-    <?php echo schermo_svg('schermo-mark', 'gx-mark'); ?>
-    <ol class="gx-index" aria-label="<?php esc_attr_e('Choose a product', 'schermo'); ?>">
-      <?php foreach ($slides as $i => $s): ?>
-        <li><button type="button" data-slide="<?php echo (int) $i; ?>" aria-current="<?php echo $i === 0 ? 'true' : 'false'; ?>" aria-label="<?php echo esc_attr($s['name']); ?>"><?php echo esc_html(sprintf('%02d', $i + 1)); ?></button></li>
-      <?php endforeach; ?>
-    </ol>
-
-    <?php foreach ($slides as $i => $s): ?>
-      <div class="gx-slide<?php echo $i === 0 ? ' is-active' : ''; ?>" data-index="<?php echo (int) $i; ?>"<?php echo $i === 0 ? '' : ' aria-hidden="true"'; ?>>
-        <p class="gx-word gx-word-a" aria-hidden="true"><?php echo esc_html($s['words'][0]); ?></p>
-        <p class="gx-word gx-word-b" aria-hidden="true"><?php echo esc_html($s['words'][1]); ?></p>
-        <figure class="gx-product">
-          <img src="<?php echo esc_url($s['image']); ?>" alt="<?php echo esc_attr($s['name']); ?>" <?php echo $i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>
-          <?php foreach ($s['spots'] as $k => [$label, $x, $y, $side]): ?>
-            <span class="gx-spot gx-<?php echo esc_attr($side); ?>" style="--x:<?php echo (float) $x; ?>%;--y:<?php echo (float) $y; ?>%;--d:<?php echo (int) $k; ?>">
-              <span class="gx-dot"></span><span class="gx-line"></span><span class="gx-tag glass"><?php echo esc_html($label); ?></span>
-            </span>
+  <?php if ($slides): $first = $slides[0]; $n = count($slides); ?>
+  <section class="hx" aria-roledescription="carousel" aria-label="<?php esc_attr_e('Featured pieces', 'schermo'); ?>" data-hx>
+    <div class="hx-copy">
+      <p class="hx-kicker"><?php esc_html_e('Made in Milan · Est. 2021', 'schermo'); ?></p>
+      <h1 class="hx-title"><?php esc_html_e('A new expression of sport.', 'schermo'); ?> <span><?php esc_html_e('A new language of style.', 'schermo'); ?></span></h1>
+      <div class="hx-panel" aria-live="polite">
+        <p class="hx-coll" data-hx-coll><?php echo esc_html($first['coll_name']); ?></p>
+        <p class="hx-name"><a href="<?php echo esc_url($first['url']); ?>" data-hx-name><?php echo esc_html($first['name']); ?></a></p>
+        <p class="hx-price" data-hx-price><?php echo wp_kses_post($first['price']); ?></p>
+        <a class="btn hx-cta<?php echo $first['ready'] ? '' : ' is-preview'; ?>" href="<?php echo esc_url($first['cta_url']); ?>" data-hx-cta><span data-hx-cta-text><?php echo esc_html($first['cta']); ?></span><?php echo brandhouse_icon('arrow'); ?></a>
+      </div>
+      <?php if ($n > 1): ?>
+      <div class="hx-controls">
+        <button type="button" class="hx-arrow hx-prev" data-hx-prev aria-label="<?php esc_attr_e('Previous piece', 'schermo'); ?>"><?php echo brandhouse_icon('arrow'); ?></button>
+        <ol class="hx-dots">
+          <?php foreach ($slides as $i => $sl): ?>
+            <li><button type="button" data-hx-go="<?php echo (int) $i; ?>" aria-label="<?php echo esc_attr(sprintf(__('Show %1$s (%2$d of %3$d)', 'schermo'), $sl['name'], $i + 1, $n)); ?>"<?php echo $i === 0 ? ' aria-current="true"' : ''; ?>></button></li>
           <?php endforeach; ?>
+        </ol>
+        <span class="hx-count" aria-hidden="true"><span data-hx-index>01</span> / <?php echo esc_html(sprintf('%02d', $n)); ?></span>
+        <button type="button" class="hx-arrow" data-hx-next aria-label="<?php esc_attr_e('Next piece', 'schermo'); ?>"><?php echo brandhouse_icon('arrow'); ?></button>
+      </div>
+      <?php endif; ?>
+    </div>
+    <div class="hx-stage" data-hx-stage>
+      <span class="hx-ring" aria-hidden="true"></span>
+      <?php echo schermo_svg('schermo-mark', 'hx-mark'); ?>
+      <?php foreach ($slides as $i => $sl): ?>
+        <figure class="hx-slide<?php echo $i === 0 ? ' is-active' : ''; ?>"<?php echo $i === 0 ? '' : ' aria-hidden="true"'; ?>>
+          <img src="<?php echo esc_url($sl['image']); ?>" alt="<?php echo esc_attr($sl['name']); ?>" width="1200" height="1500" <?php echo $i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>
         </figure>
-      </div>
-    <?php endforeach; ?>
-
-    <div class="gx-cards gx-cards-one">
-      <div class="gx-card gx-card-mid glass">
-        <p class="eyebrow" data-hero-coll><?php echo esc_html($first['collection']); ?></p>
-        <h1 class="gx-title" data-hero-name><?php echo esc_html($first['name']); ?></h1>
-        <p class="gx-price" data-hero-price><?php echo wp_kses_post($first['price']); ?></p>
-        <a class="btn gx-cta" href="<?php echo esc_url($first['cta_url']); ?>" data-hero-link><span data-hero-cta><?php echo esc_html($first['cta']); ?></span><?php echo brandhouse_icon('arrow'); ?></a>
-      </div>
+      <?php endforeach; ?>
     </div>
   </section>
   <?php endif; ?>
@@ -53,8 +54,8 @@ $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['cr
   <?php do_action('brandhouse_home_after_hero'); ?>
 
   <section class="sb-brand container" aria-labelledby="brand-title">
-    <p class="eyebrow"><?php esc_html_e('Schermo · Milano · Est. 2021', 'schermo'); ?></p>
-    <h2 id="brand-title" class="sb-display"><?php esc_html_e('A new expression of sport.', 'schermo'); ?> <span><?php esc_html_e('A new language of style.', 'schermo'); ?></span></h2>
+    <p class="eyebrow"><?php esc_html_e('The brand', 'schermo'); ?></p>
+    <h2 id="brand-title" class="sb-display sb-display-sm"><?php esc_html_e('Sport, street and Milan', 'schermo'); ?> <span><?php esc_html_e('in every piece.', 'schermo'); ?></span></h2>
     <p class="sb-lede"><?php esc_html_e('A contemporary sports, active and lifestyle label for a generation that sees no boundaries between performance, fashion and everyday expression.', 'schermo'); ?></p>
   </section>
 

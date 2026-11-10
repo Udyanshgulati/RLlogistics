@@ -56,3 +56,29 @@ add_filter('walker_nav_menu_start_el', static function (string $html, $item, int
     }
     return $html;
 }, 10, 4);
+
+/**
+ * A menu link to a section of a page (e.g. "Collections" → /#collections) is a jump link, not a page: WordPress would
+ * mark it "current" whenever that page is open, leaving it underlined. It stays current only as the parent of the page
+ * actually being viewed (e.g. while on a collection page).
+ */
+add_filter('nav_menu_css_class', static function (array $classes, $item): array {
+    if (($item->type ?? '') === 'custom' && str_contains((string) $item->url, '#')) {
+        $classes = array_values(array_diff($classes, ['current-menu-item', 'current_page_item', 'current-menu-ancestor', 'current-menu-parent', 'current_page_parent', 'current_page_ancestor']));
+        if (in_array('menu-item-has-children', $classes, true) && (is_product_category() || is_product_taxonomy())) {
+            $term = get_queried_object();
+            foreach (wp_get_nav_menu_items((int) ($item->menu_id ?? 0) ?: (get_nav_menu_locations()['primary'] ?? 0)) ?: [] as $child) {
+                if ((int) $child->menu_item_parent === (int) $item->ID && $term instanceof WP_Term && (int) $child->object_id === $term->term_id) {
+                    $classes[] = 'current-menu-ancestor';
+                }
+            }
+        }
+    }
+    return $classes;
+}, 10, 2);
+add_filter('nav_menu_link_attributes', static function (array $atts, $item): array {
+    if (($item->type ?? '') === 'custom' && str_contains((string) $item->url, '#')) {
+        unset($atts['aria-current']);
+    }
+    return $atts;
+}, 10, 2);
