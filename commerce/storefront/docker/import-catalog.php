@@ -270,3 +270,30 @@ if ((int) get_option('schermo_menu_v') < 5) {
     update_option('schermo_menu_v', 5, false);
     echo "catalog: Collections page ready\n";
 }
+
+// One-time rename (names v2): Italian, fashion-led names for Schermo Core and Schermo Atelier. A product is renamed
+// only while it still has its previous catalogue name (and description), so edits made in WP admin are kept.
+if ((int) get_option('schermo_names_v') < 2) {
+    $n = 0;
+    foreach (glob($root . '/*/products.json') ?: [] as $json) {
+        $data = json_decode((string) file_get_contents($json), true);
+        foreach ($data['products'] ?? [] as $p) {
+            if (empty($p['previous_name']) || !($id = wc_get_product_id_by_sku($p['sku']))) {
+                continue;
+            }
+            $prod = wc_get_product($id);
+            if ($prod->get_name() !== $p['previous_name']) {
+                continue;
+            }
+            $prod->set_name($p['name']);
+            $prod->set_slug(wp_unique_post_slug(sanitize_title($p['name']), $id, $prod->get_status(), 'product', 0));
+            if (!empty($p['previous_description']) && $prod->get_description() === $p['previous_description']) {
+                $prod->set_description($p['description']);
+            }
+            $prod->save();
+            $n++;
+        }
+    }
+    update_option('schermo_names_v', 2, false);
+    echo "catalog: {$n} products renamed\n";
+}

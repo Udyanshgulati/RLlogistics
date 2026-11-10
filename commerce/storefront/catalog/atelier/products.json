@@ -5,7 +5,7 @@
  "products": [
   {
    "sku": "SA-001",
-   "name": "Atelier Contour Gold Tee",
+   "name": "Atelier Oro Contour Tee",
    "category": "Clothing",
    "sizes": true,
    "description": "Forest green oversized tee with hand-stitched gold contour lines across the front.",
@@ -13,11 +13,12 @@
     "sa-contour-gold-tee-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 19",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Contour Gold Tee"
   },
   {
    "sku": "SA-002",
-   "name": "Atelier Botanica Arches Tee",
+   "name": "Atelier Botanica Tee",
    "category": "Clothing",
    "sizes": true,
    "description": "Cream oversized tee with a drawn botanical print and arches running up one side.",
@@ -25,11 +26,12 @@
     "sa-botanica-arches-tee-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 19",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Botanica Arches Tee"
   },
   {
    "sku": "SA-003",
-   "name": "Atelier Chenille S Tee",
+   "name": "Atelier Esse Chenille Tee",
    "category": "Clothing",
    "sizes": true,
    "description": "Washed black and maroon oversized tee with a raised chenille S on the chest and contrast stitching.",
@@ -37,11 +39,12 @@
     "sa-chenille-s-tee-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 19",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Chenille S Tee"
   },
   {
    "sku": "SA-004",
-   "name": "Atelier Lilac Veil Tee",
+   "name": "Atelier Lilla Veil Tee",
    "category": "Clothing",
    "sizes": true,
    "description": "Lilac oversized tee with sheer overlay panels outlined in gold stitching.",
@@ -49,11 +52,12 @@
     "sa-lilac-veil-tee-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 19",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Lilac Veil Tee"
   },
   {
    "sku": "SA-005",
-   "name": "Atelier Crescent Patchwork Tee",
+   "name": "Atelier Luna Patchwork Tee",
    "category": "Clothing",
    "sizes": true,
    "description": "Cream oversized tee with curved green patchwork and raw-edge seams.",
@@ -61,11 +65,12 @@
     "sa-crescent-patchwork-tee-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 19",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Crescent Patchwork Tee"
   },
   {
    "sku": "SA-006",
-   "name": "Atelier Midnight Piped Denim",
+   "name": "Atelier Mezzanotte Denim",
    "category": "Clothing",
    "sizes": true,
    "description": "Baggy black denim with curved panels outlined in blue piping and cuffed hems.",
@@ -73,11 +78,12 @@
     "sa-midnight-piped-denim-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 20",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Midnight Piped Denim"
   },
   {
    "sku": "SA-007",
-   "name": "Atelier Olive Floral Cargo",
+   "name": "Atelier Fiori Cargo",
    "category": "Clothing",
    "sizes": true,
    "description": "Baggy olive cargo trouser with gold floral embroidery and draped cargo pockets.",
@@ -85,11 +91,12 @@
     "sa-olive-floral-cargo-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 20",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Olive Floral Cargo"
   },
   {
    "sku": "SA-008",
-   "name": "Atelier Indigo Floral Denim",
+   "name": "Atelier Indaco Fiori Denim",
    "category": "Clothing",
    "sizes": true,
    "description": "Baggy indigo denim with floral embroidery and curved cream panels.",
@@ -97,11 +104,12 @@
     "sa-indigo-floral-denim-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 20",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Indigo Floral Denim"
   },
   {
    "sku": "SA-009",
-   "name": "Atelier Bordeaux Apron Cargo",
+   "name": "Atelier Vino Apron Cargo",
    "category": "Clothing",
    "sizes": true,
    "description": "Bordeaux cargo trouser with an apron layer, long belt, cargo pockets and cream piping.",
@@ -109,11 +117,12 @@
     "sa-bordeaux-apron-cargo-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 20",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Bordeaux Apron Cargo"
   },
   {
    "sku": "SA-010",
-   "name": "Atelier Contour Gold Cap",
+   "name": "Atelier Oro Contour Cap",
    "category": "Accessories",
    "sizes": false,
    "description": "Green cap covered in raised gold contour stitching.",
@@ -121,11 +130,12 @@
     "sa-contour-gold-cap-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 21",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Contour Gold Cap"
   },
   {
    "sku": "SA-011",
-   "name": "Atelier Chenille S Cap",
+   "name": "Atelier Esse Chenille Cap",
    "category": "Accessories",
    "sizes": false,
    "description": "Cream and maroon cap with a chenille S on the front and contrast piping.",
@@ -133,11 +143,12 @@
     "sa-chenille-s-cap-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 21",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Chenille S Cap"
   },
   {
    "sku": "SA-012",
-   "name": "Atelier Raw Patch Cap",
+   "name": "Atelier Grezzo Patch Cap",
    "category": "Accessories",
    "sizes": false,
    "description": "Washed grey cap with a raw-edge lilac patch and yellow cross stitching.",
@@ -145,9 +156,11 @@
     "sa-raw-patch-cap-1.webp"
    ],
    "source": "Schermo · The Art of Dressing.pdf, page 21",
-   "image_version": 1
+   "image_version": 1,
+   "previous_name": "Atelier Raw Patch Cap"
   }
  ],
  "removed": [],
- "image_version": 1
+ "image_version": 1,
+ "name_version": 2
 }
