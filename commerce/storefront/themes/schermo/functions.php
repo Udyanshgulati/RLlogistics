@@ -11,7 +11,7 @@ const SCHERMO_VERSION = '0.2.0';
 
 add_action('wp_enqueue_scripts', static function (): void {
     $uri = get_stylesheet_directory_uri();
-    wp_enqueue_style('schermo', $uri . '/assets/css/schermo.css', ['brandhouse'], SCHERMO_VERSION);
+    wp_enqueue_style('schermo', $uri . '/assets/css/schermo.css', ['brandhouse'], brandhouse_asset_ver('/assets/css/schermo.css', true));
 }, 20);
 
 // Preload the two fonts used above the fold.
@@ -186,7 +186,7 @@ function schermo_category_image(WP_Term $cat): string
 
 add_action('wp_enqueue_scripts', static function (): void {
     if (is_front_page()) {
-        wp_enqueue_script('schermo-home', get_stylesheet_directory_uri() . '/assets/js/schermo.js', [], SCHERMO_VERSION, ['strategy' => 'defer', 'in_footer' => true]);
+        wp_enqueue_script('schermo-home', get_stylesheet_directory_uri() . '/assets/js/schermo.js', [], brandhouse_asset_ver('/assets/js/schermo.js', true), ['strategy' => 'defer', 'in_footer' => true]);
         wp_localize_script('schermo-home', 'schermoHero', array_map(static fn ($s) => ['name' => $s['name'], 'url' => $s['url'], 'price' => wp_strip_all_tags($s['price'])], schermo_hero_slides()));
     }
 }, 21);

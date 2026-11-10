@@ -35,10 +35,17 @@ add_action('after_setup_theme', static function (): void {
     ]);
 });
 
+/** Asset version from the file's contents, so every deploy that changes a file also changes its URL (no stale caches). */
+function brandhouse_asset_ver(string $rel, bool $child = false): string
+{
+    $f = ($child ? get_stylesheet_directory() : get_template_directory()) . $rel;
+    return is_readable($f) ? substr((string) md5_file($f), 0, 10) : BRANDHOUSE_VERSION;
+}
+
 add_action('wp_enqueue_scripts', static function (): void {
     $uri = get_template_directory_uri();
-    wp_enqueue_style('brandhouse', $uri . '/assets/css/base.css', [], BRANDHOUSE_VERSION);
-    wp_enqueue_script('brandhouse', $uri . '/assets/js/theme.js', [], BRANDHOUSE_VERSION, ['strategy' => 'defer', 'in_footer' => true]);
+    wp_enqueue_style('brandhouse', $uri . '/assets/css/base.css', [], brandhouse_asset_ver('/assets/css/base.css'));
+    wp_enqueue_script('brandhouse', $uri . '/assets/js/theme.js', [], brandhouse_asset_ver('/assets/js/theme.js'), ['strategy' => 'defer', 'in_footer' => true]);
     wp_localize_script('brandhouse', 'brandhouse', ['sizeAttribute' => 'attribute_pa_size', 'viewLabel' => __('View', 'brandhouse')]);
 });
 
