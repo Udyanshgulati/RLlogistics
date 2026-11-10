@@ -96,8 +96,10 @@ Importer rules (`docker/import-catalog.php`, runs on every deploy):
 - Existing SKU → **never overwritten** (admin edits are kept), except photos are replaced when that product's `image_version` goes up.
 - SKUs listed under `"removed"` → moved to trash. Removed so far: MI-007 helmet, MI-008 pads, MI-009 gloves, MI-028 medal.
 
-**Prices and stock are not set** — the owner/client must supply them (never invent). Fill via WP admin, or load the
-client sheet (below) with a small script into WooCommerce (match by SKU / variant SKU `MI-001-M`).
+- A product trashed in WP admin stays trashed (it is not re-created on the next deploy).
+
+**Prices and stock are not set** — the owner/client must supply them (never invent). They come from the client sheet
+(§5), loaded by `docker/import-sheet.php`.
 
 ---
 
@@ -111,13 +113,39 @@ Stock by size, Size chart, Store details & policies). Needed:
 4. Returns policy, delivery text, free-shipping minimum, COD yes/no, international countries.
 5. Business details (legal name, GSTIN, address, support contact) and brand story.
 
+### Loading the filled sheet (`docker/import-sheet.php`)
+1. Save the client's file over `commerce/storefront/catalog/client-sheets/Schermo_Product_Listing_Sheet.xlsx` (same name).
+2. Check it on a local copy first: `wp eval-file docker/import-sheet.php <sheet.xlsx> dry-run`. This prints every change,
+   the warnings and a "to do by hand" list, and saves nothing.
+3. Commit and push. On deploy, `setup.sh` loads the sheet once, and only when the file has changed (its sha256 is stored
+   in the `schermo_sheet_sha` option). The output is in `docker logs schermo-wordpress-1`.
+
+What it sets: price, sale price and MRP; stock per size (`MI-001-M`), barcode and low-stock level; Show on site
+(Publish / Keep hidden → draft / Remove → trash); short description; specifications (material, GSM, fit, care, colour,
+made in); HSN; GST rate (switches on WooCommerce tax, with prices including GST); packed weight and size; search
+keywords (tags); size guide; India shipping rate and free-shipping minimum; COD on/off; countries we sell to (EU expands
+to its member states); delivery and returns text; drop countdown; announcement bar; brand story.
+Rules: empty cells change nothing. Running it again changes nothing. A product with a price but no stock filled in gets
+stock 0 (it shows Sold out and can't be oversold). The whole run is one database transaction.
+Not covered (it prints these as "to do by hand"): international shipping rate (the sheet doesn't ask for one), COD
+fee, courier plugin, footer/contact details, full returns page.
+
+### Payments and shipping (ready, waiting on keys)
+- **Razorpay** (official plugin `woo-razorpay`, version and checksum pinned in the Dockerfile) is installed and active
+  but **switched off**. To go live: WooCommerce → Settings → Payments → Razorpay, paste the **test** Key ID/Secret,
+  tick Enable, then place a test order. Add the webhook in the Razorpay dashboard:
+  `https://schermo.thodalogic.com/wp-admin/admin-post.php?action=rzp_wc_webhook`. Then swap in the live keys.
+  Keys go only in WP admin.
+- **Shipping:** an "India" zone exists (`docker/store-setup.php`). Its rates come from the sheet. Other countries use
+  WooCommerce's "Rest of the world" zone, and a rate must be added there by hand.
+
 ---
 
 ## 6. Next steps (in order)
 
-1. When the sheet comes back: import prices + stock by SKU; set size chart, policies, free-shipping minimum.
-2. **Payments:** Razorpay in WooCommerce → Settings → Payments, **test keys first**, test an order, then live keys. Keys only in WP admin, never in git or chat.
-3. Shipping: WooCommerce shipping zones (India + international) and courier (Shiprocket/Delhivery/DHL — client to choose).
+1. When the sheet comes back: dry-run it locally, then commit it (see "Loading the filled sheet"). Work through the "to do by hand" list.
+2. **Payments:** enter the Razorpay **test keys** (from the owner directly) in WP admin, place a test order, then switch to live keys. Keys go only in WP admin, never in git or chat.
+3. Shipping: add the international rate and connect the courier (Shiprocket/Delhivery/DHL; the client chooses).
 4. Before public launch: Settings → Reading → allow search engines (currently blocked); remove leftover "Demo" products from Trash.
 5. Later (designed in `commerce/docs`, code in `commerce/core` + `commerce/hub`): central inventory ledger + OMS dashboard for all brands, WhatsApp/email notifications, Milan Icons and Significant Sports storefronts as more child themes of Brandhouse.
 

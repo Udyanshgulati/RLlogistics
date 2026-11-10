@@ -84,6 +84,11 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
             }
             continue;
         }
+        // A product the owner trashed in WP admin stays trashed (WooCommerce's SKU lookup ignores the trash).
+        global $wpdb;
+        if ($wpdb->get_var($wpdb->prepare("SELECT p.ID FROM {$wpdb->posts} p JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = '_sku' WHERE m.meta_value = %s AND p.post_type = 'product' AND p.post_status = 'trash' LIMIT 1", $p['sku']))) {
+            continue;
+        }
         $product = $p['sizes'] ? new WC_Product_Variable() : new WC_Product_Simple();
         $product->set_name($p['name']);
         $product->set_sku($p['sku']);

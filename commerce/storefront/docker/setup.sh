@@ -13,9 +13,11 @@ log "syncing themes and WooCommerce from image"
 mkdir -p wp-content/themes wp-content/plugins
 rm -rf wp-content/themes/brandhouse wp-content/themes/schermo
 cp -a /opt/schermo/themes/brandhouse /opt/schermo/themes/schermo wp-content/themes/
-if [ ! -d wp-content/plugins/woocommerce ] || ! cmp -s /opt/schermo/plugins/woocommerce/woocommerce.php wp-content/plugins/woocommerce/woocommerce.php; then
-  rm -rf wp-content/plugins/woocommerce && cp -a /opt/schermo/plugins/woocommerce wp-content/plugins/
-fi
+for p in woocommerce woo-razorpay; do
+  if [ ! -d "wp-content/plugins/$p" ] || ! cmp -s "/opt/schermo/plugins/$p/$p.php" "wp-content/plugins/$p/$p.php"; then
+    rm -rf "wp-content/plugins/$p" && cp -a "/opt/schermo/plugins/$p" wp-content/plugins/
+  fi
+done
 chown -R www-data:www-data wp-content
 
 : "${WP_URL:?WP_URL must be set}"
@@ -53,8 +55,16 @@ rm -f wp-content/cache/schermo-page/*.html
 wp option update woocommerce_default_customer_address base >/dev/null 2>&1 || true
 # One-time: whole-rupee prices (₹2,999 instead of ₹2,999.00).
 if [ "$(wp option get schermo_migr_decimals 2>/dev/null)" != "1" ]; then wp option update woocommerce_price_num_decimals 0 >/dev/null && wp option update schermo_migr_decimals 1 >/dev/null; fi
+wp plugin is-active woo-razorpay || wp plugin activate woo-razorpay
+wp eval-file /opt/schermo/store-setup.php
 log "importing catalog"
 wp eval-file /opt/schermo/import-catalog.php
+# The client's listing sheet: loaded only when the committed file changes (replace it in the repo and push).
+SHEET=/opt/schermo/catalog/client-sheets/Schermo_Product_Listing_Sheet.xlsx
+if [ -f "$SHEET" ] && [ "$(sha256sum "$SHEET" | cut -d' ' -f1)" != "$(wp option get schermo_sheet_sha 2>/dev/null)" ]; then
+  log "importing client sheet"
+  wp eval-file /opt/schermo/import-sheet.php "$SHEET" || log "client sheet import FAILED (site keeps running; see above)"
+fi
 chown -R www-data:www-data wp-content/uploads 2>/dev/null || true
 wp cache flush >/dev/null 2>&1 || true
 chown -R www-data:www-data wp-content/cache wp-content/mu-plugins wp-content/advanced-cache.php
