@@ -1094,3 +1094,5 @@ dialog.qa-sheet { width: min(440px, calc(100vw - 24px)); border-radius: var(--r-
 .sch-checkout .wc-block-components-text-input.is-active label, .sch-checkout .wc-block-components-text-input input:focus + label, .sch-checkout .wc-block-components-combobox .is-active label { top: 8px; transform: none; font-size: 11px; }
 .sch-checkout .wc-blocks-components-select__select { padding-top: 22px !important; }
 .sch-checkout .wc-block-components-text-input.is-active label, .sch-checkout .wc-block-components-combobox .is-active label { line-height: 1.1; }
+/* WooCommerce gives the select wrapper a white background that showed around the rounded corners on dark. */
+.wc-blocks-components-select__container { background: transparent !important; }
