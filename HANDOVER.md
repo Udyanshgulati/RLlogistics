@@ -236,3 +236,17 @@ Still to do:
 3. Data gaps: no colour attribute (no colour filter), no ratings/sales (no popularity sort), prices only for ~20 Milan
    Icons pieces, stock not counted. Add the new SC-/SA-/GC- SKUs to the client sheet so the client can price them.
 4. Owner questions: keep Glasgow Cosmic helmet & pads and gloves? Founders' names on the homepage OK? "Schermo Atelier" OK?
+
+## Update 11 Nov 2026 — launch readiness (TL Commerce Hub 1.5.0)
+
+- **Launch checklist** (TL Commerce Hub → Settings, and on Overview for managers) checks live what still blocks taking
+  real orders: payment method, SMTP email, GST invoice details, published policy pages, unpriced products, uncounted
+  stock, courier tracking links, backups, Google visibility.
+- **Tracking:** dispatch needs courier + AWB; "Order dispatched" customer email; timeline on My account; public
+  `/track-order/` page. Completed (= delivered) email reworded "has been delivered" + invoice link.
+- **GST invoices** (`includes/invoice.php`): numbered per FY when paid, CGST/SGST vs IGST from the GSTIN's state, HSN from
+  `_schermo_hsn`, rate from the `gst-N` tax class. **Credit notes** for refunds/cancellations. Hub fetches other stores'
+  invoices over the signed `tlhub/v1/invoice` route.
+- **Share previews:** `themes/brandhouse/inc/seo.php` (meta description + Open Graph), image `themes/schermo/assets/img/share.jpg`.
+- Tested end to end locally (phone checkout with COD enabled only in the local test copy → delivered → tracking → invoice →
+  refund/credit note; store → hub sync; remote invoice). Live crawl: no JS errors, no broken images, no mobile overflow.

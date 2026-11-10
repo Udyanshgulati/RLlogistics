@@ -163,6 +163,9 @@ function tli_page_overview(): void
         echo '</section>';
     }
     echo '</div><div class="tli-stack">';
+    if (current_user_can('tl_manage') && array_filter(tli_launch_items(), static fn ($i) => !$i[1])) {
+        tli_launch_card(true);
+    }
     if ($hub) {
         echo '<section class="tli-card"><div class="tli-card-head"><div><h2>Stores</h2><p>Connection health of every storefront.</p></div><a class="tli-btn sm ghost" href="' . esc_url(admin_url('admin.php?page=tl-stores')) . '">Manage</a></div><ul class="tli-moves">';
         printf('<li><div><b>%s</b><span class="small muted">This site · hub</span></div>%s</li>', esc_html(get_bloginfo('name')), tli_badge('Hub', 'info'));
@@ -455,6 +458,7 @@ function tli_page_settings(): void
         echo '<div class="notice notice-success"><p>Saved.</p></div>';
     }
     tli_head('Settings', 'How TL Commerce Hub works for this store.');
+    tli_launch_card();
     echo '<div class="tli-card"><form method="post">';
     wp_nonce_field('tli_settings');
     printf('<label class="tli-field"><span>Low stock level (pieces per size)</span><input class="tli-input" type="number" min="0" name="tli_low_stock" value="%d" style="max-width:120px"></label>', (int) get_option('tli_low_stock', 5));

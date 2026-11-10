@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TL Commerce Hub
  * Description: One central stock and order backend for several WooCommerce storefronts — inventory, stock movements, orders and fulfilment. By Thoda Logic.
- * Version: 1.4.0
+ * Version: 1.5.0
  * Author: Thoda Logic
  * Author URI: https://thodalogic.com
  * Requires PHP: 8.2
@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-const TLI_VERSION = '1.4.0';
+const TLI_VERSION = '1.5.0';
 const TLI_DB_VERSION = '5';
 define('TLI_DIR', __DIR__);
 define('TLI_URL', plugin_dir_url(__FILE__));
@@ -33,6 +33,7 @@ require_once TLI_DIR . '/includes/printing.php';
 require_once TLI_DIR . '/includes/purchasing.php';
 require_once TLI_DIR . '/includes/tracking.php';
 require_once TLI_DIR . '/includes/invoice.php';
+require_once TLI_DIR . '/includes/launch.php';
 
 register_activation_hook(__FILE__, 'tli_install');
 // Upgrades run on the first request after a deploy (front end or admin), not only when someone opens wp-admin.
