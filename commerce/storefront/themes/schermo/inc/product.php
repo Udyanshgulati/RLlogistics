@@ -63,3 +63,33 @@ add_filter('woocommerce_related_products', static function (array $related, int 
     $ids = array_values(array_unique(array_merge(array_intersect($coll_ids, $type_ids), $coll_ids, $related)));
     return array_slice($ids, 0, max(4, (int) ($args['limit'] ?? 4)));
 }, 10, 3);
+
+// Empty cart: WooCommerce's "New in store" block shows the newest products, which are mostly not on sale yet
+// ("Coming soon"). Show pieces that can be ordered now instead, with the store's own product cards.
+add_filter('render_block', static function (string $html, array $block): string {
+    if (($block['blockName'] ?? '') !== 'woocommerce/product-new' || !function_exists('schermo_home_available') || !is_cart()) {
+        return $html;
+    }
+    $ids = schermo_home_available(4);
+    if (!$ids) {
+        return '';
+    }
+    ob_start();
+    echo '<ul class="products columns-4 cart-suggest">';
+    foreach ($ids as $id) {
+        $GLOBALS['product'] = wc_get_product($id);
+        $GLOBALS['post'] = get_post($id);
+        setup_postdata($GLOBALS['post']);
+        wc_get_template_part('content', 'product');
+    }
+    wp_reset_postdata();
+    echo '</ul>';
+    return (string) ob_get_clean();
+}, 10, 2);
+// …and its heading says what the list really is.
+add_filter('render_block', static function (string $html, array $block): string {
+    if (($block['blockName'] ?? '') === 'core/heading' && is_cart() && str_contains($html, 'New in store')) {
+        return str_replace('New in store', esc_html__('Available to order now', 'schermo'), $html);
+    }
+    return $html;
+}, 10, 2);
