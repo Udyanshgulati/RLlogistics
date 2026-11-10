@@ -9,6 +9,9 @@ defined('ABSPATH') || exit;
 
 const SCHERMO_VERSION = '0.2.0';
 
+require_once __DIR__ . '/inc/shop-filters.php';
+require_once __DIR__ . '/inc/product.php';
+
 add_action('wp_enqueue_scripts', static function (): void {
     $uri = get_stylesheet_directory_uri();
     wp_enqueue_style('schermo', $uri . '/assets/css/schermo.css', ['brandhouse'], brandhouse_asset_ver('/assets/css/schermo.css', true));

@@ -74,7 +74,7 @@ $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['cr
   </section>
 
   <?php if ($collections): ?>
-  <section class="home-section container" aria-labelledby="coll-title">
+  <section class="home-section container" id="collections" aria-labelledby="coll-title">
     <div class="section-head"><h2 id="coll-title"><?php esc_html_e('Four collections. One language.', 'schermo'); ?></h2><a class="section-link" href="<?php echo esc_url($shop); ?>"><?php esc_html_e('View all', 'schermo'); ?><?php echo brandhouse_icon('arrow'); ?></a></div>
     <ul class="sb-colls">
       <?php foreach ($collections as $i => $c): ?>

@@ -35,7 +35,7 @@ add_action('woocommerce_before_main_content', static function (): void {
 }, 1);
 
 // Products the owner has not priced yet say so instead of showing nothing.
-$brandhouse_no_price = static fn (): string => '<span class="price-soon">' . esc_html__('Price coming soon', 'brandhouse') . '</span>';
+$brandhouse_no_price = static fn (): string => '<span class="price-soon">' . esc_html__('Coming soon', 'brandhouse') . '</span>';
 add_filter('woocommerce_empty_price_html', $brandhouse_no_price);
 add_filter('woocommerce_variable_empty_price_html', $brandhouse_no_price);
 add_filter('woocommerce_out_of_stock_message', static function (string $msg): string {
@@ -132,12 +132,12 @@ function brandhouse_product_details(): void
     $sections = [];
     $desc = $product->get_description();
     if ($desc !== '') {
-        $sections[] = [__('Details', 'brandhouse'), apply_filters('the_content', $desc), true];
+        echo '<div class="pdp-desc">' . apply_filters('the_content', $desc) . '</div>'; // phpcs:ignore -- post content
     }
     $attrs = array_filter($product->get_attributes(), static fn ($a) => $a->get_visible());
     if ($attrs || $product->get_sku()) {
-        ob_start();
-        echo '<dl class="spec">';
+        echo '<h2 class="pdp-sub">' . esc_html__('Specifications', 'brandhouse') . '</h2>';
+        echo '<dl class="spec pdp-spec">';
         if ($product->get_sku()) {
             echo '<dt>' . esc_html__('SKU', 'brandhouse') . '</dt><dd>' . esc_html($product->get_sku()) . '</dd>';
         }
@@ -145,7 +145,6 @@ function brandhouse_product_details(): void
             echo '<dt>' . esc_html(wc_attribute_label($a->get_name())) . '</dt><dd>' . esc_html(implode(', ', wc_get_product_terms($product->get_id(), $a->get_name(), ['fields' => 'names']) ?: $a->get_options())) . '</dd>';
         }
         echo '</dl>';
-        $sections[] = [__('Specifications', 'brandhouse'), (string) ob_get_clean(), false];
     }
     $sections[] = [__('Delivery', 'brandhouse'), wpautop(esc_html(brandhouse_mod('brandhouse_delivery_text', __('Ships from our warehouse in Delhi, India. Available express services, delivery estimates and any import charges are shown at checkout for your address.', 'brandhouse')))), false];
     $sections[] = [__('Returns', 'brandhouse'), wpautop(esc_html(brandhouse_mod('brandhouse_returns_text', __('Returns policy to be confirmed.', 'brandhouse')))), false];
@@ -168,20 +167,47 @@ function brandhouse_bag_count(): string
     return '<span class="bag-count' . ($n ? '' : ' is-empty') . '" aria-label="' . esc_attr(sprintf(_n('%d item in bag', '%d items in bag', $n, 'brandhouse'), $n)) . '">' . (int) $n . '</span>';
 }
 
-/** Shows a small label on product cards from real data only: sale, sold out, or new (published in the last 30 days). */
+/**
+ * One small card label, from real data only, in this order: Sold out (priced and out of stock), anything a child
+ * theme adds (e.g. Limited for a limited collection), Sale (a real sale price), New (published in the last 30 days —
+ * shown only while fewer than half of the catalogue is that new, otherwise every card would say it).
+ */
 function brandhouse_card_label(WC_Product $p): ?string
 {
-    if (!$p->is_in_stock()) {
+    if ($p->get_price() !== '' && !$p->is_in_stock()) {
         return __('Sold out', 'brandhouse');
+    }
+    $own = apply_filters('brandhouse_card_label', null, $p);
+    if ($own) {
+        return (string) $own;
     }
     if ($p->is_on_sale()) {
         return __('Sale', 'brandhouse');
     }
     $created = $p->get_date_created();
-    if ($created && $created->getTimestamp() > time() - 30 * DAY_IN_SECONDS) {
+    if ($created && $created->getTimestamp() > time() - 30 * DAY_IN_SECONDS && brandhouse_new_is_meaningful()) {
         return __('New', 'brandhouse');
     }
     return null;
+}
+
+function brandhouse_new_is_meaningful(): bool
+{
+    static $ok = null;
+    if ($ok === null) {
+        $all = (int) (wp_count_posts('product')->publish ?? 0);
+        $new = count(wc_get_products(['status' => 'publish', 'limit' => -1, 'return' => 'ids', 'date_created' => '>' . (time() - 30 * DAY_IN_SECONDS)]));
+        $ok = $all > 0 && $new * 2 < $all;
+    }
+    return $ok;
+}
+
+/** The quiet line above a card's name. Default: the product's first category; a child theme can refine it. */
+function brandhouse_card_context(WC_Product $p): string
+{
+    $terms = get_the_terms($p->get_id(), 'product_cat');
+    $default = $terms && !is_wp_error($terms) ? $terms[0]->name : '';
+    return (string) apply_filters('brandhouse_card_context', $default, $p);
 }
 
 /** Sizes in stock for a variable product, from WooCommerce's variation data (never hard-coded). */

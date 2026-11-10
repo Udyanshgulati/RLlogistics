@@ -145,20 +145,30 @@ if ($added > 0) {
 }
 echo "catalog: {$added} products added\n";
 
-// One-time menu order: the four collections first (as in the brand deck), then the categories. Runs once per
-// version, so menus rearranged later in WP admin stay as they are.
+// One-time menu (v3): Shop, the four product types, then "Collections" with the four collections under it.
+// Runs once per version, so menus edited later in WP admin (Appearance → Menus) stay as they are.
 $loc = get_nav_menu_locations();
-if (!empty($loc['primary']) && (int) get_option('schermo_menu_v') < 2) {
-    $order = ['Schermo Core', 'Schermo Atelier', 'Milan Icons', 'Glasgow Cosmic', 'Clothing', 'Sportswear', 'Accessories', 'Fan Merch'];
-    $items = wp_get_nav_menu_items($loc['primary']) ?: [];
-    usort($items, static function ($a, $b) use ($order) {
-        $ra = array_search($a->title, $order, true);
-        $rb = array_search($b->title, $order, true);
-        return [$ra === false ? 99 : $ra, $a->menu_order] <=> [$rb === false ? 99 : $rb, $b->menu_order];
-    });
-    foreach ($items as $n => $item) {
-        wp_update_post(['ID' => $item->ID, 'menu_order' => $n + 1]);
+if (!empty($loc['primary']) && (int) get_option('schermo_menu_v') < 3) {
+    $menu = (int) $loc['primary'];
+    foreach (wp_get_nav_menu_items($menu) ?: [] as $item) {
+        wp_delete_post($item->ID, true);
     }
-    update_option('schermo_menu_v', 2, false);
-    echo "catalog: menu ordered (collections first)\n";
+    $pos = 0;
+    $add = static function (array $a) use ($menu, &$pos): int {
+        return (int) wp_update_nav_menu_item($menu, 0, $a + ['menu-item-status' => 'publish', 'menu-item-position' => ++$pos]);
+    };
+    $add(['menu-item-title' => 'Shop', 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-object-id' => wc_get_page_id('shop')]);
+    foreach (['Clothing', 'Accessories', 'Sportswear', 'Fan Merch'] as $name) {
+        if ($t = get_term_by('name', $name, 'product_cat')) {
+            $add(['menu-item-type' => 'taxonomy', 'menu-item-object' => 'product_cat', 'menu-item-object-id' => $t->term_id]);
+        }
+    }
+    $parent = $add(['menu-item-title' => 'Collections', 'menu-item-type' => 'custom', 'menu-item-url' => home_url('/#collections')]);
+    foreach (['Schermo Core', 'Schermo Atelier', 'Milan Icons', 'Glasgow Cosmic'] as $name) {
+        if ($t = get_term_by('name', $name, 'product_cat')) {
+            $add(['menu-item-type' => 'taxonomy', 'menu-item-object' => 'product_cat', 'menu-item-object-id' => $t->term_id, 'menu-item-parent-id' => $parent]);
+        }
+    }
+    update_option('schermo_menu_v', 3, false);
+    echo "catalog: menu rebuilt (types + Collections)\n";
 }
