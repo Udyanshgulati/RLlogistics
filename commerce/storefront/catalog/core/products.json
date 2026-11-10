@@ -1,0 +1,633 @@
+{
+ "collection": "Schermo Core",
+ "collection_description": "Schermo Essentials. Oversized tees, baggy trousers, caps, backpacks and shorts with sport details: stripes, panels, numbers and stadium graphics.",
+ "note": "From the owner's deck. Prices and stock are not set until the owner provides them.",
+ "products": [
+  {
+   "sku": "SC-001",
+   "name": "No. 10 Stadium Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Oversized green tee with cream curved side panels, cream piping and an appliqué No. 10 on the chest. Schermo wordmark across the chest and a woven label at the collar.",
+   "images": [
+    "sc-no-10-stadium-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-002",
+   "name": "Rib Band Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Oversized maroon tee in a ribbed knit with a cream chest band, cream sleeve stripes and a Schermo patch.",
+   "images": [
+    "sc-rib-band-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-003",
+   "name": "Terrace Flags Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Washed red oversized tee with a print of supporters raising flags on the terraces.",
+   "images": [
+    "sc-terrace-flags-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-004",
+   "name": "Pitch Stripe Knit Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Oversized tee in cream and green vertical stripes with a cable-knit texture and a Schermo patch on the chest.",
+   "images": [
+    "sc-pitch-stripe-knit-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-005",
+   "name": "Velocity Panel Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Washed charcoal oversized tee with curved grey panels outlined in piping and a Schermo wordmark on the chest.",
+   "images": [
+    "sc-velocity-panel-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-006",
+   "name": "Curva Panel Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Oversized green tee with royal blue sleeves and curved cream panels, finished with a Schermo patch.",
+   "images": [
+    "sc-curva-panel-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-007",
+   "name": "Silver Foil Panel Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Metallic silver oversized tee with maroon side panels and a Schermo patch on the chest.",
+   "images": [
+    "sc-silver-foil-panel-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-008",
+   "name": "Floodlight Stadium Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Cream oversized tee with a green print of stadium stands and a floodlight tower, green collar and Schermo wordmark.",
+   "images": [
+    "sc-floodlight-stadium-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-009",
+   "name": "Lime Flame Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Lime oversized tee with a dark sleeve and a flame graphic across the shoulder. Schermo patch on the chest.",
+   "images": [
+    "sc-lime-flame-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-010",
+   "name": "Patchwork Block Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Oversized patchwork tee in maroon, green, rose and cream blocks with contrast stitching and a Schermo patch.",
+   "images": [
+    "sc-patchwork-block-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 9",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-011",
+   "name": "Contour Layer Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Forest green oversized tee with a cream layered hem and cuffs and a curved contour seam across the front.",
+   "images": [
+    "sc-contour-layer-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-012",
+   "name": "Plum Stitch Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Washed plum oversized tee with tonal stitched S-curves and a small Schermo wordmark.",
+   "images": [
+    "sc-plum-stitch-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-013",
+   "name": "Navy Stripe V-Neck Jersey",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Navy V-neck jersey with cream pinstripes, cream-trimmed collar and cuffs, and a Schermo wordmark.",
+   "images": [
+    "sc-navy-stripe-v-neck-jersey-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-014",
+   "name": "Charcoal Pocket Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Washed charcoal oversized tee with panelled seams and a flap chest pocket with a Schermo label.",
+   "images": [
+    "sc-charcoal-pocket-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-015",
+   "name": "Wave Colour-Block Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Oversized tee in cream, teal and navy with a sweeping wave seam and orange piping.",
+   "images": [
+    "sc-wave-colour-block-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-016",
+   "name": "Curva Track Trouser",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Baggy green track trouser with curved cream side panels, a drawstring waist and popper hems.",
+   "images": [
+    "sc-curva-track-trouser-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 10",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-017",
+   "name": "Maroon Cord Cargo",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Baggy maroon corduroy cargo trouser with large flap pockets and a D-ring.",
+   "images": [
+    "sc-maroon-cord-cargo-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 10",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-018",
+   "name": "Smoke Wash Panel Denim",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Baggy washed grey denim with angled panel seams.",
+   "images": [
+    "sc-smoke-wash-panel-denim-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 10",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-019",
+   "name": "Sand & Rose Panel Trouser",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Baggy sand trouser with rose curved panels, zip pockets and cuffed hems.",
+   "images": [
+    "sc-sand-and-rose-panel-trouser-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 10",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-020",
+   "name": "Blue Utility Cargo",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Baggy blue cargo trouser with strapped utility pockets and a Schermo label.",
+   "images": [
+    "sc-blue-utility-cargo-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 10",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-021",
+   "name": "Silver Foil Track Trouser",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Metallic silver baggy track trouser with maroon side stripes and cuffed hems.",
+   "images": [
+    "sc-silver-foil-track-trouser-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 10",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-022",
+   "name": "Heritage Stripe Track Trouser",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Baggy green ribbed track trouser with triple cream side stripes.",
+   "images": [
+    "sc-heritage-stripe-track-trouser-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 10",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-023",
+   "name": "Rose Wash Cargo Denim",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Baggy rose-washed denim with a cargo pocket and panel seams.",
+   "images": [
+    "sc-rose-wash-cargo-denim-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 10",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-024",
+   "name": "Teal Pleated Wide Trouser",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Wide teal trouser with front pleats, side adjusters and contrast piping down the leg.",
+   "images": [
+    "sc-teal-pleated-wide-trouser-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-025",
+   "name": "Brown Panel Denim",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Baggy washed brown denim with curved panel seams.",
+   "images": [
+    "sc-brown-panel-denim-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-026",
+   "name": "Indigo Barrel Denim",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Indigo barrel-leg denim with curved seams and a Schermo wordmark at the hip.",
+   "images": [
+    "sc-indigo-barrel-denim-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-027",
+   "name": "Black Barrel Cargo",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Black barrel-leg cargo trouser with a zip pocket and a Schermo wordmark at the hip.",
+   "images": [
+    "sc-black-barrel-cargo-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-028",
+   "name": "Racing Stripe Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Green six-panel cap with cream racing stripes over the crown and brim and a Schermo patch.",
+   "images": [
+    "sc-racing-stripe-cap-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 11",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-029",
+   "name": "Varsity S Trucker Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Maroon trucker cap with a cream varsity S, cream mesh back and contrast stitching on the brim.",
+   "images": [
+    "sc-varsity-s-trucker-cap-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 11",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-030",
+   "name": "Stadium Wash Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Washed black cap with a stadium and floodlight print across the brim and a Schermo patch.",
+   "images": [
+    "sc-stadium-wash-cap-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 11",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-031",
+   "name": "Wave Panel Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Cream cap with royal blue wave panels and a Schermo patch.",
+   "images": [
+    "sc-wave-panel-cap-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 11",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-032",
+   "name": "Lime Bungee Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Lime ripstop cap with a bungee cord detail and a Schermo patch.",
+   "images": [
+    "sc-lime-bungee-cap-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 11",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-033",
+   "name": "Silver Foil Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Metallic silver cap with a maroon side panel and a Schermo patch.",
+   "images": [
+    "sc-silver-foil-cap-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 11",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-034",
+   "name": "Washed Denim Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Washed blue denim cap with a stitched Schermo wordmark.",
+   "images": [
+    "sc-washed-denim-cap-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-035",
+   "name": "Corduroy Colour-Block Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Corduroy cap in green and cream panels with a burnt orange brim.",
+   "images": [
+    "sc-corduroy-colour-block-cap-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-036",
+   "name": "Sand Contour Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Sand cap with a brown brim and a stitched contour line across the crown.",
+   "images": [
+    "sc-sand-contour-cap-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 12",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-037",
+   "name": "Forest Roll-Top Backpack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Forest green roll-top backpack with a quilted wave front, gold piping, buckle closure and a Schermo label.",
+   "images": [
+    "sc-forest-roll-top-backpack-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 13",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-038",
+   "name": "Heritage Canvas Backpack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Cream canvas backpack with brown leather trims, flowing wave embroidery and a Schermo label.",
+   "images": [
+    "sc-heritage-canvas-backpack-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 13",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-039",
+   "name": "Shift Flap Backpack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black backpack with an asymmetric front flap, blue bungee lacing and a Schermo wordmark.",
+   "images": [
+    "sc-shift-flap-backpack-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 13",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-040",
+   "name": "Bordeaux Quilted Backpack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Burgundy backpack with quilted channels, a tonal S panel and a Schermo label.",
+   "images": [
+    "sc-bordeaux-quilted-backpack-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 13",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-041",
+   "name": "Olive Trail Backpack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Olive canvas backpack with a front utility pocket, bungee lacing and contour stitching.",
+   "images": [
+    "sc-olive-trail-backpack-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 14",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-042",
+   "name": "Navy Clip Backpack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Navy backpack with clip fastenings and a front pouch with blue wave stitching.",
+   "images": [
+    "sc-navy-clip-backpack-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 14",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-043",
+   "name": "Tan Buckle Rucksack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Brown rucksack with buckled flap pockets, contrast stitching and a Schermo label.",
+   "images": [
+    "sc-tan-buckle-rucksack-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 14",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-044",
+   "name": "Denim Panel Backpack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Navy backpack with a denim front panel, gold contour stitching and side pockets.",
+   "images": [
+    "sc-denim-panel-backpack-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 14",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-045",
+   "name": "Forest Cargo Shorts",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Forest green drawstring shorts with large curved cargo pockets and contrast stitching.",
+   "images": [
+    "sc-forest-cargo-shorts-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 16",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-046",
+   "name": "Fern Embroidered Denim Shorts",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Denim shorts with fern embroidery down one leg, a cream side panel and frayed hems.",
+   "images": [
+    "sc-fern-embroidered-denim-shorts-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 16",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-047",
+   "name": "Maroon Layer Shorts",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Maroon layered drawstring shorts with a mesh under-layer and cream piping.",
+   "images": [
+    "sc-maroon-layer-shorts-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 16",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-048",
+   "name": "Sand Scribble Cargo Shorts",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Sand cargo shorts with a flap pocket, panelled seams and a chenille scribble.",
+   "images": [
+    "sc-sand-scribble-cargo-shorts-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 16",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-049",
+   "name": "Black Panel Shorts",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Black textured shorts with grey insert panels, contrast stitching and a drawstring waist.",
+   "images": [
+    "sc-black-panel-shorts-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 17",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-050",
+   "name": "Slate Wave Knit Shorts",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Slate knit shorts with wave stitching, split hems and a cream inner layer.",
+   "images": [
+    "sc-slate-wave-knit-shorts-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 17",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-051",
+   "name": "Cocoa Pleated Shorts",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Brown pleated shorts with tonal wave stitching at the hem.",
+   "images": [
+    "sc-cocoa-pleated-shorts-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 17",
+   "image_version": 1
+  },
+  {
+   "sku": "SC-052",
+   "name": "Olive Strap Cargo Shorts",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Olive shorts with an apron cargo layer, buckle straps and contrast stitching.",
+   "images": [
+    "sc-olive-strap-cargo-shorts-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 17",
+   "image_version": 1
+  }
+ ],
+ "removed": [],
+ "image_version": 1
+}

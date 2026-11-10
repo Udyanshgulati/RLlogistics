@@ -94,6 +94,11 @@ Code map: `themes/brandhouse/inc/woocommerce.php` (shop/product behaviour), `inc
 Importer rules (`docker/import-catalog.php`, runs on every deploy):
 - New SKU → product created (apparel gets sizes S–XXXL as variations).
 - Existing SKU → **never overwritten** (admin edits are kept), except photos are replaced when that product's `image_version` goes up.
+- Collections (from the owner's deck *Schermo · The Art of Dressing*): `catalog/core` (Schermo Core, SC-xxx, 52),
+  `catalog/atelier` (Schermo Atelier = the deck's "Special Release", limited drops, SA-xxx, 12), `catalog/milan-icons`
+  (MI-xxx), `catalog/glasgow-cosmic` (GC-xxx, 27; the Blazer is left out on the owner's request). Product names were
+  written from each design; images were cut from the deck pages with background removal (a few Cosmic items use the
+  deck's lifestyle photo).
 - SKUs listed under `"removed"` → moved to trash. Removed so far: MI-007 helmet, MI-008 pads, MI-009 gloves, MI-028 medal.
 
 - A product trashed in WP admin stays trashed (it is not re-created on the next deploy).

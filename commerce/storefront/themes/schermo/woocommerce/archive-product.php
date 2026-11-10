@@ -1,7 +1,7 @@
 <?php
 /**
  * Schermo listing (shop, category, search): bento hero, one sticky glass toolbar, uniform product grid and a
- * Milan Icons row after the eighth product. Keeps WooCommerce's hooks so plugins still work.
+ * Schermo Atelier (limited drops) row after the eighth product. Keeps WooCommerce's hooks so plugins still work.
  */
 defined('ABSPATH') || exit;
 
@@ -24,9 +24,16 @@ $sizeUrl = static function (string $slug) use ($chosen): string {
 };
 $total = (int) wc_get_loop_prop('total');
 $title = woocommerce_page_title(false);
-$line = $current && $current->description !== '' ? wp_strip_all_tags($current->description) : __('Kits, travel wear and accessories — shipped from Delhi, India.', 'schermo');
+$line = $current && $current->description !== '' ? wp_strip_all_tags($current->description) : __('Core, Atelier, Milan Icons and Glasgow Cosmic. Shipped from Delhi, India.', 'schermo');
 $hero = get_stylesheet_directory_uri() . '/assets/img/hero/';
-$collection = get_term_by('slug', 'milan-icons', 'product_cat');
+$collection = get_term_by('slug', 'schermo-atelier', 'product_cat');
+// Header stack: one cut-out from each of three collections (the product's own first photo).
+$stack = [];
+foreach (['SC-016', 'SA-003', 'GC-001'] as $sku) {
+    $pid = wc_get_product_id_by_sku($sku);
+    $src = $pid ? wp_get_attachment_image_url((int) get_post_thumbnail_id($pid), 'large') : '';
+    $stack[] = $src ?: '';
+}
 ?>
 <section class="sx-hero container" aria-labelledby="sx-title">
   <div class="sx-panel">
@@ -38,9 +45,9 @@ $collection = get_term_by('slug', 'milan-icons', 'product_cat');
       <?php if ($total): ?><p class="sx-count"><span><?php echo (int) $total; ?></span><?php echo esc_html(_n('piece', 'pieces', $total, 'schermo')); ?></p><?php endif; ?>
     </div>
     <div class="sx-stack" aria-hidden="true">
-      <img class="sx-a" src="<?php echo esc_url($hero . 'practice-shorts.webp'); ?>" alt="">
-      <img class="sx-b" src="<?php echo esc_url($hero . 'playing-jersey.webp'); ?>" alt="">
-      <img class="sx-c" src="<?php echo esc_url($hero . 'practice-kit-sleeveless.webp'); ?>" alt="">
+      <img class="sx-a" src="<?php echo esc_url($stack[0] ?: $hero . 'practice-shorts.webp'); ?>" alt="">
+      <img class="sx-b" src="<?php echo esc_url($stack[1] ?: $hero . 'playing-jersey.webp'); ?>" alt="">
+      <img class="sx-c" src="<?php echo esc_url($stack[2] ?: $hero . 'practice-kit-sleeveless.webp'); ?>" alt="">
     </div>
   </div>
 </section>
@@ -79,13 +86,13 @@ if (woocommerce_product_loop()) {
         the_post();
         do_action('woocommerce_shop_loop');
         wc_get_template_part('content', 'product');
-        if (++$n === 8 && $collection && !is_wp_error($collection) && (!$current || $current->slug !== 'milan-icons')) {
+        if (++$n === 8 && $collection && !is_wp_error($collection) && (!$current || $current->slug !== 'schermo-atelier')) {
             ?>
             <li class="sx-promo">
               <a href="<?php echo esc_url(get_term_link($collection)); ?>">
-                <img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/img/milan-icons-crest.jpg'); ?>" alt="" loading="lazy">
-                <span class="sx-promo-copy"><span class="eyebrow"><?php esc_html_e('Collection', 'schermo'); ?></span><span class="sx-promo-title"><?php echo esc_html($collection->name); ?></span><span class="sx-promo-line">Play Beyond · Sempre Avanti</span></span>
-                <span class="btn gx-gold"><?php esc_html_e('Shop the collection', 'schermo'); ?><?php echo brandhouse_icon('arrow'); ?></span>
+                <?php if ($stack[1]): ?><img class="sx-promo-img" src="<?php echo esc_url($stack[1]); ?>" alt="" loading="lazy"><?php endif; ?>
+                <span class="sx-promo-copy"><span class="eyebrow"><?php esc_html_e('Limited drops', 'schermo'); ?></span><span class="sx-promo-title"><?php echo esc_html($collection->name); ?></span><span class="sx-promo-line"><?php esc_html_e('Limited pieces. Made to be noticed.', 'schermo'); ?></span></span>
+                <span class="btn gx-gold"><?php esc_html_e('Shop the drop', 'schermo'); ?><?php echo brandhouse_icon('arrow'); ?></span>
               </a>
             </li>
             <?php

@@ -448,3 +448,73 @@ input[type=text], input[type=email], input[type=search], input[type=tel], input[
 .site-header .tools { grid-column: 4; grid-row: 1; }
 .logo-header .logo-svg { width: 140px; }
 @media (min-width: 1501px) { .site-header .bar { grid-template-columns: 0 auto 1fr auto; column-gap: 0; } .site-header .nav-primary { padding: 0 24px; } }
+
+/* ── Homepage v5: Schermo leads; four collections from the brand deck ─────────── */
+.sb-brand { padding-top: clamp(64px, 9vw, 120px); }
+.sb-display { font: 700 clamp(30px, 5.4vw, 76px)/1.02 var(--font-display); letter-spacing: -.01em; margin: 14px 0 clamp(32px, 5vw, 64px); max-width: 16ch; text-wrap: balance; }
+.sb-display span { color: var(--muted); }
+.sb-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(18px, 3vw, 40px); padding-top: 22px; border-top: 1px solid var(--line-strong); }
+.sb-cols p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
+
+.sb-colls { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.sb-coll a { position: relative; display: grid; grid-template-rows: auto 1fr; height: 100%; border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--line); background: #141210; transition: transform .5s var(--ease), box-shadow .5s var(--ease); }
+.sb-coll a:hover { transform: translateY(-3px); box-shadow: 0 18px 60px -14px rgba(0, 0, 0, .8); }
+.sb-cosmic a { background: radial-gradient(80% 60% at 50% 30%, #1b2b6b, #0b1230 70%); border-color: rgba(64, 112, 255, .35); }
+.sb-icons a { background: radial-gradient(80% 60% at 50% 30%, #2a2212, #0e0d0b 70%); border-color: rgba(201, 162, 74, .3); }
+.sb-atelier a { background: radial-gradient(80% 60% at 50% 30%, #3a1016, #120a0b 70%); border-color: rgba(142, 15, 29, .45); }
+.sb-num { position: absolute; left: 16px; top: 14px; z-index: 2; font: 500 11px/1 var(--font-label); letter-spacing: .2em; color: rgba(255, 255, 255, .55); }
+.sb-media { display: block; aspect-ratio: 4 / 5; }
+.sb-media img, .sb-media .ph { width: 100%; height: 100%; object-fit: contain; padding: 12% 8% 4%; background: transparent; transition: transform .7s var(--ease); }
+.sb-coll a:hover .sb-media img { transform: scale(1.04); }
+.sb-copy { display: grid; align-content: start; gap: 6px; padding: 4px 18px 20px; }
+.sb-name { font: 700 clamp(18px, 1.8vw, 26px)/1.1 var(--font-display); color: #fff; }
+.sb-sub { font: 600 10px/1.3 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; color: rgba(255, 255, 255, .7); }
+.sb-line { font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, .6); }
+.sb-count { display: inline-flex; gap: 8px; align-items: center; margin-top: 8px; font: 700 10px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; color: #fff; }
+.sb-count .i { width: 14px; height: 14px; }
+
+.sb-ways { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.sb-ways li { position: relative; padding: clamp(22px, 3vw, 34px); padding-top: clamp(90px, 9vw, 130px); border-radius: var(--r-md); }
+.sb-ghost { position: absolute; left: clamp(22px, 3vw, 34px); top: 22px; font: 700 clamp(44px, 5vw, 72px)/1 var(--font-display); color: transparent; -webkit-text-stroke: 1px var(--line-strong); }
+.sb-ways h3 { margin: 0 0 10px; font: 700 clamp(16px, 1.6vw, 22px)/1.15 var(--font-display); }
+.sb-ways p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+.sb-teams { display: grid; grid-template-columns: 1fr auto; gap: clamp(24px, 4vw, 64px); align-items: center; padding: clamp(24px, 4vw, 56px); border-radius: var(--r-lg); border: 1px solid var(--line); background: radial-gradient(60% 120% at 100% 50%, rgba(201, 162, 74, .12), transparent 60%), radial-gradient(50% 100% at 70% 100%, rgba(64, 112, 255, .14), transparent 60%), #0f0e0d; }
+.sb-teams h2 { font: 700 clamp(26px, 4vw, 56px)/1.04 var(--font-display); margin: 12px 0 16px; max-width: 14ch; }
+.sb-teams p { color: var(--muted); max-width: 44ch; margin: 0; }
+.sb-crests { list-style: none; margin: 0; padding: 0; display: flex; gap: clamp(12px, 2vw, 28px); }
+.sb-crests a { display: grid; justify-items: center; gap: 14px; }
+.sb-crests img { width: clamp(120px, 14vw, 200px); aspect-ratio: 1; object-fit: contain; transition: transform .5s var(--ease); }
+.sb-crests a:hover img { transform: translateY(-4px) scale(1.03); }
+.sb-crests span { display: inline-flex; gap: 8px; align-items: center; font: 700 10px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; }
+.sb-crests .i { width: 14px; height: 14px; }
+
+.sb-journey { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(18px, 3vw, 40px); }
+.sb-journey li { position: relative; padding-top: 34px; border-top: 1px solid var(--line-strong); }
+.sb-journey li::before { content: ""; position: absolute; left: 0; top: -6px; width: 11px; height: 11px; border-radius: 50%; background: var(--ink); }
+.sb-journey li.is-next::before { background: var(--bg); border: 1px solid var(--ink); }
+.sb-year { display: block; font: 700 clamp(30px, 4vw, 52px)/1 var(--font-display); margin-bottom: 14px; }
+.sb-journey strong { display: block; margin-bottom: 8px; }
+.sb-journey p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+.sb-phil { margin: 0 0 8px; font: 700 clamp(18px, 2.2vw, 30px)/1.25 var(--font-display); }
+.sb-phil span { color: var(--muted); }
+.story-copy .gx-soft { margin-top: 20px; }
+
+/* Shop: the Atelier (limited drops) promo row in maroon instead of gold. */
+.sx-promo a { border-color: rgba(196, 29, 51, .4); background: radial-gradient(60% 140% at 0% 50%, rgba(196, 29, 51, .28), transparent 60%), #120a0b; }
+.sx-promo a:hover { box-shadow: 0 0 40px -8px var(--red-glow); }
+.sx-promo-img { object-fit: contain; background: radial-gradient(70% 60% at 50% 42%, #f6f6f3, #e6e6e2); aspect-ratio: 4 / 5; }
+.sx-promo-title { background: none; color: #fff; }
+.sx-promo-line { color: rgba(255, 255, 255, .7); }
+.sx-promo .gx-gold { background: var(--red); color: #fff; box-shadow: 0 10px 30px -8px var(--red-glow); }
+.sx-promo .gx-gold:hover { background: transparent; color: #fff; border-color: #fff; }
+
+@media (max-width: 900px) {
+  .sb-colls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sb-cols, .sb-ways, .sb-journey { grid-template-columns: 1fr; }
+  .sb-teams { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .sb-crests img { width: 120px; }
+}
