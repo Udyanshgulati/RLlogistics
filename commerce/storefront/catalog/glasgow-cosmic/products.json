@@ -339,6 +339,8 @@
    "image_version": 1
   }
  ],
- "removed": [],
+ "removed": [
+  "GC-027"
+ ],
  "image_version": 1
 }

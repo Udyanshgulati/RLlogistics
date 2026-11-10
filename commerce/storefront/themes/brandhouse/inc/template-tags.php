@@ -48,3 +48,11 @@ function brandhouse_icon(string $name): string
     $paths = (array) apply_filters('brandhouse_icon_paths', $paths);
     return '<svg class="i i-' . esc_attr($name) . '" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' . ($paths[$name] ?? '') . '</svg>';
 }
+
+/** Menu items with a submenu get a real button to open it (keyboard and touch), next to their link. */
+add_filter('walker_nav_menu_start_el', static function (string $html, $item, int $depth, $args): string {
+    if ($depth === 0 && in_array('menu-item-has-children', (array) $item->classes, true)) {
+        $html .= '<button type="button" class="sub-toggle" aria-expanded="false" aria-label="' . esc_attr(sprintf(__('Show %s', 'brandhouse'), wp_strip_all_tags($item->title))) . '"><span aria-hidden="true"></span></button>';
+    }
+    return $html;
+}, 10, 4);

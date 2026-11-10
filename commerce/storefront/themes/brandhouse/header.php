@@ -15,7 +15,7 @@
   <div class="bar">
     <button class="icon-btn menu-toggle" type="button" aria-controls="drawer-menu" aria-expanded="false" data-menu-open><?php echo brandhouse_icon('menu'); ?><span class="sr-only"><?php esc_html_e('Menu', 'brandhouse'); ?></span></button>
     <nav class="nav-primary" aria-label="<?php esc_attr_e('Main', 'brandhouse'); ?>">
-      <?php wp_nav_menu(['theme_location' => 'primary', 'container' => false, 'depth' => 1, 'fallback_cb' => 'brandhouse_menu_fallback']); ?>
+      <?php wp_nav_menu(['theme_location' => 'primary', 'container' => false, 'depth' => 2, 'fallback_cb' => 'brandhouse_menu_fallback']); ?>
     </nav>
     <div class="brand"><?php brandhouse_logo(); ?></div>
     <div class="tools">
@@ -38,7 +38,7 @@
 </header>
 <dialog class="drawer-menu" id="drawer-menu" aria-label="<?php esc_attr_e('Menu', 'brandhouse'); ?>">
   <div class="drawer-head"><?php brandhouse_logo('drawer'); ?><button class="icon-btn" type="button" data-dialog-close><?php echo brandhouse_icon('close'); ?><span class="sr-only"><?php esc_html_e('Close menu', 'brandhouse'); ?></span></button></div>
-  <nav aria-label="<?php esc_attr_e('Main', 'brandhouse'); ?>"><?php wp_nav_menu(['theme_location' => 'primary', 'container' => false, 'depth' => 1, 'fallback_cb' => 'brandhouse_menu_fallback']); ?></nav>
+  <nav aria-label="<?php esc_attr_e('Main', 'brandhouse'); ?>"><?php wp_nav_menu(['theme_location' => 'primary', 'container' => false, 'depth' => 2, 'fallback_cb' => 'brandhouse_menu_fallback']); ?></nav>
   <?php if (function_exists('brandhouse_market_button')) echo brandhouse_market_button('drawer-market'); ?>
   <?php if (class_exists('WooCommerce')): ?><a class="drawer-link" href="<?php echo esc_url(wc_get_page_permalink('myaccount')); ?>"><?php esc_html_e('Account', 'brandhouse'); ?></a><?php endif; ?>
 </dialog>

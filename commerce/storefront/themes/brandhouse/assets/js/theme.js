@@ -9,6 +9,27 @@
   $$('[data-menu-open]').forEach((b) => b.addEventListener('click', () => { drawer.showModal(); b.setAttribute('aria-expanded', 'true'); }));
   if (drawer) drawer.addEventListener('close', () => $$('[data-menu-open]').forEach((b) => b.setAttribute('aria-expanded', 'false')));
 
+  // Submenus (e.g. Collections): the toggle button opens/closes; outside click and Escape close them.
+  const closeSubs = (except) => $$('.menu-item-has-children.is-open').forEach((li) => {
+    if (li === except || li.closest('#drawer-menu')) return;
+    li.classList.remove('is-open');
+    const t = $('.sub-toggle', li); if (t) t.setAttribute('aria-expanded', 'false');
+  });
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('.sub-toggle');
+    if (t) {
+      const li = t.closest('li'); const open = !li.classList.contains('is-open');
+      closeSubs(li); li.classList.toggle('is-open', open); t.setAttribute('aria-expanded', String(open));
+      return;
+    }
+    if (!e.target.closest('.nav-primary .menu-item-has-children')) closeSubs();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSubs(); });
+  // In the phone drawer, the section holding the current page starts open.
+  $$('#drawer-menu .current-menu-ancestor, #drawer-menu .current-menu-parent').forEach((li) => {
+    li.classList.add('is-open'); const t = $('.sub-toggle', li); if (t) t.setAttribute('aria-expanded', 'true');
+  });
+
   // Dialogs: [data-dialog="id"] opens, [data-dialog-close] / backdrop click closes.
   document.addEventListener('click', (e) => {
     const open = e.target.closest('[data-dialog]');

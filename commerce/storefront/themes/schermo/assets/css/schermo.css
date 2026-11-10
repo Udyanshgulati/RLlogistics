@@ -447,7 +447,7 @@ input[type=text], input[type=email], input[type=search], input[type=tel], input[
 .site-header .nav-primary { grid-column: 3; grid-row: 1; justify-self: center; }
 .site-header .tools { grid-column: 4; grid-row: 1; }
 .logo-header .logo-svg { width: 140px; }
-@media (min-width: 1501px) { .site-header .bar { grid-template-columns: 0 auto 1fr auto; column-gap: 0; } .site-header .nav-primary { padding: 0 24px; } }
+@media (min-width: 1101px) { .site-header .bar { grid-template-columns: 0 auto 1fr auto; column-gap: 0; } .site-header .nav-primary { padding: 0 24px; } }
 
 /* ── Homepage v5: Schermo leads; four collections from the brand deck ─────────── */
 .sb-brand { padding-top: clamp(64px, 9vw, 120px); }
@@ -534,4 +534,101 @@ input[type=text], input[type=email], input[type=search], input[type=tel], input[
   .sx-sizes { overflow-x: auto; scrollbar-width: none; max-width: 100%; }
   .sx-bar .woocommerce-ordering { margin-left: 0; width: 100%; }
   .sx-bar .woocommerce-ordering select { width: 100%; }
+}
+
+/* ── Navigation v3: Shop · types · Collections ▾ ──────────────────────────────── */
+.nav-primary ul { align-items: center; }
+.nav-primary li { position: relative; display: flex; align-items: center; gap: 2px; }
+.nav-primary .current-menu-item > a, .nav-primary .current-menu-ancestor > a, .nav-primary .current-menu-parent > a { border-color: var(--ink); }
+.nav-primary .sub-menu .current-menu-item > a { border-color: transparent; background: var(--glass-strong); }
+.sub-toggle { width: 26px; height: 26px; display: inline-grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; }
+.sub-toggle span { width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .2s var(--ease); }
+.is-open > .sub-toggle span { transform: translateY(2px) rotate(-135deg); }
+.sub-toggle:hover { background: var(--glass-strong); }
+.nav-primary .sub-menu { position: absolute; top: calc(100% + 12px); left: -14px; z-index: 50; display: none; flex-direction: column; align-items: stretch; gap: 2px; min-width: 230px; padding: 8px; border-radius: var(--r-md); background: rgba(14, 14, 16, .97); border: 1px solid var(--glass-line); box-shadow: 0 24px 60px -16px rgba(0, 0, 0, .8); }
+.nav-primary .sub-menu::before { content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 14px; }
+.nav-primary .sub-menu a { display: block; padding: 12px 14px; border: 0; border-radius: 10px; }
+.nav-primary .sub-menu a:hover, .nav-primary .sub-menu a:focus-visible { background: var(--glass-strong); }
+@media (hover: hover) { .nav-primary li:hover > .sub-menu { display: flex; } }
+.nav-primary li:focus-within > .sub-menu, .nav-primary li.is-open > .sub-menu { display: flex; }
+/* Phone drawer: Collections is an expandable section; the current page is marked. */
+.drawer-menu li { position: relative; }
+.drawer-menu li.menu-item-has-children > a { padding-right: 56px; }
+.drawer-menu .sub-toggle { position: absolute; right: 0; top: 4px; width: 44px; height: 44px; }
+.drawer-menu .sub-menu { display: none; padding: 0 0 6px 14px; }
+.drawer-menu li.is-open > .sub-menu { display: block; }
+.drawer-menu .sub-menu a { font-size: 12px; color: var(--muted); }
+.drawer-menu .current-menu-item > a { color: var(--ink); box-shadow: inset 3px 0 0 var(--red); padding-left: 12px; }
+
+/* ── Shop v3: type pills; Filters button, chips, sorting; quiet collection links ─ */
+.sx-kicker { margin: 10px 0 -4px; }
+.sx-colls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 14px; font: 600 11px/1.2 var(--font-label); letter-spacing: .08em; }
+.sx-colls span { color: var(--muted); text-transform: uppercase; letter-spacing: var(--label-tracking); font-size: 10px; }
+.sx-colls a { color: var(--ink-2, var(--ink)); padding: 6px 0; border-bottom: 1px solid transparent; }
+.sx-colls a:hover, .sx-colls a.is-on { border-color: var(--ink); color: var(--ink); }
+.sx-tools { align-items: center; justify-content: flex-start; flex-wrap: wrap; }
+.sx-filter-btn { display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-strong); background: transparent; color: var(--ink); font: 700 10px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; cursor: pointer; }
+.sx-filter-btn:hover { border-color: var(--ink); }
+.sx-filter-ico { width: 14px; height: 10px; background: linear-gradient(currentColor, currentColor) 0 0 / 100% 1.5px, linear-gradient(currentColor, currentColor) 2px 50% / 10px 1.5px, linear-gradient(currentColor, currentColor) 4px 100% / 6px 1.5px; background-repeat: no-repeat; }
+.sx-filter-n { min-width: 20px; height: 20px; padding: 0 6px; display: inline-grid; place-items: center; border-radius: 999px; background: var(--red); color: #fff; font-size: 10px; letter-spacing: 0; }
+.sx-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; flex: 1; }
+.sx-chip { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px 0 12px; border-radius: 999px; background: var(--glass-strong); font: 600 11px/1 var(--font-label); }
+.sx-chip span { width: 18px; height: 18px; display: inline-grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .12); font-size: 13px; }
+.sx-chip:hover span { background: var(--red); }
+.sx-clear-all { font: 700 10px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--muted); padding: 8px 4px; border-bottom: 1px solid transparent; }
+.sx-clear-all:hover { color: var(--ink); border-color: var(--ink); }
+/* Filter drawer: a right-hand panel on desktop, full-height sheet on phones. */
+dialog.sx-sheet { margin: 0 0 0 auto; width: min(420px, 100vw); height: 100%; max-height: 100%; background: #111113; color: var(--ink); border-left: 1px solid var(--glass-line); }
+dialog.sx-sheet[open] { animation: sx-slide .25s var(--ease); }
+@keyframes sx-slide { from { transform: translateX(24px); opacity: 0; } }
+.sx-form { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
+.sx-sheet .sheet-body { overflow-y: auto; display: grid; align-content: start; gap: 26px; }
+.sx-field { margin: 0; padding: 0; border: 0; display: grid; gap: 8px; }
+.sx-field legend { margin-bottom: 10px; font: 700 11px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; }
+.sx-field legend small { font-weight: 500; color: var(--muted); letter-spacing: .04em; text-transform: none; margin-left: 6px; }
+.sx-opt { display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); cursor: pointer; font-size: 14px; }
+.sx-opt:hover { border-color: var(--line-strong); }
+.sx-opt input { width: 18px; height: 18px; accent-color: var(--red); margin: 0; }
+.sx-opt:has(input:checked) { border-color: var(--ink); background: var(--glass); }
+.sx-size-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.sx-size-opt { position: relative; }
+.sx-size-opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.sx-size-opt span { display: grid; place-items: center; height: 44px; border-radius: 12px; border: 1px solid var(--line-strong); font: 600 12px/1 var(--font-label); }
+.sx-size-opt input:checked + span { background: var(--red); border-color: var(--red); color: #fff; }
+.sx-size-opt input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
+.sx-price { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sx-price label { display: grid; gap: 6px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+.sx-price input { height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line-strong); background: transparent; color: var(--ink); font-size: 15px; }
+.sx-note { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+.sx-sheet-foot { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; padding: 16px 24px 24px; border-top: 1px solid var(--line); }
+.sx-sheet-foot .btn { justify-content: center; }
+
+/* ── Cards v5: one link per card, clear focus, restrained "Coming soon" ─────── */
+.card { position: relative; }
+.card-link::after { content: ""; position: absolute; inset: 0; z-index: 4; border-radius: var(--r-md); }
+.card-link:focus-visible { outline: none; }
+.card:has(.card-link:focus-visible) .card-media { outline: 2px solid var(--ink); outline-offset: 3px; }
+.card .card-title a:hover { text-decoration: none; }
+.card:hover .card-title a { text-decoration: underline; text-underline-offset: 3px; }
+.card-cat { font-weight: 600; color: var(--muted); }
+.price-soon { color: var(--muted); font-size: 13px; letter-spacing: .02em; }
+.card .tag { z-index: 3; }
+
+/* ── Product page v2: context above the title; description and specs visible ── */
+.pdp-context { margin: 0 0 10px; }
+.pdp-context a { border-bottom: 1px solid transparent; }
+.pdp-context a:hover { border-color: currentColor; }
+.pdp-limited { display: inline-block; margin: 0 0 12px; padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(196, 29, 51, .6); color: #ff8a98; font: 700 9px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; }
+.pdp-desc { margin: 26px 0 0; padding-top: 22px; border-top: 1px solid var(--line); color: var(--ink-2, var(--ink)); font-size: 15px; line-height: 1.65; }
+.pdp-desc p { margin: 0 0 10px; }
+.pdp-sub { margin: 22px 0 12px; font: 700 11px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; }
+.pdp-spec { font-size: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.pdp-spec + .accordions, .pdp-desc + .accordions { margin-top: 6px; }
+
+@media (max-width: 640px) {
+  .sx-tools { gap: 10px; }
+  .sx-chips { order: 3; flex-basis: 100%; }
+  .sx-bar .woocommerce-ordering { width: auto; flex: 1; }
+  dialog.sx-sheet { width: 100vw; border-left: 0; }
+  .sx-size-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
