@@ -12,6 +12,14 @@ services:
       - WP_ADMIN_PASSWORD=${SERVICE_PASSWORD_WPADMIN}
       - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL:?Set WP_ADMIN_EMAIL in Coolify}
       - SEED_DEMO=${SEED_DEMO:-1}
+      # Outgoing email (order emails, stock alerts, password resets). Set these in the server's env file.
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_SECURE=${SMTP_SECURE:-tls}
+      - SMTP_FROM=${SMTP_FROM:-}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME:-Schermo}
       - WORDPRESS_DB_HOST=mariadb
       - WORDPRESS_DB_NAME=wordpress
       - WORDPRESS_DB_USER=${SERVICE_USER_MARIADB}
@@ -21,6 +29,7 @@ services:
       - "127.0.0.1:${HOST_PORT:-8095}:80"
     volumes:
       - wordpress-files:/var/www/html
+      - backups:/backups
     depends_on:
       mariadb:
         condition: service_healthy
@@ -47,5 +56,6 @@ services:
       retries: 10
 
 volumes:
+  backups:
   wordpress-files:
   mariadb-data:

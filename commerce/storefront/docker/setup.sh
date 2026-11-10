@@ -52,7 +52,7 @@ else
 fi
 log "installing page cache"
 cp /opt/schermo/advanced-cache.php wp-content/advanced-cache.php
-mkdir -p wp-content/mu-plugins wp-content/cache/schermo-page && cp /opt/schermo/schermo-cache.php wp-content/mu-plugins/schermo-cache.php
+mkdir -p wp-content/mu-plugins wp-content/cache/schermo-page && cp /opt/schermo/schermo-cache.php /opt/schermo/schermo-mail.php wp-content/mu-plugins/
 rm -f wp-content/cache/schermo-page/*.html
 wp option update woocommerce_default_customer_address base >/dev/null 2>&1 || true
 # One-time: whole-rupee prices (₹2,999 instead of ₹2,999.00).
@@ -60,6 +60,8 @@ if [ "$(wp option get schermo_migr_decimals 2>/dev/null)" != "1" ]; then wp opti
 wp plugin is-active woo-razorpay || wp plugin activate woo-razorpay
 wp plugin is-active tl-commerce-hub || wp plugin activate tl-commerce-hub
 wp eval-file /opt/schermo/store-setup.php
+log "store pages and email branding"
+wp eval-file /opt/schermo/store-pages.php || log "store pages FAILED (site keeps running)"
 log "importing catalog"
 wp eval-file /opt/schermo/import-catalog.php
 # The client's listing sheet: loaded only when the committed file changes (replace it in the repo and push).

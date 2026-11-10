@@ -128,7 +128,7 @@ add_action('rest_api_init', static function (): void {
 /** The warehouse moves a remote order to its next stage; the storefront is told straight away. */
 add_action('admin_post_tli_remote_next', static function (): void {
     global $wpdb;
-    if (!current_user_can('edit_shop_orders')) {
+    if (!current_user_can('tl_fulfil')) {
         wp_die('Not allowed.', 403);
     }
     $id = absint($_POST['remote'] ?? 0);
@@ -157,7 +157,7 @@ add_action('admin_post_tli_remote_next', static function (): void {
 /* Stores screen (hub mode). */
 add_action('admin_post_tli_add_store', static function (): void {
     global $wpdb;
-    if (!current_user_can('manage_woocommerce')) {
+    if (!current_user_can('tl_manage')) {
         wp_die('Not allowed.', 403);
     }
     check_admin_referer('tli_add_store');
@@ -176,7 +176,7 @@ add_action('admin_post_tli_add_store', static function (): void {
 });
 add_action('admin_post_tli_store_toggle', static function (): void {
     global $wpdb;
-    if (!current_user_can('manage_woocommerce')) {
+    if (!current_user_can('tl_manage')) {
         wp_die('Not allowed.', 403);
     }
     $id = sanitize_text_field(wp_unslash($_POST['store'] ?? ''));

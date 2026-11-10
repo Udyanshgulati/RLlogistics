@@ -119,3 +119,6 @@
 .tli-store-fields { max-width: 520px; }
 .tli-btn:disabled { opacity: .45; cursor: not-allowed; }
 .tli-moves li > div { display: grid; gap: 1px; } .tli-moves li > div > b { font-size: 13.5px; }
+.tli-steps { display: flex; gap: 6px; flex-wrap: wrap; } .tli-steps form { margin: 0; }
+.tli-return-form .tli-inline { margin-bottom: 4px; }
+.tli-table td .muted.small { display: block; }

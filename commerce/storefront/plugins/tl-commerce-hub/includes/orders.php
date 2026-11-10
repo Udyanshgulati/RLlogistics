@@ -43,7 +43,7 @@ function tli_stage(WC_Order $o): array
 }
 
 add_action('admin_post_tli_next_stage', static function (): void {
-    if (!current_user_can('edit_shop_orders')) {
+    if (!current_user_can('tl_fulfil')) {
         wp_die('Not allowed.', 403);
     }
     $id = absint($_POST['order_id'] ?? 0);

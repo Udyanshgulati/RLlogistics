@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TL Commerce Hub
  * Description: One central stock and order backend for several WooCommerce storefronts — inventory, stock movements, orders and fulfilment. By Thoda Logic.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Thoda Logic
  * Author URI: https://thodalogic.com
  * Requires PHP: 8.2
@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-const TLI_VERSION = '1.1.0';
-const TLI_DB_VERSION = '2';
+const TLI_VERSION = '1.2.0';
+const TLI_DB_VERSION = '3';
 define('TLI_DIR', __DIR__);
 define('TLI_URL', plugin_dir_url(__FILE__));
 
@@ -26,6 +26,9 @@ require_once TLI_DIR . '/includes/branding.php';
 require_once TLI_DIR . '/includes/sync.php';
 require_once TLI_DIR . '/includes/hub.php';
 require_once TLI_DIR . '/includes/store.php';
+require_once TLI_DIR . '/includes/roles.php';
+require_once TLI_DIR . '/includes/returns.php';
+require_once TLI_DIR . '/includes/alerts.php';
 
 register_activation_hook(__FILE__, 'tli_install');
 add_action('admin_init', static function (): void {
@@ -87,6 +90,8 @@ function tli_install(): void
         UNIQUE KEY store_remote (store_id, remote_id),
         KEY status (status)
     ) {$wpdb->get_charset_collate()};");
+    tli_install_returns();
+    tli_install_roles();
     update_option('tli_db_version', TLI_DB_VERSION);
     add_option('tli_mode', 'hub');
     add_option('tli_low_stock', 5);

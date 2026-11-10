@@ -6,17 +6,18 @@ declare(strict_types=1);
 defined('ABSPATH') || exit;
 
 add_action('admin_menu', static function (): void {
-    $cap = 'manage_woocommerce';
+    $cap = 'tl_view';
     add_menu_page('TL Commerce Hub', 'TL Commerce Hub', $cap, 'tl-inventory', 'tli_page_overview', 'data:image/svg+xml;base64,' . base64_encode(tli_menu_icon()), 3);
     add_submenu_page('tl-inventory', 'Overview', 'Overview', $cap, 'tl-inventory', 'tli_page_overview');
     add_submenu_page('tl-inventory', 'Inventory', 'Inventory', $cap, 'tl-stock', 'tli_page_inventory');
-    add_submenu_page('tl-inventory', 'Orders', 'Orders', 'edit_shop_orders', 'tl-orders', 'tli_page_orders');
+    add_submenu_page('tl-inventory', 'Orders', 'Orders', $cap, 'tl-orders', 'tli_page_orders');
+    add_submenu_page('tl-inventory', 'Returns', 'Returns', 'tl_returns', 'tl-returns', 'tli_page_returns');
     add_submenu_page('tl-inventory', 'Stock movements', 'Stock movements', $cap, 'tl-movements', 'tli_page_movements');
     if (tli_mode() === 'hub') {
-        add_submenu_page('tl-inventory', 'Stores', 'Stores', $cap, 'tl-stores', 'tli_page_stores');
+        add_submenu_page('tl-inventory', 'Stores', 'Stores', 'tl_manage', 'tl-stores', 'tli_page_stores');
     }
-    add_submenu_page('tl-inventory', 'Connection', 'Connection', $cap, 'tl-connection', 'tli_page_connection');
-    add_submenu_page('tl-inventory', 'Settings', 'Settings', $cap, 'tl-settings', 'tli_page_settings');
+    add_submenu_page('tl-inventory', 'Connection', 'Connection', 'tl_manage', 'tl-connection', 'tli_page_connection');
+    add_submenu_page('tl-inventory', 'Settings', 'Settings', 'tl_manage', 'tl-settings', 'tli_page_settings');
 });
 
 add_action('admin_enqueue_scripts', static function (string $hook): void {
@@ -122,6 +123,15 @@ function tli_page_overview(): void
     if ($s['low']) {
         $att[] = [$s['low'], 'sizes are at or below the reorder level', admin_url('admin.php?page=tl-stock&filter=low'), 'Restock', 'warn'];
     }
+    if (function_exists('schermo_mail_ready') && !schermo_mail_ready()) {
+        $att[] = ['!', 'emails are not being sent (no mail service set) — orders, alerts and password resets', admin_url('admin.php?page=tl-settings'), 'How to fix', 'bad'];
+    } elseif ($me = get_option('schermo_mail_error')) {
+        $att[] = ['!', 'the last email failed: ' . mb_strimwidth((string) $me['error'], 0, 90, '…'), admin_url('admin.php?page=tl-settings'), 'Details', 'bad'];
+    }
+    $bk = tli_last_backup();
+    if (is_dir('/backups') && ($bk === null || time() - $bk > 2 * DAY_IN_SECONDS)) {
+        $att[] = ['!', $bk === null ? 'no backup has been made yet' : 'the last backup is more than 2 days old', admin_url('admin.php?page=tl-settings'), 'Details', 'bad'];
+    }
     if ($s['untracked']) {
         $att[] = [$s['untracked'], 'sizes have no stock count yet (sold without a limit)', admin_url('admin.php?page=tl-stock&filter=untracked'), 'Count stock', 'neutral'];
     }
@@ -131,7 +141,7 @@ function tli_page_overview(): void
     } else {
         echo '<ul class="tli-att">';
         foreach ($att as [$n, $msg, $href, $label, $tone]) {
-            printf('<li class="tone-%s"><span class="n">%d</span><span class="msg">%s</span><a class="tli-btn sm" href="%s">%s</a></li>', esc_attr($tone), $n, esc_html($msg), esc_url($href), esc_html($label));
+            printf('<li class="tone-%s"><span class="n">%s</span><span class="msg">%s</span><a class="tli-btn sm" href="%s">%s</a></li>', esc_attr($tone), $n, esc_html($msg), esc_url($href), esc_html($label));
         }
         echo '</ul>';
     }
@@ -196,11 +206,11 @@ function tli_page_inventory(): void
         $states = array_column($g['rows'], 'state');
         $worst = in_array('out', $states, true) ? 'out' : (in_array('low', $states, true) ? 'low' : (in_array('untracked', $states, true) ? 'untracked' : 'ok'));
         $img = $p->get_image_id() ? wp_get_attachment_image($p->get_image_id(), [44, 55], false, ['class' => 'tli-thumb']) : '<span class="tli-thumb"></span>';
-        printf('<tbody class="tli-group%s" data-group><tr class="tli-prow"><td><button type="button" class="tli-toggle" data-toggle aria-expanded="%s" aria-label="Show sizes">▸</button></td><td><div class="tli-prod">%s<div><a class="tli-link" href="%s">%s</a><span class="mono">%s</span></div></div></td><td class="muted">%s</td><td class="num">%d</td><td class="num"><b>%s</b></td><td>%s</td><td class="num"><a class="tli-btn sm ghost" href="%s">Edit product</a></td></tr>',
-            $i === 0 && $q !== '' ? ' open' : '', $i === 0 && $q !== '' ? 'true' : 'false', $img, esc_url(get_edit_post_link($p->get_id())), esc_html($p->get_name()), esc_html($p->get_sku()),
-            esc_html($g['cats']), count($g['rows']), $g['total'] === null ? '—' : esc_html(number_format_i18n($g['total'])), tli_state_badge($worst), esc_url(get_edit_post_link($p->get_id())));
+        printf('<tbody class="tli-group%s" data-group><tr class="tli-prow"><td><button type="button" class="tli-toggle" data-toggle aria-expanded="%s" aria-label="Show sizes">▸</button></td><td><div class="tli-prod">%s<div><a class="tli-link" href="%s">%s</a><span class="mono">%s</span></div></div></td><td class="muted">%s</td><td class="num">%d</td><td class="num"><b>%s</b></td><td>%s</td><td class="num">' . (current_user_can('edit_products') ? '<a class="tli-btn sm ghost" href="%s">Edit product</a>' : '<!-- %s -->') . '</td></tr>',
+            $i === 0 && $q !== '' ? ' open' : '', $i === 0 && $q !== '' ? 'true' : 'false', $img, esc_url((string) get_edit_post_link($p->get_id())), esc_html($p->get_name()), esc_html($p->get_sku()),
+            esc_html($g['cats']), count($g['rows']), $g['total'] === null ? '—' : esc_html(number_format_i18n($g['total'])), tli_state_badge($worst), esc_url((string) get_edit_post_link($p->get_id())));
         foreach ($g['rows'] as $r) {
-            printf('<tr class="tli-vrow"><td></td><td><span class="tli-size">%s</span> <span class="mono">%s</span></td><td></td><td></td><td class="num"><b>%s</b></td><td>%s</td><td class="num"><button type="button" class="tli-btn sm" ' . (tli_mode() === 'store' ? 'disabled title="Record changes at the hub"' : '') . ' data-adjust data-id="%d" data-name="%s" data-qty="%s">Adjust</button></td></tr>',
+            printf('<tr class="tli-vrow"><td></td><td><span class="tli-size">%s</span> <span class="mono">%s</span></td><td></td><td></td><td class="num"><b>%s</b></td><td>%s</td><td class="num"><button type="button" class="tli-btn sm" ' . (tli_mode() === 'store' || !current_user_can('tl_adjust') ? 'disabled title="Not available here"' : '') . ' data-adjust data-id="%d" data-name="%s" data-qty="%s">Adjust</button></td></tr>',
                 esc_html($r['size']), esc_html($r['sku']), $r['qty'] === null ? '—' : (int) $r['qty'], tli_state_badge($r['state']), $r['id'], esc_attr($p->get_name() . ($r['size'] !== '—' ? ' · ' . $r['size'] : '')), $r['qty'] === null ? '' : (int) $r['qty']);
         }
         echo '</tbody>';
@@ -223,7 +233,7 @@ function tli_page_inventory(): void
 }
 
 add_action('admin_post_tli_adjust', static function (): void {
-    if (!current_user_can('manage_woocommerce')) {
+    if (!current_user_can('tl_adjust')) {
         wp_die('Not allowed.', 403);
     }
     check_admin_referer('tli_adjust');
@@ -241,7 +251,7 @@ add_action('admin_post_tli_adjust', static function (): void {
 });
 
 add_action('admin_post_tli_export', static function (): void {
-    if (!current_user_can('manage_woocommerce')) {
+    if (!current_user_can('tl_view')) {
         wp_die('Not allowed.', 403);
     }
     check_admin_referer('tli_export');
@@ -273,12 +283,12 @@ function tli_orders_table(array $orders, bool $compact = false): void
         [$label, $tone] = tli_stage($o);
         $items = implode(', ', array_map(static fn ($i) => $i->get_quantity() . '× ' . $i->get_name(), array_values($o->get_items())));
         printf('<tr><td class="nowrap"><a class="tli-link" href="%s">#%s</a><span class="muted small">%s</span></td><td>%s</td>%s<td class="mono">%s</td><td>%s</td><td class="num">%s</td>',
-            esc_url($o->get_edit_order_url()), esc_html($o->get_order_number()), esc_html($o->get_date_created() ? wp_date('d M, H:i', $o->get_date_created()->getTimestamp()) : ''),
+            esc_url(current_user_can('edit_shop_orders') ? $o->get_edit_order_url() : '#'), esc_html($o->get_order_number()), esc_html($o->get_date_created() ? wp_date('d M, H:i', $o->get_date_created()->getTimestamp()) : ''),
             esc_html(trim($o->get_formatted_billing_full_name()) ?: '—'), $compact ? '' : '<td class="small">' . esc_html(mb_strimwidth($items, 0, 80, '…')) . '</td>',
             esc_html($o->get_shipping_country() ?: $o->get_billing_country() ?: '—'), tli_badge($label, $tone), esc_html(wp_strip_all_tags($o->get_formatted_order_total())));
         if (!$compact) {
             echo '<td>';
-            if (isset(TLI_NEXT[$o->get_status()])) {
+            if (isset(TLI_NEXT[$o->get_status()]) && current_user_can('tl_fulfil')) {
                 printf('<form method="post" action="%s"><input type="hidden" name="action" value="tli_next_stage"><input type="hidden" name="order_id" value="%d">%s<button class="tli-btn sm primary">%s</button></form>',
                     esc_url(admin_url('admin-post.php')), $o->get_id(), wp_nonce_field('tli_next_' . $o->get_id(), '_wpnonce', true, false), esc_html(TLI_NEXT[$o->get_status()][1]));
             } else {
@@ -317,7 +327,7 @@ function tli_remote_table(array $rows): void
         printf('<tr><td class="nowrap"><b>#%s</b><span class="muted small">%s</span></td><td><span class="tli-store-chip">%s</span></td><td>%s</td><td class="small">%s</td><td class="mono">%s</td><td>%s</td><td class="num">%s %s</td><td>',
             esc_html($o['number']), esc_html(wp_date('d M, H:i', strtotime($o['placed_at'] . ' UTC'))), esc_html($names[$o['store_id']] ?? $o['store_id']), esc_html($o['customer'] ?: '—'),
             esc_html(mb_strimwidth($items, 0, 80, '…')), esc_html($o['country'] ?: '—'), tli_badge($label, $tone), esc_html($o['currency']), esc_html(number_format_i18n((float) $o['total'])));
-        if (isset(TLI_NEXT[$o['status']])) {
+        if (isset(TLI_NEXT[$o['status']]) && current_user_can('tl_fulfil')) {
             printf('<form method="post" action="%s"><input type="hidden" name="action" value="tli_remote_next"><input type="hidden" name="remote" value="%d">%s<button class="tli-btn sm primary">%s</button></form>',
                 esc_url(admin_url('admin-post.php')), (int) $o['id'], wp_nonce_field('tli_remote_' . $o['id'], '_wpnonce', true, false), esc_html(TLI_NEXT[$o['status']][1]));
         } else {
@@ -394,17 +404,33 @@ function tli_page_movements(): void
 }
 
 /* ── Settings ─────────────────────────────────────────────────────────── */
+/** Time of the newest daily backup in the backups volume, or null. */
+function tli_last_backup(): ?int
+{
+    $files = glob('/backups/db-*.sql.gz') ?: [];
+    return $files ? max(array_map('filemtime', $files)) : null;
+}
+
 function tli_page_settings(): void
 {
-    if (isset($_POST['tli_low_stock']) && check_admin_referer('tli_settings')) {
+    if (isset($_POST['tli_low_stock']) && check_admin_referer('tli_settings') && current_user_can('tl_manage')) {
         update_option('tli_low_stock', max(0, (int) $_POST['tli_low_stock']));
+        update_option('tli_alert_email', sanitize_email(wp_unslash($_POST['tli_alert_email'] ?? '')));
         echo '<div class="notice notice-success"><p>Saved.</p></div>';
     }
     tli_head('Settings', 'How TL Commerce Hub works for this store.');
     echo '<div class="tli-card"><form method="post">';
     wp_nonce_field('tli_settings');
     printf('<label class="tli-field"><span>Low stock level (pieces per size)</span><input class="tli-input" type="number" min="0" name="tli_low_stock" value="%d" style="max-width:120px"></label>', (int) get_option('tli_low_stock', 5));
-    echo '<p class="muted small">A size at or below this number shows as Low stock on the Overview and Inventory screens.</p><p><button class="tli-btn primary">Save</button></p></form></div>';
+    printf('<label class="tli-field"><span>Send daily alerts to</span><input class="tli-input" type="email" name="tli_alert_email" value="%s" placeholder="%s" style="max-width:320px"></label>', esc_attr((string) get_option('tli_alert_email', '')), esc_attr(get_option('admin_email')));
+    echo '<p class="muted small">A size at or below the low stock level shows as Low stock. Every morning an email lists low and out-of-stock sizes and orders waiting more than 24 hours to be packed (only when there is something to report).</p><p><button class="tli-btn primary">Save</button></p></form></div>';
+    $bk = tli_last_backup();
+    $mail = function_exists('schermo_mail_ready') && schermo_mail_ready();
+    $me = get_option('schermo_mail_error');
+    printf('<div class="tli-card"><h2>System</h2><ul class="tli-help"><li><b>Backups:</b> %s. Database and uploaded files are saved every day and kept for 14 days on the server. Restore: <code>docker exec -it schermo-wordpress-1 /opt/schermo/restore.sh YYYY-MM-DD</code></li><li><b>Email:</b> %s</li></ul></div>',
+        $bk ? 'last one ' . esc_html(human_time_diff($bk)) . ' ago' : (is_dir('/backups') ? 'none yet (the first runs about 10 minutes after a deploy)' : 'not available on this server'),
+        $mail ? ($me ? 'set up, but the last send failed: ' . esc_html((string) $me['error']) : 'set up and working.') : 'NOT set up — no email leaves the site. Add SMTP_HOST, SMTP_USER, SMTP_PASS and SMTP_FROM (from a mail service such as Zoho Mail, Brevo or Google Workspace) to <code>/opt/schermo/schermo.env</code> on the server and redeploy.');
+    echo '<div class="tli-card"><h2>Team</h2><p class="muted">Add people in <a href="' . esc_url(admin_url('user-new.php')) . '">Users → Add New</a> and choose a role:</p><ul class="tli-help"><li><b>Warehouse staff</b> — sees the hub, adjusts stock, packs and dispatches orders, records returns.</li><li><b>Customer support</b> — sees the hub and orders, records returns. Cannot change stock.</li><li><b>Shop manager / Administrator</b> — everything, including Stores, Connection and Settings.</li></ul></div>';
     echo '<div class="tli-card"><h2>How it works</h2><ul class="tli-help"><li>The hub site holds the central stock (WooCommerce stock on the hub). Storefronts connected on the Stores page send their paid orders to the hub, which takes the stock once, and read stock back every 5 minutes.</li><li>Every change is written to Stock movements with who, when and why: adjustments here, orders (sold / cancelled) and edits in the WooCommerce product screen.</li><li>Order stages: Paid → Packed → Dispatched → Delivered. Use the Next step button on Orders.</li><li>Sizes marked "Not counted yet" are sold without a limit until you record a count with Adjust → Stocktake.</li></ul></div>';
     tli_foot();
 }

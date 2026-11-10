@@ -153,7 +153,7 @@ add_action('rest_api_init', static function (): void {
 
 /* Connection screen. */
 add_action('admin_post_tli_connection', static function (): void {
-    if (!current_user_can('manage_woocommerce')) {
+    if (!current_user_can('tl_manage')) {
         wp_die('Not allowed.', 403);
     }
     check_admin_referer('tli_connection');
@@ -180,7 +180,7 @@ add_action('admin_post_tli_connection', static function (): void {
     exit;
 });
 add_action('admin_post_tli_sync_now', static function (): void {
-    if (!current_user_can('manage_woocommerce')) {
+    if (!current_user_can('tl_manage')) {
         wp_die('Not allowed.', 403);
     }
     check_admin_referer('tli_sync_now');
