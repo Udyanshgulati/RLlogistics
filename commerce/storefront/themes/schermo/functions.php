@@ -188,6 +188,9 @@ function schermo_category_image(WP_Term $cat): string
 }
 
 add_action('wp_enqueue_scripts', static function (): void {
+    if (is_shop() || is_product_taxonomy() || (is_search() && get_query_var('post_type') === 'product')) {
+        wp_enqueue_script('schermo-shop', get_stylesheet_directory_uri() . '/assets/js/shop.js', [], brandhouse_asset_ver('/assets/js/shop.js', true), ['strategy' => 'defer', 'in_footer' => true]);
+    }
     if (is_front_page()) {
         wp_enqueue_script('schermo-home', get_stylesheet_directory_uri() . '/assets/js/schermo.js', [], brandhouse_asset_ver('/assets/js/schermo.js', true), ['strategy' => 'defer', 'in_footer' => true]);
         wp_localize_script('schermo-home', 'schermoHero', array_map(static fn ($s) => ['name' => $s['name'], 'url' => $s['url'], 'price' => wp_strip_all_tags($s['price'])], schermo_hero_slides()));

@@ -632,3 +632,55 @@ dialog.sx-sheet[open] { animation: sx-slide .25s var(--ease); }
   dialog.sx-sheet { width: 100vw; border-left: 0; }
   .sx-size-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* ── Motion & states v1: quick, restrained, consistent; off for reduced motion ─ */
+:root { interpolate-size: allow-keywords; --t-fast: .16s; --t-med: .26s; }
+/* Shop results updating in place: grid dims with a thin progress line; the page around it stays put. */
+.sx-grid-wrap { position: relative; }
+.sx-grid-wrap::before { content: ""; position: absolute; left: 0; right: 0; top: -10px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--red), transparent); background-size: 40% 100%; background-repeat: no-repeat; opacity: 0; transition: opacity var(--t-fast); }
+.sx-grid-wrap.is-loading::before { opacity: 1; animation: sx-progress 1s linear infinite; }
+.sx-grid-wrap > ul.products, .sx-grid-wrap > .empty-state { transition: opacity var(--t-fast) var(--ease), filter var(--t-fast); }
+.sx-grid-wrap.is-loading > ul.products, .sx-grid-wrap.is-loading > .empty-state { opacity: .45; filter: saturate(.6); pointer-events: none; }
+.sx-grid-wrap.is-entering .card { animation: sx-in .32s var(--ease) both; }
+.sx-grid-wrap.is-entering .card:nth-child(n+5) { animation-delay: .04s; }
+.sx-grid-wrap.is-entering .card:nth-child(n+9) { animation-delay: .08s; }
+@keyframes sx-progress { from { background-position: -40% 0; } to { background-position: 140% 0; } }
+@keyframes sx-in { from { opacity: 0; transform: translateY(6px); } }
+.sx-error .btn { margin: 4px; }
+
+/* Desktop dropdown: fade and lift instead of popping in. */
+.nav-primary .sub-menu { display: flex; opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease), visibility 0s linear var(--t-fast); }
+@media (hover: hover) { .nav-primary li:hover > .sub-menu { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; } }
+.nav-primary li:focus-within > .sub-menu, .nav-primary li.is-open > .sub-menu { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.drawer-menu li.is-open > .sub-menu { animation: sx-in var(--t-med) var(--ease); }
+
+/* Accordions open smoothly where the browser supports animating <details>. */
+details.acc::details-content { block-size: 0; overflow: hidden; transition: block-size var(--t-med) var(--ease), content-visibility var(--t-med) allow-discrete; }
+details.acc[open]::details-content { block-size: auto; }
+
+/* Buttons and choices: hover, pressed, focus, disabled and loading look the same everywhere. */
+.btn, .button, button.button, .sx-pill, .sx-chip, .sx-filter-btn, .size-opt, .sx-size-opt span, .icon-btn, .gx-round { transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast), box-shadow var(--t-fast), transform .1s var(--ease), opacity var(--t-fast); }
+.btn:active, .button:active, .sx-pill:active, .sx-chip:active, .sx-filter-btn:active, .size-opt:active, .icon-btn:active, .gx-round:active { transform: scale(.97); }
+.btn:focus-visible, .button:focus-visible, .sx-pill:focus-visible, .sx-chip:focus-visible, .sx-filter-btn:focus-visible, .size-opt:focus-visible, .icon-btn:focus-visible, .sub-toggle:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.button:disabled, .button.disabled, .btn:disabled, button[disabled] { opacity: .45; cursor: not-allowed !important; transform: none !important; }
+.size-opt[aria-checked="true"], .size-opt.is-on { box-shadow: 0 0 0 1px var(--ink) inset; }
+.button.is-loading, .btn.is-loading { position: relative; color: transparent !important; pointer-events: none; }
+.button.is-loading::after, .btn.is-loading::after { content: ""; position: absolute; inset: 0; margin: auto; width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-color: var(--on-accent, #0a0a0b) transparent var(--on-accent, #0a0a0b) transparent; animation: sx-spin .7s linear infinite; }
+.btn-outline.is-loading::after, .buy-now.is-loading::after { border-color: var(--ink) transparent var(--ink) transparent; }
+@keyframes sx-spin { to { transform: rotate(360deg); } }
+/* Cart feedback ("added to your cart") slides in instead of appearing abruptly. */
+.woocommerce-message, .woocommerce-info, .woocommerce-error, .wc-block-components-notice-banner { animation: sx-in var(--t-med) var(--ease); }
+/* Card image swap and lift stay quick. */
+.card-media img { will-change: opacity; }
+
+/* Page-to-page navigation: a short crossfade in browsers that support it; the header stays still. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  .site-header { view-transition-name: site-header; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .18s; }
+  ::view-transition-group(site-header) { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

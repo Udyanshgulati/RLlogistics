@@ -30,6 +30,20 @@
     li.classList.add('is-open'); const t = $('.sub-toggle', li); if (t) t.setAttribute('aria-expanded', 'true');
   });
 
+  // Add to bag / Buy now: immediate pressed + loading state, and no double submits while the request is on its way.
+  document.addEventListener('submit', (e) => {
+    const form = e.target.closest('form.cart');
+    if (!form) return;
+    if (form.dataset.busy === '1') { e.preventDefault(); return; }
+    const btn = e.submitter || form.querySelector('.single_add_to_cart_button');
+    if (!btn || btn.disabled || btn.classList.contains('disabled')) return;
+    form.dataset.busy = '1';
+    btn.classList.add('is-loading');
+    btn.setAttribute('aria-busy', 'true');
+    // If the page is restored from the back/forward cache, the button must not stay busy.
+    window.addEventListener('pageshow', () => { form.dataset.busy = ''; btn.classList.remove('is-loading'); btn.removeAttribute('aria-busy'); }, { once: true });
+  });
+
   // Dialogs: [data-dialog="id"] opens, [data-dialog-close] / backdrop click closes.
   document.addEventListener('click', (e) => {
     const open = e.target.closest('[data-dialog]');
