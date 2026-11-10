@@ -4,6 +4,22 @@
     const g = b.closest('[data-group]'); const open = !g.classList.contains('open');
     g.classList.toggle('open', open); b.setAttribute('aria-expanded', String(open));
   }));
+  // Orders: "select all" ticks every order in that table (for pick lists / packing slips).
+  document.querySelectorAll('[data-check-all]').forEach((all) => all.addEventListener('change', () => {
+    all.closest('table').querySelectorAll('tbody input[name="o[]"]').forEach((c) => { c.checked = all.checked; });
+  }));
+  // Purchase order form: add rows; show the product name for a typed SKU.
+  const lines = document.querySelector('[data-po-lines]');
+  if (lines) {
+    const names = new Map([...document.querySelectorAll('#tli-skus option')].map((o) => [o.value, o.textContent]));
+    const label = (input) => { const td = input.closest('tr').querySelector('[data-label]'); const v = input.value.trim(); td.textContent = v === '' ? '' : (names.get(v) || 'Unknown SKU'); td.classList.toggle('bad', v !== '' && !names.has(v)); };
+    lines.addEventListener('input', (e) => { if (e.target.name === 'sku[]') label(e.target); });
+    document.querySelector('[data-po-add]').addEventListener('click', () => {
+      const row = lines.lastElementChild.cloneNode(true);
+      row.querySelectorAll('input').forEach((i) => { i.value = ''; }); row.querySelector('[data-label]').textContent = '';
+      lines.appendChild(row); row.querySelector('input').focus();
+    });
+  }
   const panel = document.getElementById('tli-adjust');
   if (!panel) return;
   const f = (k) => panel.querySelector(`[data-f="${k}"]`);

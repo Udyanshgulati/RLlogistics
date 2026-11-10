@@ -132,6 +132,13 @@ function tli_page_overview(): void
     if (is_dir('/backups') && ($bk === null || time() - $bk > 2 * DAY_IN_SECONDS)) {
         $att[] = ['!', $bk === null ? 'no backup has been made yet' : 'the last backup is more than 2 days old', admin_url('admin.php?page=tl-settings'), 'Details', 'bad'];
     }
+    if ($hub) {
+        [$pot] = tli_po_tables();
+        $late = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$pot} WHERE status IN ('ordered','partial') AND expected_date IS NOT NULL AND expected_date < '" . esc_sql(wp_date('Y-m-d')) . "'");
+        if ($late) {
+            $att[] = [$late, 'supplier deliveries are overdue', admin_url('admin.php?page=tl-purchasing'), 'Purchasing', 'warn'];
+        }
+    }
     if ($s['untracked']) {
         $att[] = [$s['untracked'], 'sizes have no stock count yet (sold without a limit)', admin_url('admin.php?page=tl-stock&filter=untracked'), 'Count stock', 'neutral'];
     }
@@ -169,6 +176,20 @@ function tli_page_overview(): void
         }
         echo '</ul></section>';
     }
+    if ($hub) {
+        $inc = tli_incoming_map();
+        [$pot, $plt] = tli_po_tables();
+        $next = $wpdb->get_results("SELECT p.id, p.supplier, p.expected_date, SUM(GREATEST(CAST(l.qty_ordered AS SIGNED) - l.qty_received - l.qty_damaged, 0)) AS q FROM {$pot} p JOIN {$plt} l ON l.po_id = p.id WHERE p.status IN ('ordered','partial') GROUP BY p.id ORDER BY p.expected_date IS NULL, p.expected_date ASC LIMIT 4", ARRAY_A) ?: [];
+        printf('<section class="tli-card"><div class="tli-card-head"><div><h2>Incoming stock</h2><p>%s units on order from suppliers.</p></div><a class="tli-btn sm ghost" href="%s">Purchasing</a></div><ul class="tli-moves">', esc_html(number_format_i18n(array_sum($inc))), esc_url(admin_url('admin.php?page=tl-purchasing')));
+        foreach ($next as $n) {
+            printf('<li><div><a class="tli-link" href="%s"><b>PO #%d · %s</b></a><span class="small muted">%s</span></div><b>%d</b></li>', esc_url(admin_url('admin.php?page=tl-purchasing&po=' . $n['id'])), (int) $n['id'], esc_html($n['supplier']),
+                $n['expected_date'] ? esc_html('Expected ' . wp_date('d M Y', strtotime($n['expected_date']))) : 'No date given', (int) $n['q']);
+        }
+        if (!$next) {
+            echo '<li><span class="small muted">Nothing on order. Create a purchase order when you buy stock from a supplier.</span></li>';
+        }
+        echo '</ul></section>';
+    }
     // Stock at a glance
     printf('<section class="tli-card"><div class="tli-card-head"><div><h2>Stock at a glance</h2><p>Counted units only.</p></div></div><div class="tli-flow"><div><b>%s</b><span>Units in stock</span></div><div><b>%d</b><span>Sizes / SKUs</span></div><div><b>%s</b><span>Stock value at selling price</span></div></div></section>',
         esc_html(number_format_i18n($s['units'])), $s['skus'], esc_html(tli_money($s['value'])));
@@ -185,6 +206,7 @@ function tli_page_inventory(): void
     $q = sanitize_text_field(wp_unslash($_GET['s'] ?? '')); // phpcs:ignore WordPress.Security.NonceVerification
     $filter = sanitize_key($_GET['filter'] ?? 'all'); // phpcs:ignore WordPress.Security.NonceVerification
     $groups = tli_inventory_rows($q, $filter);
+    $incoming = tli_incoming_map();
     $base = admin_url('admin.php?page=tl-stock');
     tli_head('Inventory', 'Stock for every product and size, held at the Delhi warehouse.',
         '<a class="tli-btn" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_export'), 'tli_export')) . '">Export CSV</a><a class="tli-btn primary" href="' . esc_url(admin_url('post-new.php?post_type=product')) . '">Add product</a>');
@@ -210,8 +232,8 @@ function tli_page_inventory(): void
             $i === 0 && $q !== '' ? ' open' : '', $i === 0 && $q !== '' ? 'true' : 'false', $img, esc_url((string) get_edit_post_link($p->get_id())), esc_html($p->get_name()), esc_html($p->get_sku()),
             esc_html($g['cats']), count($g['rows']), $g['total'] === null ? '—' : esc_html(number_format_i18n($g['total'])), tli_state_badge($worst), esc_url((string) get_edit_post_link($p->get_id())));
         foreach ($g['rows'] as $r) {
-            printf('<tr class="tli-vrow"><td></td><td><span class="tli-size">%s</span> <span class="mono">%s</span></td><td></td><td></td><td class="num"><b>%s</b></td><td>%s</td><td class="num"><button type="button" class="tli-btn sm" ' . (tli_mode() === 'store' || !current_user_can('tl_adjust') ? 'disabled title="Not available here"' : '') . ' data-adjust data-id="%d" data-name="%s" data-qty="%s">Adjust</button></td></tr>',
-                esc_html($r['size']), esc_html($r['sku']), $r['qty'] === null ? '—' : (int) $r['qty'], tli_state_badge($r['state']), $r['id'], esc_attr($p->get_name() . ($r['size'] !== '—' ? ' · ' . $r['size'] : '')), $r['qty'] === null ? '' : (int) $r['qty']);
+            printf('<tr class="tli-vrow"><td></td><td><span class="tli-size">%s</span> <span class="mono">%s</span></td><td></td><td></td><td class="num"><b>%s</b>%s</td><td>%s</td><td class="num"><button type="button" class="tli-btn sm" ' . (tli_mode() === 'store' || !current_user_can('tl_adjust') ? 'disabled title="Not available here"' : '') . ' data-adjust data-id="%d" data-name="%s" data-qty="%s">Adjust</button></td></tr>',
+                esc_html($r['size']), esc_html($r['sku']), $r['qty'] === null ? '—' : (int) $r['qty'], !empty($incoming[$r['sku']]) ? ' <a class="tli-incoming" href="' . esc_url(admin_url('admin.php?page=tl-purchasing')) . '" title="On order from suppliers">+' . (int) $incoming[$r['sku']] . ' incoming</a>' : '', tli_state_badge($r['state']), $r['id'], esc_attr($p->get_name() . ($r['size'] !== '—' ? ' · ' . $r['size'] : '')), $r['qty'] === null ? '' : (int) $r['qty']);
         }
         echo '</tbody>';
     }
@@ -275,14 +297,19 @@ function tli_orders_table(array $orders, bool $compact = false): void
         echo '<div class="tli-empty"><h3>No orders yet</h3><p>Orders appear here as soon as customers place them.</p></div>';
         return;
     }
-    echo '<table class="tli-table' . ($compact ? ' compact' : '') . '"><thead><tr><th>Order</th><th>Customer</th>' . ($compact ? '' : '<th>Items</th>') . '<th>Ship to</th><th>Stage</th><th class="num">Total</th>' . ($compact ? '' : '<th>Next step</th>') . '</tr></thead><tbody>';
+    echo '<table class="tli-table' . ($compact ? ' compact' : '') . '"><thead><tr>' . ($compact ? '' : '<th class="tli-chk"><input type="checkbox" data-check-all aria-label="Select all"></th>') . '<th>Order</th><th>Customer</th>' . ($compact ? '' : '<th>Items</th>') . '<th>Ship to</th><th>Stage</th><th class="num">Total</th>' . ($compact ? '' : '<th>Next step</th>') . '</tr></thead><tbody>';
     foreach ($orders as $o) {
         if (!$o instanceof WC_Order) {
             continue;
         }
         [$label, $tone] = tli_stage($o);
         $items = implode(', ', array_map(static fn ($i) => $i->get_quantity() . '× ' . $i->get_name(), array_values($o->get_items())));
-        printf('<tr><td class="nowrap"><a class="tli-link" href="%s">#%s</a><span class="muted small">%s</span></td><td>%s</td>%s<td class="mono">%s</td><td>%s</td><td class="num">%s</td>',
+        if (!$compact) {
+            printf('<tr><td class="tli-chk"><input type="checkbox" form="tli-print-form" name="o[]" value="L:%d" aria-label="Select order"></td>', $o->get_id());
+        } else {
+            echo '<tr>';
+        }
+        printf('<td class="nowrap"><a class="tli-link" href="%s">#%s</a><span class="muted small">%s</span></td><td>%s</td>%s<td class="mono">%s</td><td>%s</td><td class="num">%s</td>',
             esc_url(current_user_can('edit_shop_orders') ? $o->get_edit_order_url() : '#'), esc_html($o->get_order_number()), esc_html($o->get_date_created() ? wp_date('d M, H:i', $o->get_date_created()->getTimestamp()) : ''),
             esc_html(trim($o->get_formatted_billing_full_name()) ?: '—'), $compact ? '' : '<td class="small">' . esc_html(mb_strimwidth($items, 0, 80, '…')) . '</td>',
             esc_html($o->get_shipping_country() ?: $o->get_billing_country() ?: '—'), tli_badge($label, $tone), esc_html(wp_strip_all_tags($o->get_formatted_order_total())));
@@ -301,7 +328,7 @@ function tli_orders_table(array $orders, bool $compact = false): void
             $steps = ['processing' => 'Paid', 'tl-packed' => 'Packed', 'tl-dispatched' => 'Dispatched', 'completed' => 'Delivered'];
             $at = array_search($o->get_status(), array_keys($steps), true);
             if ($at !== false) {
-                echo '<tr class="tli-progress-row"><td colspan="7"><ol class="tli-progress">';
+                echo '<tr class="tli-progress-row"><td colspan="8"><ol class="tli-progress">';
                 $n = 0;
                 foreach ($steps as $label2) {
                     printf('<li class="%s">%s</li>', $n <= $at ? 'done' : '', esc_html($label2));
@@ -320,12 +347,12 @@ function tli_remote_table(array $rows): void
         return;
     }
     $names = array_column(tli_stores(), 'name', 'id');
-    echo '<table class="tli-table"><thead><tr><th>Order</th><th>Store</th><th>Customer</th><th>Items</th><th>Ship to</th><th>Stage</th><th class="num">Total</th><th>Next step</th></tr></thead><tbody>';
+    echo '<table class="tli-table"><thead><tr><th class="tli-chk"><input type="checkbox" data-check-all aria-label="Select all"></th><th>Order</th><th>Store</th><th>Customer</th><th>Items</th><th>Ship to</th><th>Stage</th><th class="num">Total</th><th>Next step</th></tr></thead><tbody>';
     foreach ($rows as $o) {
         [$label, $tone] = TLI_STAGES[$o['status']] ?? [ucfirst($o['status']), 'neutral'];
         $items = implode(', ', array_map(static fn ($l) => $l['qty'] . '× ' . ($l['name'] ?: $l['sku']), json_decode($o['lines_json'], true) ?: []));
-        printf('<tr><td class="nowrap"><b>#%s</b><span class="muted small">%s</span></td><td><span class="tli-store-chip">%s</span></td><td>%s</td><td class="small">%s</td><td class="mono">%s</td><td>%s</td><td class="num">%s %s</td><td>',
-            esc_html($o['number']), esc_html(wp_date('d M, H:i', strtotime($o['placed_at'] . ' UTC'))), esc_html($names[$o['store_id']] ?? $o['store_id']), esc_html($o['customer'] ?: '—'),
+        printf('<tr><td class="tli-chk"><input type="checkbox" form="tli-print-form" name="o[]" value="R:%d" aria-label="Select order"></td><td class="nowrap"><b>#%s</b><span class="muted small">%s</span></td><td><span class="tli-store-chip">%s</span></td><td>%s</td><td class="small">%s</td><td class="mono">%s</td><td>%s</td><td class="num">%s %s</td><td>',
+            (int) $o['id'], esc_html($o['number']), esc_html(wp_date('d M, H:i', strtotime($o['placed_at'] . ' UTC'))), esc_html($names[$o['store_id']] ?? $o['store_id']), esc_html($o['customer'] ?: '—'),
             esc_html(mb_strimwidth($items, 0, 80, '…')), esc_html($o['country'] ?: '—'), tli_badge($label, $tone), esc_html($o['currency']), esc_html(number_format_i18n((float) $o['total'])));
         if (isset(TLI_NEXT[$o['status']]) && current_user_can('tl_fulfil')) {
             printf('<form method="post" action="%s"><input type="hidden" name="action" value="tli_remote_next"><input type="hidden" name="remote" value="%d">%s<button class="tli-btn sm primary">%s</button></form>',
@@ -350,7 +377,12 @@ function tli_page_orders(): void
     foreach (['' => 'All', 'processing' => 'To pack', 'tl-packed' => 'Packed', 'tl-dispatched' => 'Dispatched', 'completed' => 'Delivered', 'pending' => 'Awaiting payment', 'cancelled' => 'Cancelled'] as $k => $l) {
         printf('<a class="%s" href="%s">%s</a>', $stage === $k ? 'on' : '', esc_url(admin_url('admin.php?page=tl-orders' . ($k ? '&stage=' . $k : ''))), esc_html($l));
     }
-    echo '</nav><h2 class="tli-sec">' . esc_html(get_bloginfo('name')) . '</h2><div class="tli-card flush">';
+    echo '</nav>';
+    // Printing: tick orders below (checkboxes belong to this form), or print everything waiting to be packed.
+    printf('<form id="tli-print-form" class="tli-printbar" method="get" action="%s" target="_blank"><input type="hidden" name="action" value="tli_print">%s<span class="muted">Warehouse printouts:</span><button class="tli-btn sm" name="what" value="pick">Pick list · ticked orders</button><button class="tli-btn sm" name="what" value="slips">Packing slips · ticked orders</button><span class="tli-sep"></span><a class="tli-btn sm primary" target="_blank" href="%s">Pick list · all to pack</a><a class="tli-btn sm" target="_blank" href="%s">Packing slips · all to pack</a></form>',
+        esc_url(admin_url('admin-post.php')), wp_nonce_field('tli_print', '_wpnonce', false, false),
+        esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=pick&all_to_pack=1'), 'tli_print')), esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=slips&all_to_pack=1'), 'tli_print')));
+    echo '<h2 class="tli-sec">' . esc_html(get_bloginfo('name')) . '</h2><div class="tli-card flush">';
     tli_orders_table(wc_get_orders($args));
     echo '</div>';
     if (tli_mode() === 'hub') {

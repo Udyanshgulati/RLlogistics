@@ -122,3 +122,20 @@
 .tli-steps { display: flex; gap: 6px; flex-wrap: wrap; } .tli-steps form { margin: 0; }
 .tli-return-form .tli-inline { margin-bottom: 4px; }
 .tli-table td .muted.small { display: block; }
+/* Printing + purchasing */
+.tli-chk { width: 28px; }
+.tli-printbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 14px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.tli-printbar .tli-sep { width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
+.tli-incoming { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 600; color: #1d4ed8; background: #eef3ff; border-radius: 10px; padding: 1px 7px; text-decoration: none; }
+.tli-input.sm { min-width: 0; width: 90px; text-align: right; }
+.tli-textarea { height: auto; padding: 8px 10px; width: 100%; }
+.tli-po-head { display: grid; grid-template-columns: 2fr 1.4fr 1fr; gap: 14px; }
+.tli-po-head .tli-input { min-width: 0; width: 100%; }
+.tli-po-lines td:first-child .tli-input { min-width: 200px; }
+.tli-po-lines td.bad { color: #b42318; }
+.tli-po-foot { padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+.tli-po-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.tli-po-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.tli-po-meta > div { display: grid; gap: 4px; justify-items: start; }
+.tli-inline-form { display: inline; margin: 0; }
+@media (max-width: 960px) { .tli-po-head, .tli-po-meta { grid-template-columns: 1fr 1fr; } }

@@ -83,7 +83,10 @@ function tli_order_payload(WC_Order $o): array
     }
     return ['remote_id' => (string) $o->get_id(), 'number' => (string) $o->get_order_number(), 'status' => $o->get_status(), 'currency' => $o->get_currency(),
         'total' => (float) $o->get_total(), 'country' => $o->get_shipping_country() ?: $o->get_billing_country(), 'customer' => trim($o->get_formatted_billing_full_name()),
-        'placed_at' => $o->get_date_created() ? gmdate('Y-m-d H:i:s', $o->get_date_created()->getTimestamp()) : current_time('mysql', true), 'lines' => $lines];
+        'placed_at' => $o->get_date_created() ? gmdate('Y-m-d H:i:s', $o->get_date_created()->getTimestamp()) : current_time('mysql', true), 'lines' => $lines,
+        // For packing slips at the warehouse.
+        'ship_to' => wp_strip_all_tags(str_replace(['<br/>', '<br>'], "\n", (string) ($o->get_formatted_shipping_address() ?: $o->get_formatted_billing_address()))),
+        'phone' => (string) ($o->get_shipping_phone() ?: $o->get_billing_phone()), 'note' => (string) $o->get_customer_note()];
 }
 
 /** Background job: send one order to the hub. Throwing makes Action Scheduler record the failure; we retry with backoff. */

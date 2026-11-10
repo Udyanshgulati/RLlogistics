@@ -117,7 +117,8 @@ add_action('rest_api_init', static function (): void {
         }
         // The hub owns the shipping stages; a storefront's own "processing" never moves an order back.
         $keep = $shipping_stage && $status === 'processing';
-        $wpdb->update($t, ['status' => $keep ? $o['status'] : $status, 'updated_at' => $now, 'lines_json' => wp_json_encode($lines)], ['id' => $o['id']]);
+        $wpdb->update($t, ['status' => $keep ? $o['status'] : $status, 'updated_at' => $now, 'lines_json' => wp_json_encode($lines),
+            'ship_to' => sanitize_textarea_field((string) ($d['ship_to'] ?? '')), 'phone' => sanitize_text_field((string) ($d['phone'] ?? '')), 'note' => sanitize_textarea_field((string) ($d['note'] ?? ''))], ['id' => $o['id']]);
         $wpdb->query('COMMIT');
         tli_store_seen($store['id'], $problems ? implode('; ', $problems) : '');
         $skus = array_column($lines, 'sku');

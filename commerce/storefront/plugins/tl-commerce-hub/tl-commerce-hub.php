@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TL Commerce Hub
  * Description: One central stock and order backend for several WooCommerce storefronts — inventory, stock movements, orders and fulfilment. By Thoda Logic.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: Thoda Logic
  * Author URI: https://thodalogic.com
  * Requires PHP: 8.2
@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-const TLI_VERSION = '1.2.0';
-const TLI_DB_VERSION = '3';
+const TLI_VERSION = '1.3.0';
+const TLI_DB_VERSION = '4';
 define('TLI_DIR', __DIR__);
 define('TLI_URL', plugin_dir_url(__FILE__));
 
@@ -29,6 +29,8 @@ require_once TLI_DIR . '/includes/store.php';
 require_once TLI_DIR . '/includes/roles.php';
 require_once TLI_DIR . '/includes/returns.php';
 require_once TLI_DIR . '/includes/alerts.php';
+require_once TLI_DIR . '/includes/printing.php';
+require_once TLI_DIR . '/includes/purchasing.php';
 
 register_activation_hook(__FILE__, 'tli_install');
 add_action('admin_init', static function (): void {
@@ -84,6 +86,9 @@ function tli_install(): void
         country char(2) NOT NULL DEFAULT '',
         customer varchar(150) NOT NULL DEFAULT '',
         lines_json longtext NOT NULL,
+        ship_to text NULL,
+        phone varchar(40) NOT NULL DEFAULT '',
+        note text NULL,
         placed_at datetime NOT NULL,
         updated_at datetime NOT NULL,
         PRIMARY KEY  (id),
@@ -91,6 +96,7 @@ function tli_install(): void
         KEY status (status)
     ) {$wpdb->get_charset_collate()};");
     tli_install_returns();
+    tli_install_purchasing();
     tli_install_roles();
     update_option('tli_db_version', TLI_DB_VERSION);
     add_option('tli_mode', 'hub');
