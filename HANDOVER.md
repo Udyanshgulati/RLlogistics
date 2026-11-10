@@ -172,3 +172,20 @@ fee, courier plugin, footer/contact details, full returns page.
 
 ## 9. Local development (optional)
 `commerce/storefront/README.md` explains running the stack locally: `docker compose up` with an env file (see compose for the variables), site on 127.0.0.1:8095.
+
+
+---
+
+## Update 11 Nov 2026 — TL Commerce Hub (1 backend, several storefronts)
+
+- Plugin `commerce/storefront/plugins/tl-commerce-hub` (installed and activated on every deploy). wp-admin → **TL Commerce Hub**:
+  Overview, Inventory (Adjust stock panel), Orders (all stores, next-step button), Stock movements (permanent log), Stores, Connection, Settings.
+  Thoda Logic branding across admin and login.
+- **schermo.thodalogic.com is the Hub** (central stock). To add a storefront: Hub → Stores → *Create connection key*; on the
+  storefront (any WooCommerce site with this plugin) → Connection → *A storefront* → paste hub address, store ID, secret.
+  Storefronts send paid orders/cancellations (signed, retried) and pull stock every 5 minutes; Packed/Dispatched/Delivered set at
+  the Hub are sent back. Tested end-to-end with two stores.
+- Speed: page cache drop-in (`docker/advanced-cache.php`, `docker/schermo-cache.php`), async geolocation, cron in the container.
+- Prices for 22 products come from `catalog/milan-icons/products.json` (`regular_price` = MRP, `sale_price` = selling price,
+  applied once per `price_version`).
+- **Full task list: `commerce/docs/Schermo_Task_Sheet.xlsx`** (done / owner & client to-dos / development to-dos / sheet gaps / risks).
