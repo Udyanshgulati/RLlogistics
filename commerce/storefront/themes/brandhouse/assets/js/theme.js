@@ -82,7 +82,7 @@
       return;
     }
     if (!qa) { location.href = d.url; return; }
-    $('.qa-img', qa).src = d.image; $('.qa-name', qa).textContent = d.name; $('.qa-price', qa).textContent = d.price;
+    $('.qa-img', qa).src = d.image; $('.qa-name', qa).textContent = d.name; const pr = $('.qa-price', qa); pr.replaceChildren(); if (d.was) { const s = document.createElement('s'); s.textContent = d.was; s.className = 'qa-was'; pr.append(s, ' '); } pr.append(d.price);
     $('.qa-more', qa).href = d.url; $('.qa-msg', qa).textContent = ''; $('.qa-bag', qa).hidden = true;
     const grid = $('.qa-grid', qa); grid.replaceChildren();
     d.sizes.forEach((s) => {

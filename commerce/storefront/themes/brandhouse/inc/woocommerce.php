@@ -221,7 +221,13 @@ function brandhouse_quick_add_data(WC_Product $p): ?array
     if (!$p->is_purchasable() || !$p->is_in_stock() || $p->get_price() === '') {
         return null;
     }
-    $data = ['id' => $p->get_id(), 'name' => $p->get_name(), 'url' => $p->get_permalink(), 'price' => wp_strip_all_tags(html_entity_decode($p->get_price_html())), 'image' => (string) wp_get_attachment_image_url((int) $p->get_image_id(), 'woocommerce_thumbnail'), 'sizes' => []];
+    // Plain prices for the sheet: the current price and, only when on sale, the old one (no screen-reader sentences).
+    $money = static fn ($v): string => $v === '' || $v === null ? '' : html_entity_decode(wp_strip_all_tags(wc_price((float) $v)), ENT_QUOTES, 'UTF-8');
+    $var = $p->is_type('variable');
+    $now = $var ? $p->get_variation_price('min') : $p->get_price();
+    $was = $p->is_on_sale() ? ($var ? $p->get_variation_regular_price('min') : $p->get_regular_price()) : '';
+    $from = $var && $p->get_variation_price('min') !== $p->get_variation_price('max');
+    $data = ['id' => $p->get_id(), 'name' => $p->get_name(), 'url' => $p->get_permalink(), 'price' => ($from ? __('From', 'brandhouse') . ' ' : '') . $money($now), 'was' => (float) $was > (float) $now ? $money($was) : '', 'image' => (string) wp_get_attachment_image_url((int) $p->get_image_id(), 'woocommerce_thumbnail'), 'sizes' => []];
     if ($p->is_type('variable')) {
         $order = ['s', 'm', 'l', 'xl', 'xxl', 'xxxl'];
         foreach ($p->get_available_variations('objects') as $v) {
@@ -253,7 +259,7 @@ add_action('wp_footer', static function (): void {
         <div class="qa-prod"><img class="qa-img" alt="" width="96" height="120"><div><p class="qa-name"></p><p class="qa-price"></p></div></div>
         <fieldset class="qa-sizes"><legend class="sr-only"><?php esc_html_e('Size', 'brandhouse'); ?></legend><div class="qa-grid"></div></fieldset>
         <p class="qa-msg" role="status" aria-live="polite"></p>
-        <div class="qa-actions"><button type="button" class="btn qa-add" disabled><?php esc_html_e('Add to bag', 'brandhouse'); ?></button><a class="btn btn-outline qa-more" href="#"><?php esc_html_e('View details', 'brandhouse'); ?></a></div>
+        <div class="qa-actions"><button type="button" class="btn qa-add" disabled><?php esc_html_e('Add to bag', 'brandhouse'); ?></button></div><a class="qa-more" href="#"><?php esc_html_e('View details', 'brandhouse'); ?></a>
         <a class="link-btn qa-bag" href="<?php echo esc_url(wc_get_cart_url()); ?>" hidden><?php esc_html_e('View bag', 'brandhouse'); ?></a>
       </div>
     </dialog>

@@ -765,7 +765,11 @@ dialog.qa-sheet { width: min(440px, calc(100vw - 24px)); border-radius: var(--r-
 .qa-size input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
 .qa-size input:disabled + span { color: var(--faint); text-decoration: line-through; border-style: dashed; cursor: not-allowed; }
 .qa-msg { min-height: 20px; margin: 6px 0 10px; font-size: 13px; color: var(--muted); }
-.qa-actions { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
+.qa-actions { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.qa-price { color: var(--ink); font-size: 15px; }
+.qa-was { color: var(--muted); margin-right: 4px; }
+.qa-more { display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; font-size: 13px; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
+.qa-more:hover { color: var(--ink); }
 .qa-actions .btn { justify-content: center; }
 .qa-bag { display: inline-block; margin-top: 12px; }
 @media (max-width: 400px) { .qa-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
