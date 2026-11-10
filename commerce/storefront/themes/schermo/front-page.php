@@ -86,6 +86,7 @@ $teams = array_values(array_filter($collections, static fn ($c) => !empty($c['cr
               <span class="sb-name"><?php echo esc_html($c['label']); ?></span>
               <span class="sb-sub"><?php echo esc_html($c['sub']); ?></span>
               <span class="sb-line"><?php echo esc_html($c['line']); ?></span>
+              <span class="sb-state<?php echo $c['ready'] ? ' is-ready' : ''; ?>"><?php echo esc_html($c['ready'] ? sprintf(_n('%d piece available to order', '%d pieces available to order', $c['ready'], 'schermo'), $c['ready']) : __('Coming soon · prices to be announced', 'schermo')); ?></span>
               <span class="sb-count"><?php echo esc_html(sprintf(_n('%d piece', '%d pieces', (int) $c['term']->count, 'schermo'), (int) $c['term']->count)); ?><?php echo brandhouse_icon('arrow'); ?></span>
             </span>
           </a>

@@ -145,10 +145,74 @@ if ($added > 0) {
 }
 echo "catalog: {$added} products added\n";
 
-// One-time menu (v3): Shop, the four product types, then "Collections" with the four collections under it.
+// Product types (v1): finer types under Clothing and Accessories, assigned from each product's name. A product keeps
+// its parent type and collection; only one sub-type is added. Runs once per version and only fills products that
+// have no sub-type yet, so changes made in WP admin are kept.
+$subtypes = [
+    'clothing' => [
+        'shorts' => ['Shorts', 'Cargo, layered, denim and practice shorts.', ['shorts']],
+        'knitwear-hoodies' => ['Knitwear & Hoodies', 'Winter warmers, sweaters and hoodies.', ['hoodie', 'warmer', 'sweater']],
+        'trousers' => ['Trousers', 'Baggy trousers, denim, cargos and track trousers.', ['trouser', 'denim', 'cargo', 'pants']],
+        't-shirts-polos' => ['T-shirts & Polos', 'Oversized tees, jerseys and polos.', ['tee', 't-shirt', 'polo', 'jersey']],
+    ],
+    'accessories' => [
+        'caps-hats' => ['Caps & Hats', 'Caps, bucket hats and beanies.', ['cap', 'hat', 'beanie']],
+        'bags-backpacks' => ['Bags & Backpacks', 'Backpacks, kit bags and travel bags.', ['backpack', 'rucksack', 'kit bag', 'travel bag', 'duffel', ' bag']],
+        'other-accessories' => ['Other Accessories', 'Socks, sippers, sneakers and other everyday pieces.', []],
+    ],
+];
+if ((int) get_option('schermo_types_v') < 1) {
+    $n = 0;
+    foreach ($subtypes as $parent_slug => $children) {
+        $parent = get_term_by('slug', $parent_slug, 'product_cat');
+        if (!$parent) {
+            continue;
+        }
+        $ids = [];
+        foreach ($children as $slug => [$name, $desc]) {
+            $t = get_term_by('slug', $slug, 'product_cat') ?: (object) wp_insert_term($name, 'product_cat', ['slug' => $slug, 'parent' => $parent->term_id, 'description' => $desc]);
+            $ids[$slug] = (int) $t->term_id;
+        }
+        foreach (wc_get_products(['status' => ['publish', 'draft', 'private'], 'limit' => -1, 'category' => [$parent_slug]]) as $prod) {
+            $cats = $prod->get_category_ids();
+            if (array_intersect($cats, $ids)) {
+                continue;
+            }
+            $name = ' ' . strtolower($prod->get_name());
+            $pick = array_key_last($children); // the last child is the catch-all (or the most general match)
+            foreach ($children as $slug => [, , $words]) {
+                foreach ($words as $w) {
+                    if (str_contains($name, $w) && !str_contains($name, 'bag tag')) {
+                        $pick = $slug;
+                        break 2;
+                    }
+                }
+            }
+            $prod->set_category_ids(array_values(array_unique(array_merge($cats, [$ids[$pick]]))));
+            $prod->save();
+            $n++;
+        }
+    }
+    update_option('schermo_types_v', 1, false);
+    echo "catalog: product types assigned to {$n} products\n";
+}
+// Short, specific lines for the top-level type pages (only while a page has none — admin edits are kept).
+foreach ([
+    'clothing' => 'Tees, polos, trousers, shorts and knitwear from Schermo Core, Schermo Atelier and the team collections.',
+    'accessories' => 'Caps and hats, bags and backpacks, and everyday accessories.',
+    'sportswear' => 'Match and practice kits, track trousers and playing gear from Milan Icons and Glasgow Cosmic.',
+    'fan-merch' => 'Bag tags, lanyards and keychains for Milan Icons and Glasgow Cosmic supporters.',
+] as $slug => $line) {
+    $t = get_term_by('slug', $slug, 'product_cat');
+    if ($t && $t->description === '') {
+        wp_update_term($t->term_id, 'product_cat', ['description' => $line]);
+    }
+}
+
+// One-time menu (v4): New In · Shop ▾ (types, grouped) · Collections ▾ (the four collections).
 // Runs once per version, so menus edited later in WP admin (Appearance → Menus) stay as they are.
 $loc = get_nav_menu_locations();
-if (!empty($loc['primary']) && (int) get_option('schermo_menu_v') < 3) {
+if (!empty($loc['primary']) && (int) get_option('schermo_menu_v') < 4) {
     $menu = (int) $loc['primary'];
     foreach (wp_get_nav_menu_items($menu) ?: [] as $item) {
         wp_delete_post($item->ID, true);
@@ -157,18 +221,28 @@ if (!empty($loc['primary']) && (int) get_option('schermo_menu_v') < 3) {
     $add = static function (array $a) use ($menu, &$pos): int {
         return (int) wp_update_nav_menu_item($menu, 0, $a + ['menu-item-status' => 'publish', 'menu-item-position' => ++$pos]);
     };
-    $add(['menu-item-title' => 'Shop', 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-object-id' => wc_get_page_id('shop')]);
-    foreach (['Clothing', 'Accessories', 'Sportswear', 'Fan Merch'] as $name) {
-        if ($t = get_term_by('name', $name, 'product_cat')) {
-            $add(['menu-item-type' => 'taxonomy', 'menu-item-object' => 'product_cat', 'menu-item-object-id' => $t->term_id]);
+    $term = static fn (string $slug, int $parent = 0): array => ($t = get_term_by('slug', $slug, 'product_cat')) ? ['menu-item-type' => 'taxonomy', 'menu-item-object' => 'product_cat', 'menu-item-object-id' => $t->term_id, 'menu-item-parent-id' => $parent] : [];
+    $add(['menu-item-title' => 'New In', 'menu-item-type' => 'custom', 'menu-item-url' => add_query_arg('orderby', 'date', wc_get_page_permalink('shop'))]);
+    $shop = $add(['menu-item-title' => 'Shop', 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-object-id' => wc_get_page_id('shop')]);
+    foreach (['clothing' => array_keys($subtypes['clothing']), 'accessories' => array_keys($subtypes['accessories']), 'sportswear' => [], 'fan-merch' => []] as $top => $kids) {
+        $a = $term($top, $shop);
+        if (!$a) {
+            continue;
+        }
+        $pid = $add($a);
+        usort($kids, static fn ($x, $y) => array_search($x, ['t-shirts-polos', 'trousers', 'shorts', 'knitwear-hoodies', 'caps-hats', 'bags-backpacks', 'other-accessories'], true) <=> array_search($y, ['t-shirts-polos', 'trousers', 'shorts', 'knitwear-hoodies', 'caps-hats', 'bags-backpacks', 'other-accessories'], true));
+        foreach ($kids as $k) {
+            if ($b = $term($k, $pid)) {
+                $add($b);
+            }
         }
     }
-    $parent = $add(['menu-item-title' => 'Collections', 'menu-item-type' => 'custom', 'menu-item-url' => home_url('/#collections')]);
-    foreach (['Schermo Core', 'Schermo Atelier', 'Milan Icons', 'Glasgow Cosmic'] as $name) {
-        if ($t = get_term_by('name', $name, 'product_cat')) {
-            $add(['menu-item-type' => 'taxonomy', 'menu-item-object' => 'product_cat', 'menu-item-object-id' => $t->term_id, 'menu-item-parent-id' => $parent]);
+    $coll = $add(['menu-item-title' => 'Collections', 'menu-item-type' => 'custom', 'menu-item-url' => home_url('/#collections')]);
+    foreach (['schermo-core', 'schermo-atelier', 'milan-icons', 'glasgow-cosmic'] as $slug) {
+        if ($a = $term($slug, $coll)) {
+            $add($a);
         }
     }
-    update_option('schermo_menu_v', 3, false);
-    echo "catalog: menu rebuilt (types + Collections)\n";
+    update_option('schermo_menu_v', 4, false);
+    echo "catalog: menu rebuilt (New In, Shop by type, Collections)\n";
 }

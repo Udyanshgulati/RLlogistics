@@ -12,14 +12,14 @@ function schermo_product_groups(int $id): array
     $slugs = wp_get_post_terms($id, 'product_cat', ['fields' => 'slugs']);
     $slugs = is_wp_error($slugs) ? [] : $slugs;
     $coll = array_values(array_intersect(array_keys(schermo_collection_labels()), $slugs))[0] ?? null;
-    $type = array_values(array_intersect(array_keys(schermo_types()), $slugs))[0] ?? null;
+    $type = array_values(array_intersect(array_keys(schermo_leaf_types()), $slugs))[0] ?? (array_values(array_intersect(array_keys(schermo_types()), $slugs))[0] ?? null);
     return [$coll, $type];
 }
 
 // Card line: "Schermo Atelier · Clothing" — collection first, then type; never a list of every category.
 add_filter('brandhouse_card_context', static function (string $default, WC_Product $p): string {
     [$coll, $type] = schermo_product_groups($p->get_id());
-    $parts = array_filter([$coll ? schermo_collection_labels()[$coll] : '', $type ? schermo_types()[$type] : '']);
+    $parts = array_filter([$coll ? schermo_collection_labels()[$coll] : '', $type ? (schermo_types()[$type] ?? '') : '']);
     return $parts ? implode(' · ', $parts) : $default;
 }, 10, 2);
 
