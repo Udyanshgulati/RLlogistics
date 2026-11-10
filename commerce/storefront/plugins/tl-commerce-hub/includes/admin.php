@@ -309,7 +309,10 @@ function tli_orders_table(array $orders, bool $compact = false): void
         } else {
             echo '<tr>';
         }
-        $inv = $compact || !$o->is_paid() ? '' : '<a class="tli-mini" target="_blank" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=invoice&o[]=L:' . $o->get_id()), 'tli_print')) . '">Invoice</a>';
+        $inv = $compact || (!$o->is_paid() && !$o->get_meta('_tl_invoice_no')) ? '' : '<a class="tli-mini" target="_blank" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=invoice&o[]=L:' . $o->get_id()), 'tli_print')) . '">Invoice</a>';
+        if (!$compact && ($o->get_meta('_tl_cn_cancel_no') || array_filter($o->get_refunds(), static fn ($r) => $r->get_meta('_tl_cn_no')))) {
+            $inv .= '<a class="tli-mini" target="_blank" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=creditnote&o[]=L:' . $o->get_id()), 'tli_print')) . '">Credit note</a>';
+        }
         printf('<td class="nowrap"><a class="tli-link" href="%s">#%s</a><span class="muted small">%s</span>%s</td><td>%s</td>%s<td class="mono">%s</td><td>%s</td><td class="num">%s</td>',
             esc_url(current_user_can('edit_shop_orders') ? $o->get_edit_order_url() : '#'), esc_html($o->get_order_number()), esc_html($o->get_date_created() ? wp_date('d M, H:i', $o->get_date_created()->getTimestamp()) : ''), $inv,
             esc_html(trim($o->get_formatted_billing_full_name()) ?: '—'), $compact ? '' : '<td class="small">' . esc_html(mb_strimwidth($items, 0, 80, '…')) . '</td>',

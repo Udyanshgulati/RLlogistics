@@ -158,6 +158,24 @@ add_action('rest_api_init', static function (): void {
     }]);
 });
 
+// The hub asks for an order's GST invoice (and credit notes) to print them at the warehouse.
+add_action('rest_api_init', static function (): void {
+    if (tli_mode() !== 'store') {
+        return;
+    }
+    register_rest_route('tlhub/v1', '/invoice', ['methods' => 'POST', 'permission_callback' => static function (WP_REST_Request $r) {
+        $c = tli_store_conf();
+        return tli_store_ready() && hash_equals($c['id'], (string) $r->get_header('x_tl_store')) && tli_verify($r, $c['secret'])
+            ? true : new WP_Error('tl_auth', 'Signature invalid.', ['status' => 401]);
+    }, 'callback' => static function (WP_REST_Request $r) {
+        $o = wc_get_order(absint(($r->get_json_params() ?: [])['remote_id'] ?? 0));
+        if (!$o instanceof WC_Order) {
+            return new WP_Error('tl_bad', 'Unknown order.', ['status' => 404]);
+        }
+        return ['html' => tli_invoice_fragment($o)];
+    }]);
+});
+
 /* Connection screen. */
 add_action('admin_post_tli_connection', static function (): void {
     if (!current_user_can('tl_manage')) {

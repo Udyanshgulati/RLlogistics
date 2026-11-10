@@ -59,17 +59,34 @@ add_action('admin_post_tli_print', static function (): void {
     if (!empty($_REQUEST['all_to_pack'])) {
         $keys = tli_to_pack_keys();
     }
-    if ($what === 'invoice') {
+    if ($what === 'invoice' || $what === 'creditnote') {
         $list = [];
         $skipped = [];
+        $extra = '';
         foreach ($keys as $k) {
             if (str_starts_with($k, 'L:') && ($o = wc_get_order(absint(substr($k, 2))))) {
                 $list[] = $o;
-            } elseif (str_starts_with($k, 'R:')) {
-                $skipped[] = 'Orders from other stores are invoiced by the store that sold them (open the invoice in that store\'s admin).';
+            } elseif (str_starts_with($k, 'R:') && tli_mode() === 'hub') {
+                // Invoices of other stores are issued (and numbered) by that store; fetch them for printing here.
+                global $wpdb;
+                $r = $wpdb->get_row($wpdb->prepare("SELECT store_id, remote_id, number FROM {$wpdb->prefix}tl_remote_orders WHERE id = %d", absint(substr($k, 2))), ARRAY_A);
+                $st = $r ? tli_store($r['store_id']) : null;
+                try {
+                    if (!$st) {
+                        throw new RuntimeException('store not found');
+                    }
+                    $res = tli_call($st['url'], $st['id'], $st['secret'], 'POST', 'invoice', ['remote_id' => $r['remote_id']]);
+                    $extra .= wp_kses_post((string) ($res['html'] ?? ''));
+                } catch (Throwable $e) {
+                    $skipped[] = sprintf('Order #%s from another store: invoice could not be fetched (%s).', $r['number'] ?? '?', $e->getMessage());
+                }
             }
         }
-        tli_invoice_document($list, array_unique($skipped));
+        if ($what === 'creditnote') {
+            tli_credit_note_document($list);
+        } else {
+            tli_invoice_document($list, $skipped, $extra);
+        }
         exit;
     }
     $orders = tli_print_orders($keys);

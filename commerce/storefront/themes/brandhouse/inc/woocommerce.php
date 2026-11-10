@@ -44,7 +44,11 @@ add_filter('woocommerce_out_of_stock_message', static function (string $msg): st
 });
 
 // Menu links to product categories that have no products are hidden (e.g. after products are removed).
+// Links to pages that are not published yet (e.g. policy drafts) are hidden from visitors instead of leading to a 404.
 add_filter('wp_nav_menu_objects', static fn (array $items): array => array_values(array_filter($items, static function ($i): bool {
+    if ($i->type === 'post_type') {
+        return get_post_status((int) $i->object_id) === 'publish';
+    }
     if ($i->object !== 'product_cat') {
         return true;
     }

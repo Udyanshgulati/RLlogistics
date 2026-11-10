@@ -133,13 +133,18 @@ add_action('template_redirect', static function (): void {
     if (!defined('DONOTCACHEPAGE')) {
         define('DONOTCACHEPAGE', true);
     }
-    tli_invoice_document([$o]);
+    if (!empty($_GET['cn'])) { // phpcs:ignore WordPress.Security.NonceVerification
+        tli_credit_note_document([$o]);
+    } else {
+        tli_invoice_document([$o]);
+    }
     exit;
 });
 
 add_action('woocommerce_order_details_after_order_table', static function ($o): void {
     if ($o instanceof WC_Order && ($link = tli_invoice_link($o))) {
-        printf('<p><a class="button" href="%s" target="_blank" rel="noopener">Download GST invoice</a></p>', esc_url($link));
+        printf('<p><a class="button" href="%s" target="_blank" rel="noopener">Download GST invoice</a>%s</p>', esc_url($link),
+            tli_credit_notes($o) ? ' <a class="button" href="' . esc_url(add_query_arg('cn', 1, $link)) . '" target="_blank" rel="noopener">Credit note</a>' : '');
     }
 });
 
@@ -255,7 +260,7 @@ function tli_amount_words(float $amt): string
 }
 
 /** Full HTML page with one invoice per order. */
-function tli_invoice_document(array $orders, array $skipped = []): void
+function tli_invoice_document(array $orders, array $skipped = [], string $extra = ''): void
 {
     nocache_headers();
     header('Content-Type: text/html; charset=utf-8');
@@ -267,19 +272,56 @@ function tli_invoice_document(array $orders, array $skipped = []): void
     foreach ($orders as $o) {
         tli_render_invoice($o);
     }
-    if (!$orders) {
+    echo $extra; // phpcs:ignore WordPress.Security.EscapeOutput -- invoices from connected stores, passed through wp_kses_post
+    if (!$orders && $extra === '') {
         echo '<p class="empty">No orders to invoice.</p>';
     }
     echo '</body></html>';
 }
 
-function tli_render_invoice(WC_Order $o): void
+function tli_credit_note_document(array $orders): void
+{
+    nocache_headers();
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!doctype html><html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Credit note · ' . esc_html(get_bloginfo('name')) . '</title><style>' . tli_print_css() . tli_invoice_css() . '</style></head><body>';
+    echo '<div class="bar no-print"><b>Credit notes</b><button onclick="window.print()">Print / save as PDF</button></div>';
+    $any = false;
+    foreach ($orders as $o) {
+        foreach (tli_credit_notes($o) as $cn) {
+            tli_render_invoice($o, $cn);
+            $any = true;
+        }
+    }
+    if (!$any) {
+        echo '<p class="empty">No credit notes for these orders.</p>';
+    }
+    echo '</body></html>';
+}
+
+/** Invoice + credit notes of one order as an HTML fragment (sent to the hub for printing at the warehouse). */
+function tli_invoice_fragment(WC_Order $o): string
+{
+    ob_start();
+    tli_render_invoice($o);
+    foreach (tli_credit_notes($o) as $cn) {
+        tli_render_invoice($o, $cn);
+    }
+    return (string) ob_get_clean();
+}
+
+function tli_render_invoice(WC_Order $o, ?array $cn = null): void
 {
     $c = tli_invoice_conf();
-    $no = tli_invoice_number($o);
+    $inv_no = tli_invoice_number($o, $cn === null);
+    $no = $cn ? $cn['no'] : $inv_no;
     $draft = $no === '';
     $d = tli_invoice_data($o);
     $at = (int) $o->get_meta('_tl_invoice_at') ?: ($o->get_date_paid() ? $o->get_date_paid()->getTimestamp() : time());
+    $inv_at = $at;
+    if ($cn) {
+        $d = array_merge($d, ['lines' => $cn['lines'], 'totals' => $cn['totals'], 'missing_rate' => false]);
+        $at = $cn['at'];
+    }
     $bill = wp_strip_all_tags(str_replace(['<br/>', '<br>'], "\n", (string) $o->get_formatted_billing_address()));
     $ship = wp_strip_all_tags(str_replace(['<br/>', '<br>'], "\n", (string) ($o->get_formatted_shipping_address() ?: $o->get_formatted_billing_address())));
     $pos = $d['export'] ? 'Outside India (' . (WC()->countries->get_countries()[$d['country']] ?? $d['country']) . ') — 96' : ($d['state'] !== '' ? tli_state_name($d['state']) . ' — ' . (TLI_GST_STATE_CODES[$d['state']] ?? '') : '—');
@@ -288,13 +330,14 @@ function tli_render_invoice(WC_Order $o): void
         $why = tli_invoice_missing() ? 'business details are missing (' . implode(', ', tli_invoice_missing()) . ') — fill them in TL Commerce Hub → Settings → GST invoice' : 'the order is not paid yet';
         echo '<div class="inv-draft">DRAFT — NOT A TAX INVOICE: ' . esc_html($why) . '.</div>';
     }
-    if (in_array($o->get_status(), ['cancelled', 'refunded'], true) && !$draft) {
-        echo '<div class="inv-draft">This order was ' . esc_html($o->get_status()) . ' after the invoice was issued — issue a credit note against invoice ' . esc_html($no) . '.</div>';
+    if (!$cn && !$draft && ($cns = tli_credit_notes($o))) {
+        echo '<p class="note no-print">Credit note' . (count($cns) > 1 ? 's' : '') . ' issued against this invoice: ' . esc_html(implode(', ', array_column($cns, 'no'))) . '.</p>';
     }
-    printf('<header class="doc-head"><div><img class="logo" src="%s" alt=""><p><b>%s</b><br>%s<br>GSTIN: <b>%s</b>%s</p></div><div class="right"><h1>Tax Invoice</h1><p>Invoice no. <b>%s</b><br>Date: %s<br>Order #%s · %s</p></div></header>',
+    printf('<header class="doc-head"><div><img class="logo" src="%s" alt=""><p><b>%s</b><br>%s<br>GSTIN: <b>%s</b>%s</p></div><div class="right"><h1>%s</h1><p>%s no. <b>%s</b><br>Date: %s<br>%sOrder #%s · %s</p></div></header>',
         esc_url(get_stylesheet_directory_uri() . '/assets/img/email-logo.png'), esc_html($c['legal_name'] ?: '[LEGAL BUSINESS NAME]'), nl2br(esc_html($c['address'] ?: '[REGISTERED ADDRESS]')),
         esc_html($c['gstin'] ?: '[GSTIN]'), ($c['email'] || $c['phone']) ? '<br>' . esc_html(trim($c['email'] . ' · ' . $c['phone'], ' ·')) : '',
-        esc_html($draft ? '—' : $no), esc_html(wp_date('d M Y', $at)), esc_html($o->get_order_number()), esc_html(wc_format_datetime($o->get_date_created(), 'd M Y')));
+        $cn ? 'Credit Note' : 'Tax Invoice', $cn ? 'Credit note' : 'Invoice', esc_html($draft ? '—' : $no), esc_html(wp_date('d M Y', $at)),
+        $cn ? 'Against invoice <b>' . esc_html($inv_no) . '</b> of ' . esc_html(wp_date('d M Y', $inv_at)) . '<br>' : '', esc_html($o->get_order_number()), esc_html(wc_format_datetime($o->get_date_created(), 'd M Y')));
     printf('<div class="cols"><div><h2>Billed to</h2><p class="addr">%s</p>%s</div><div><h2>Shipped to</h2><p class="addr">%s</p><p>Place of supply: <b>%s</b><br>Reverse charge: No</p></div></div>',
         nl2br(esc_html($bill)), $o->get_billing_email() ? '<p>' . esc_html($o->get_billing_email()) . '</p>' : '', nl2br(esc_html($ship)), esc_html($pos));
     $split = $d['intra'];
@@ -310,23 +353,23 @@ function tli_render_invoice(WC_Order $o): void
         $tax_cg += $half;
         $taxcols = $split ? sprintf('<td class="n">%s<small>%s%%</small></td><td class="n">%s<small>%s%%</small></td>', $fmt($half), $l['rate'] === null ? '?' : rtrim(rtrim(number_format($l['rate'] / 2, 2), '0'), '.'), $fmt($l['tax'] - $half), $l['rate'] === null ? '?' : rtrim(rtrim(number_format($l['rate'] / 2, 2), '0'), '.'))
             : sprintf('<td class="n">%s<small>%s%%</small></td>', $fmt($l['tax']), $rate);
-        printf('<tr><td>%d</td><td>%s</td><td class="mono">%s</td><td class="n">%d</td><td class="n">%s</td>%s<td class="n">%s</td></tr>', $i, esc_html($l['desc']), esc_html($l['hsn'] ?: '—'), $l['qty'], $fmt($l['taxable']), $taxcols, $fmt($l['gross']));
+        printf('<tr><td>%d</td><td>%s</td><td class="mono">%s</td><td class="n">%s</td><td class="n">%s</td>%s<td class="n">%s</td></tr>', $i, esc_html($l['desc']), esc_html($l['hsn'] ?: '—'), $l['qty'] === null ? '—' : (int) $l['qty'], $fmt($l['taxable']), $taxcols, $fmt($l['gross']));
     }
     $t = $d['totals'];
     printf('</tbody><tfoot><tr><td></td><td colspan="3"><b>Total</b></td><td class="n"><b>%s</b></td>%s<td class="n"><b>%s</b></td></tr></tfoot></table>', $fmt($t['taxable']),
         $split ? sprintf('<td class="n"><b>%s</b></td><td class="n"><b>%s</b></td>', $fmt($tax_cg), $fmt($t['tax'] - $tax_cg)) : sprintf('<td class="n"><b>%s</b></td>', $fmt($t['tax'])), $fmt($t['gross']));
-    printf('<div class="inv-sum"><p>Amount in words: <b>%s</b></p><table><tr><td>Taxable value</td><td class="n">₹%s</td></tr><tr><td>GST</td><td class="n">₹%s</td></tr><tr class="g"><td>Invoice total</td><td class="n">₹%s</td></tr><tr><td>Paid via</td><td class="n">%s</td></tr></table></div>',
-        esc_html(tli_amount_words($t['gross'])), $fmt($t['taxable']), $fmt($t['tax']), $fmt($t['gross']), esc_html($o->get_payment_method_title() ?: '—'));
+    printf('<div class="inv-sum"><p>Amount in words: <b>%s</b></p><table><tr><td>Taxable value</td><td class="n">₹%s</td></tr><tr><td>GST</td><td class="n">₹%s</td></tr><tr class="g"><td>%s</td><td class="n">₹%s</td></tr><tr><td>%s</td><td class="n">%s</td></tr></table></div>',
+        esc_html(tli_amount_words($t['gross'])), $fmt($t['taxable']), $fmt($t['tax']), $cn ? 'Credit note total' : 'Invoice total', $fmt($t['gross']), $cn ? 'Reason' : 'Paid via', esc_html($cn ? $cn['reason'] : ($o->get_payment_method_title() ?: '—')));
     if ($d['zero']) {
         echo '<p class="note">Supply meant for export under LUT (' . esc_html($c['lut']) . ') without payment of IGST.</p>';
     }
     if ($d['missing_rate']) {
         echo '<p class="note">GST rate missing for a line marked "?" — set the product\'s GST rate (client sheet "GST rate" column).</p>';
     }
-    if (abs($t['gross'] - (float) $o->get_total()) > 1.0) {
+    if (!$cn && abs($t['gross'] - (float) $o->get_total()) > 1.0) {
         echo '<p class="note no-print">Check: invoice total differs from the order total (₹' . esc_html($fmt((float) $o->get_total())) . ').</p>';
     }
-    printf('<div class="inv-sign"><div class="muted">Prices include GST. This is a computer-generated invoice.</div><div>For %s<br><br><br>Authorised signatory</div></div></section>', esc_html($c['legal_name'] ?: get_bloginfo('name')));
+    printf('<div class="inv-sign"><div class="muted">Prices include GST. This is a computer-generated %s.</div><div>For %s<br><br><br>Authorised signatory</div></div></section>', $cn ? 'credit note' : 'invoice', esc_html($c['legal_name'] ?: get_bloginfo('name')));
 }
 
 function tli_invoice_css(): string
@@ -335,6 +378,125 @@ function tli_invoice_css(): string
 .inv-t td small{display:block;color:#777;font-size:10.5px}.inv-t tfoot td{border-top:1.5px solid #111;border-bottom:0}.inv-sum{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;margin-top:6px}
 .inv-sum table{width:auto;min-width:260px;margin:0}.inv-sum td{padding:5px 6px}.inv-sum tr.g td{font-weight:700;font-size:14px;border-top:1.5px solid #111}
 .inv-sign{display:flex;justify-content:space-between;align-items:flex-end;margin-top:28px;text-align:right}.inv-sign .muted{text-align:left;font-size:11px}';
+}
+
+/* ── Credit notes ─────────────────────────────────────────────────────── */
+/**
+ * A credit note is issued (own series per financial year, PREFIXC/2627/0001) for every refund on an invoiced order,
+ * and for an invoiced order cancelled without a refund. Refunds of specific items credit those items; a refund of an
+ * amount only credits every invoice line in proportion.
+ */
+function tli_next_cn_number(): string
+{
+    global $wpdb;
+    if (!$wpdb->get_var("SELECT GET_LOCK('tli_invoice_no', 10)")) {
+        return '';
+    }
+    try {
+        $fy = tli_fy(time());
+        $key = 'tli_cn_seq_' . str_replace('-', '_', $fy);
+        wp_cache_delete($key, 'options');
+        $seq = (int) get_option($key, 0) + 1;
+        update_option($key, $seq, false);
+        return sprintf('%sC/%s/%04d', tli_invoice_conf()['prefix'], str_replace('-', '', $fy), $seq);
+    } finally {
+        $wpdb->query("SELECT RELEASE_LOCK('tli_invoice_no')");
+    }
+}
+
+add_action('woocommerce_order_refunded', static function ($order_id, $refund_id): void {
+    $o = wc_get_order($order_id);
+    $r = wc_get_order($refund_id);
+    if (!$o instanceof WC_Order || !$r instanceof WC_Order_Refund || tli_invoice_number($o, false) === '' || $o->get_meta('_tl_cn_cancel_no') || $r->get_meta('_tl_cn_no')) {
+        return;
+    }
+    if ($n = tli_next_cn_number()) {
+        $r->update_meta_data('_tl_cn_no', $n);
+        $r->update_meta_data('_tl_cn_at', time());
+        $r->save_meta_data();
+        $o->add_order_note('Credit note ' . $n . ' issued for the refund of ' . wp_strip_all_tags(wc_price((float) $r->get_amount())) . '.');
+    }
+}, 10, 2);
+
+add_action('woocommerce_order_status_cancelled', static function ($id, $o = null): void {
+    $o = $o instanceof WC_Order ? $o : wc_get_order($id);
+    if (!$o || tli_invoice_number($o, false) === '' || $o->get_meta('_tl_cn_cancel_no') || $o->get_refunds()) {
+        return;
+    }
+    if ($n = tli_next_cn_number()) {
+        $o->update_meta_data('_tl_cn_cancel_no', $n);
+        $o->update_meta_data('_tl_cn_cancel_at', time());
+        $o->save_meta_data();
+        $o->add_order_note('Order cancelled after invoicing: credit note ' . $n . ' issued for the full invoice.');
+    }
+}, 10, 2);
+
+/** Every credit note of an order, oldest first, with its lines. */
+function tli_credit_notes(WC_Order $o): array
+{
+    $inv = tli_invoice_data($o);
+    $sum = static function (array $lines): array {
+        $t = ['taxable' => 0.0, 'tax' => 0.0, 'gross' => 0.0];
+        foreach ($lines as $l) {
+            foreach ($t as $k => $v) {
+                $t[$k] += $l[$k];
+            }
+        }
+        return $t;
+    };
+    $scale = static function (float $amount) use ($inv): array {
+        $total = (float) $inv['totals']['gross'];
+        $f = $total > 0 ? min(1.0, $amount / $total) : 0.0;
+        $out = [];
+        foreach ($inv['lines'] as $l) {
+            $g = round($l['gross'] * $f, 2);
+            $tx = round($l['taxable'] * $f, 2);
+            $out[] = ['desc' => $l['desc'], 'hsn' => $l['hsn'], 'qty' => $f >= 0.999 ? $l['qty'] : null, 'rate' => $l['rate'], 'taxable' => $tx, 'tax' => round($g - $tx, 2), 'gross' => $g];
+        }
+        // Rounding remainder goes on the largest line so the note adds up to exactly the refunded amount.
+        $diff = round(min($amount, $total) - array_sum(array_column($out, 'gross')), 2);
+        if ($out && abs($diff) > 0) {
+            $k = array_search(max(array_column($out, 'gross')), array_column($out, 'gross'), true);
+            $out[$k]['gross'] = round($out[$k]['gross'] + $diff, 2);
+            $out[$k]['tax'] = round($out[$k]['gross'] - $out[$k]['taxable'], 2);
+        }
+        return $out;
+    };
+    $notes = [];
+    if ($n = (string) $o->get_meta('_tl_cn_cancel_no')) {
+        $lines = $scale((float) $inv['totals']['gross']);
+        $notes[] = ['no' => $n, 'at' => (int) $o->get_meta('_tl_cn_cancel_at'), 'reason' => 'Order cancelled', 'lines' => $lines, 'totals' => $sum($lines)];
+    }
+    foreach ($o->get_refunds() as $r) {
+        if (!($n = (string) $r->get_meta('_tl_cn_no'))) {
+            continue;
+        }
+        $lines = [];
+        $itemised = 0.0;
+        foreach ($r->get_items(['line_item', 'shipping', 'fee']) as $ri) {
+            $gross = round(abs((float) $ri->get_total() + (float) $ri->get_total_tax()), wc_get_price_decimals());
+            if ($gross < 0.005) {
+                continue;
+            }
+            $orig = $o->get_item((int) $ri->get_meta('_refunded_item_id'));
+            $rate = $orig ? tli_line_rate($orig) : null;
+            if ($rate === null && $ri->get_type() !== 'line_item') {
+                $rate = max(array_map(static fn ($l) => (float) $l['rate'], $inv['lines']) ?: [0]) ?: null;
+            }
+            $taxable = $inv['zero'] || $rate === null ? $gross : round($gross / (1 + $rate / 100), 2);
+            $hsn = $orig instanceof WC_Order_Item_Product ? tli_line_hsn($orig) : '';
+            $lines[] = ['desc' => $ri->get_type() === 'shipping' ? 'Delivery charges' : $ri->get_name(), 'hsn' => $hsn, 'qty' => $ri->get_type() === 'line_item' ? abs((int) $ri->get_quantity()) : 1,
+                'rate' => $inv['zero'] ? 0.0 : $rate, 'taxable' => $taxable, 'tax' => round($gross - $taxable, 2), 'gross' => $gross];
+            $itemised += $gross;
+        }
+        $amount = (float) $r->get_amount();
+        if (!$lines || abs($itemised - $amount) > 1.0) {
+            $lines = $scale($amount); // refund of an amount (e.g. from the payment gateway): credit every line in proportion
+        }
+        $notes[] = ['no' => $n, 'at' => (int) $r->get_meta('_tl_cn_at') ?: time(), 'reason' => $r->get_reason() ?: 'Refund', 'lines' => $lines, 'totals' => $sum($lines)];
+    }
+    usort($notes, static fn ($a, $b) => strnatcmp($a['no'], $b['no']));
+    return $notes;
 }
 
 /* ── Settings: GST invoice + couriers ─────────────────────────────────── */

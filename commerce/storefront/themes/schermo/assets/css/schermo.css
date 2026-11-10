@@ -269,6 +269,8 @@ dialog.sheet, .market-sheet { background: rgba(18, 18, 20, .92); color: var(--in
 /* Footer: deeper black with a faint red horizon */
 .site-footer { background: radial-gradient(80% 120% at 50% 120%, rgba(142, 15, 29, .35), transparent 60%), #050505; color: rgba(255, 255, 255, .78); border-top: 1px solid var(--line); }
 .site-footer .wordmark.has-svg { color: #fff; }
+.site-footer .foot-col h2 { color: rgba(255, 255, 255, .55); }
+.site-footer a:hover { color: #fff; }
 
 @media (max-width: 1240px) { .site-header .bar { grid-template-columns: 1fr auto 1fr; } }
 @media (max-width: 960px) {
