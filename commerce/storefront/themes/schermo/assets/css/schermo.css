@@ -1222,3 +1222,17 @@ dialog.qa-sheet { width: min(440px, calc(100vw - 24px)); border-radius: var(--r-
   .summary .size-options { grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); }
   .summary .size-opt { min-height: 44px; padding: 0 4px; }
 }
+
+/* Notices (e.g. "added to your cart") receive focus for screen readers; that must not draw a white frame. */
+.woocommerce-message:focus, .woocommerce-info:focus, .woocommerce-error:focus, .woocommerce-notices-wrapper:focus, .wc-block-components-notice-banner:focus, [tabindex="-1"]:focus:not(:focus-visible), .woocommerce-message:focus-visible, .woocommerce-error:focus-visible, .woocommerce-info:focus-visible { outline: none !important; }
+.woocommerce-message, .woocommerce-info, .woocommerce-error { border: 1px solid var(--line) !important; }
+/* Selects: no native background showing behind the rounded corners (Safari). */
+.wc-blocks-components-select__select { -webkit-appearance: none; appearance: none; background-clip: padding-box; }
+.wc-blocks-components-select, .wc-blocks-components-select__container { background: transparent !important; }
+/* Quantity on the order summary photos: a dark badge with the number readable. */
+.wc-block-components-order-summary-item__quantity { background: #0a0a0b !important; color: #fff !important; border: 1px solid var(--gold, #c9a24a) !important; box-shadow: none !important; min-width: 22px; height: 22px; font: 600 11px/20px var(--font-label); }
+.wc-block-components-order-summary-item__quantity * { color: #fff !important; }
+/* Terms: the one checkbox, comfortable to tap. */
+.sch-checkout .wc-block-checkout__terms .wc-block-components-checkbox__input { width: 22px; height: 22px; }
+.sch-checkout .wc-block-checkout__terms { font-size: 14px; color: var(--ink); }
+.sch-checkout .wc-block-checkout__terms a { text-decoration: underline; text-underline-offset: 3px; }

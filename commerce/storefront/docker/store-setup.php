@@ -29,3 +29,21 @@ if (!in_array('India', $names, true)) {
     $zone->save();
     echo "store: India shipping zone created (no rates yet)\n";
 }
+
+// Checkout content (v1, once): no order-note box, and a required "I agree to the Terms and Conditions" checkbox
+// linked to the published Terms page (the owner's choice for a minimal checkout).
+if ((int) get_option('schermo_checkout_v') < 1) {
+    $page = get_post(wc_get_page_id('checkout'));
+    if ($page) {
+        $c = $page->post_content;
+        $c = preg_replace('#\s*<!-- wp:woocommerce/checkout-order-note-block[^>]*-->.*?<!-- /wp:woocommerce/checkout-order-note-block -->#s', '', $c);
+        $c = preg_replace('#<!-- wp:woocommerce/checkout-terms-block[^>]*-->#', '<!-- wp:woocommerce/checkout-terms-block {"checkbox":true} -->', $c);
+        wp_update_post(['ID' => $page->ID, 'post_content' => $c]);
+    }
+    $terms = get_page_by_path('terms-and-conditions', OBJECT, 'page');
+    if ($terms && $terms->post_status === 'publish') {
+        update_option('woocommerce_terms_page_id', $terms->ID);
+    }
+    update_option('schermo_checkout_v', 1, false);
+    echo "store: checkout simplified (terms checkbox, no order note)\n";
+}

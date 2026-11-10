@@ -77,7 +77,10 @@ function scm_marketing_audience(string $channel): array
 
 // ---- Checkout boxes (block checkout). Optional and unchecked; values are saved on the order and recorded below.
 add_action('woocommerce_init', static function (): void {
-    if (!function_exists('woocommerce_register_additional_checkout_field')) {
+    // The owner chose a minimal checkout (only the terms checkbox), so these boxes are off unless switched on with
+    // add_filter('scm_checkout_consent_fields', '__return_true'). Without them no WhatsApp or marketing consent is
+    // collected at checkout, so those messages are not sent to checkout customers.
+    if (!function_exists('woocommerce_register_additional_checkout_field') || !apply_filters('scm_checkout_consent_fields', false)) {
         return;
     }
     foreach (['whatsapp:updates' => 'scm/wa-updates', 'email:marketing' => 'scm/email-marketing', 'whatsapp:marketing' => 'scm/wa-marketing'] as $key => $id) {
