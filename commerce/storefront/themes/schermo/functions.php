@@ -87,9 +87,9 @@ add_filter('brandhouse_icon_paths', static fn (array $paths): array => array_mer
 ], $paths));
 
 /**
- * Hero slides: product cut-outs with feature labels taken from what is visible on each product.
- * Words are the collection's own lines (Sempre Avanti, Play Beyond) or the product's name. A slide is
- * skipped if its product is not in the store. Spots: [label, x%, y%, side of the label].
+ * Hero slides: one product per collection, with feature labels taken from what is visible on each product.
+ * Words are the collection's own lines from the owner's deck. A slide is skipped if its product is not in the store.
+ * Image: a cut-out in assets/img/hero/, or null for the product's own first photo. Spots: [label, x%, y%, side].
  */
 function schermo_hero_slides(): array
 {
@@ -98,11 +98,12 @@ function schermo_hero_slides(): array
     }
     $dir = get_stylesheet_directory_uri() . '/assets/img/hero/';
     $defs = [
+        ['SC-001', null, ['Sport', 'Street'], [[__('Appliqué No. 10', 'schermo'), 52, 56, 'right'], [__('Cream curved panels', 'schermo'), 22, 47, 'left'], [__('Contrast collar', 'schermo'), 50, 25, 'left']]],
+        ['SA-003', null, ['Limited', 'Drops'], [[__('Raised chenille S', 'schermo'), 58, 38, 'right'], [__('Washed black body', 'schermo'), 30, 32, 'left'], [__('Maroon side panels', 'schermo'), 74, 72, 'right']]],
         ['MI-001', 'playing-jersey.webp', ['Sempre', 'Avanti'], [[__('Gold-trimmed collar', 'schermo'), 50, 11, 'left'], [__('Milan Icons crest', 'schermo'), 69, 33, 'right'], [__('Duomo skyline print', 'schermo'), 40, 78, 'left']]],
-        ['MI-004', 'practice-kit.webp', ['Practice', 'Kit'], [[__('Gold-striped collar', 'schermo'), 51, 7, 'left'], [__('Milan Icons crest', 'schermo'), 67, 33, 'right'], [__('Tonal Duomo print', 'schermo'), 33, 72, 'left']]],
-        ['MI-005', 'practice-kit-sleeveless.webp', ['Play', 'Beyond'], [[__('Gold-trimmed armholes', 'schermo'), 11, 26, 'left'], [__('Milan Icons crest', 'schermo'), 74, 30, 'right'], [__('Tonal Duomo print', 'schermo'), 48, 76, 'left']]],
-        ['MI-006', 'practice-shorts.webp', ['Milan', 'Icons'], [[__('Drawstring waist', 'schermo'), 49, 24, 'right'], [__('Gold side piping', 'schermo'), 92, 49, 'right'], [__('Milan Icons crest', 'schermo'), 23, 80, 'left']]],
+        ['GC-001', null, ['Glasgow', 'Cosmic'], [[__('Glasgow Cosmic crest', 'schermo'), 64, 30, 'right'], [__('Woven thistle pattern', 'schermo'), 38, 64, 'left'], [__('Electric blue panels', 'schermo'), 79, 74, 'right']]],
     ];
+    $names = array_column(schermo_collections(), 'label', 'slug');
     $slides = [];
     foreach ($defs as [$sku, $img, $words, $spots]) {
         $id = wc_get_product_id_by_sku($sku);
@@ -110,13 +111,20 @@ function schermo_hero_slides(): array
         if (!$p || $p->get_status() !== 'publish') {
             continue;
         }
-        $coll = get_term_by('slug', 'milan-icons', 'product_cat');
+        $src = $img ? $dir . $img : (string) wp_get_attachment_image_url((int) $p->get_image_id(), 'full');
+        if ($src === '') {
+            continue;
+        }
+        $coll = '';
+        foreach (wp_get_post_terms($id, 'product_cat', ['fields' => 'slugs']) as $slug) {
+            $coll = $names[$slug] ?? $coll;
+        }
         $slides[] = [
             'name' => $p->get_name(),
             'url' => $p->get_permalink(),
             'price' => $p->get_price_html(),
-            'collection' => $coll ? $coll->name : '',
-            'image' => $dir . $img,
+            'collection' => $coll,
+            'image' => $src,
             'words' => $words,
             'spots' => $spots,
         ];
@@ -124,12 +132,40 @@ function schermo_hero_slides(): array
     return $slides;
 }
 
+/**
+ * The four collections in deck order, with the deck's subtitle and line, a representative product photo and, for
+ * the team collections, the crest. Collections not yet in the store are left out.
+ */
+function schermo_collections(): array
+{
+    static $out = null;
+    if ($out !== null || !class_exists('WooCommerce')) {
+        return $out ?? [];
+    }
+    $img = get_stylesheet_directory_uri() . '/assets/img/';
+    $defs = [
+        ['schermo-core', 'core', __('Core', 'schermo'), __('Schermo Essentials', 'schermo'), __('Tees, baggy trousers, caps, backpacks, shorts.', 'schermo'), null],
+        ['schermo-atelier', 'atelier', __('Atelier', 'schermo'), __('Limited drops', 'schermo'), __('Embroidery, patchwork and hand stitched detail.', 'schermo'), null],
+        ['milan-icons', 'icons', __('Milan Icons', 'schermo'), __('Team merchandise', 'schermo'), __('Black and gold, drawn from the Duomo.', 'schermo'), $img . 'crest-milan-icons.webp'],
+        ['glasgow-cosmic', 'cosmic', __('Glasgow Cosmic', 'schermo'), __('Team merchandise', 'schermo'), __('Cosmic navy, electric blue, Scottish thistle.', 'schermo'), $img . 'crest-glasgow-cosmic.webp'],
+    ];
+    $out = [];
+    foreach ($defs as [$slug, $key, $label, $sub, $line, $crest]) {
+        $term = get_term_by('slug', $slug, 'product_cat');
+        if (!$term || is_wp_error($term) || !$term->count) {
+            continue;
+        }
+        $out[] = ['slug' => $slug, 'key' => $key, 'term' => $term, 'label' => $label, 'sub' => $sub, 'line' => $line, 'crest' => $crest, 'image' => schermo_category_image($term)];
+    }
+    return $out;
+}
+
 /** Category tile image: the category's own thumbnail, else the newest product's photo in it. */
 function schermo_category_image(WP_Term $cat): string
 {
     static $used = [];
     // A representative product per category (full cut-out), else the category's own image, else the newest product.
-    $featured = ['accessories' => 'MI-010', 'clothing' => 'MI-018', 'fan-merch' => 'MI-028', 'milan-icons' => 'MI-001', 'sportswear' => 'MI-014'];
+    $featured = ['accessories' => 'SC-028', 'clothing' => 'SC-016', 'fan-merch' => 'GC-026', 'sportswear' => 'MI-014', 'schermo-core' => 'SC-001', 'schermo-atelier' => 'SA-003', 'milan-icons' => 'MI-001', 'glasgow-cosmic' => 'GC-001'];
     $thumb = 0;
     if (isset($featured[$cat->slug]) && ($fid = wc_get_product_id_by_sku($featured[$cat->slug])) && get_post_status($fid) === 'publish') {
         $thumb = (int) get_post_thumbnail_id($fid);

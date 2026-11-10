@@ -44,6 +44,10 @@ $added = 0;
 foreach (glob($root . '/*/products.json') ?: [] as $json) {
     $data = json_decode((string) file_get_contents($json), true);
     $collection = $cat($data['collection']);
+    // The collection's line (shown on its shop page), only while the term has none — admin edits are kept.
+    if (!empty($data['collection_description']) && term_description($collection, 'product_cat') === '') {
+        wp_update_term($collection, 'product_cat', ['description' => $data['collection_description']]);
+    }
     // Put the collection first in the main menu, once.
     $loc = get_nav_menu_locations();
     if (!empty($loc['primary'])) {
@@ -140,3 +144,21 @@ if ($added > 0) {
     }
 }
 echo "catalog: {$added} products added\n";
+
+// One-time menu order: the four collections first (as in the brand deck), then the categories. Runs once per
+// version, so menus rearranged later in WP admin stay as they are.
+$loc = get_nav_menu_locations();
+if (!empty($loc['primary']) && (int) get_option('schermo_menu_v') < 2) {
+    $order = ['Schermo Core', 'Schermo Atelier', 'Milan Icons', 'Glasgow Cosmic', 'Clothing', 'Sportswear', 'Accessories', 'Fan Merch'];
+    $items = wp_get_nav_menu_items($loc['primary']) ?: [];
+    usort($items, static function ($a, $b) use ($order) {
+        $ra = array_search($a->title, $order, true);
+        $rb = array_search($b->title, $order, true);
+        return [$ra === false ? 99 : $ra, $a->menu_order] <=> [$rb === false ? 99 : $rb, $b->menu_order];
+    });
+    foreach ($items as $n => $item) {
+        wp_update_post(['ID' => $item->ID, 'menu_order' => $n + 1]);
+    }
+    update_option('schermo_menu_v', 2, false);
+    echo "catalog: menu ordered (collections first)\n";
+}

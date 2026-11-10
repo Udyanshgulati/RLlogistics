@@ -1,0 +1,344 @@
+{
+ "collection": "Glasgow Cosmic",
+ "collection_description": "Cosmic navy and electric blue, with the Scottish thistle woven into the fabric. Our roots are Scottish. Our ambitions are universal.",
+ "note": "From the owner's deck. Prices and stock are not set until the owner provides them.",
+ "products": [
+  {
+   "sku": "GC-001",
+   "name": "Glasgow Cosmic Playing Jersey",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Cosmic navy playing jersey with a woven thistle pattern, electric blue side panels and the Glasgow Cosmic crest. Sponsor marks on the chest and sleeves.",
+   "images": [
+    "gc-playing-jersey-1.webp",
+    "gc-playing-jersey-2.webp",
+    "gc-playing-jersey-3.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 34, 40",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-002",
+   "name": "Glasgow Cosmic Playing Trouser",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Navy playing trouser with electric blue side stripes and a slim, tapered leg.",
+   "images": [
+    "gc-playing-trouser-1.webp",
+    "gc-playing-trouser-2.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 35",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-003",
+   "name": "Glasgow Cosmic Playing Cap",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Navy cap with the Glasgow Cosmic crest on the front, Schermo mark on the side and a contrast-piped brim.",
+   "images": [
+    "gc-playing-cap-1.webp",
+    "gc-playing-cap-2.webp",
+    "gc-playing-cap-3.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 35",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-004",
+   "name": "Glasgow Cosmic Practice Jersey",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Navy V-neck practice jersey with electric blue brush-stroke panels, the Glasgow Cosmic crest and Schermo mark.",
+   "images": [
+    "gc-practice-jersey-1.webp",
+    "gc-practice-jersey-2.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 36, 40",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-005",
+   "name": "Glasgow Cosmic Practice Shorts",
+   "category": "Sportswear",
+   "sizes": true,
+   "description": "Navy practice shorts with white side piping and the Glasgow Cosmic crest.",
+   "images": [
+    "gc-practice-shorts-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 36",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-006",
+   "name": "Glasgow Cosmic Winter Warmer Full Sleeve",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Navy V-neck sweater with electric blue side panels and trims, the Glasgow Cosmic crest and sponsor marks.",
+   "images": [
+    "gc-winter-warmer-full-sleeve-1.webp",
+    "gc-winter-warmer-full-sleeve-2.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 36, 39",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-007",
+   "name": "Glasgow Cosmic Winter Warmer Sleeveless",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Sleeveless navy V-neck sweater with electric blue side panels and trims and the Glasgow Cosmic crest.",
+   "images": [
+    "gc-winter-warmer-sleeveless-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 36",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-008",
+   "name": "Glasgow Cosmic Helmet & Pads",
+   "category": "Sportswear",
+   "sizes": false,
+   "description": "Gold batting helmet and leg pads with the Glasgow Cosmic crest.",
+   "images": [
+    "gc-helmet-and-pads-1.webp",
+    "gc-helmet-and-pads-2.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 37",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-009",
+   "name": "Glasgow Cosmic Playing Gloves",
+   "category": "Sportswear",
+   "sizes": false,
+   "description": "Navy and gold batting gloves.",
+   "images": [
+    "gc-playing-gloves-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 40",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-010",
+   "name": "Glasgow Cosmic Travel Hoodie",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Navy hoodie with blush yoke panels, the Glasgow Cosmic crest on the chest and a large Glasgow Cosmic wordmark on the back.",
+   "images": [
+    "gc-travel-hoodie-1.webp",
+    "gc-travel-hoodie-2.webp",
+    "gc-travel-hoodie-3.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 37, 39",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-011",
+   "name": "Glasgow Cosmic Travel Kit T-Shirt",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Charcoal and black travel shirt with white collar and cuff trims and a Glasgow Cosmic wordmark.",
+   "images": [
+    "gc-travel-kit-t-shirt-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 39",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-012",
+   "name": "Glasgow Cosmic Round Neck Tee",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "Cream round-neck tee with brown raglan sleeves and a Glasgow Cosmic script on the chest.",
+   "images": [
+    "gc-round-neck-tee-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 39",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-013",
+   "name": "Glasgow Cosmic Polo",
+   "category": "Clothing",
+   "sizes": true,
+   "description": "White polo with navy sleeves and collar and a large GC Glasgow Cosmic graphic on the chest.",
+   "images": [
+    "gc-polo-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 39",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-014",
+   "name": "Glasgow Cosmic Fashion Cap 01",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Cream cap with a rust brim and Glasgow Cosmic embroidery.",
+   "images": [
+    "gc-fashion-cap-01-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 39",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-015",
+   "name": "Glasgow Cosmic Fashion Cap 02",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black and electric blue mesh cap with a Glasgow Cosmic wordmark.",
+   "images": [
+    "gc-fashion-cap-02-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 39",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-016",
+   "name": "Glasgow Cosmic Bucket Hat",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black bucket hat with the Glasgow Cosmic crest and an electric blue band.",
+   "images": [
+    "gc-bucket-hat-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 39",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-017",
+   "name": "Glasgow Cosmic Winter Beanie",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Navy ribbed beanie with an electric blue stripe and the Glasgow Cosmic crest.",
+   "images": [
+    "gc-winter-beanie-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 39",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-018",
+   "name": "Glasgow Cosmic Backpack",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Navy backpack with a Glasgow Cosmic wordmark and crest on the front and padded straps with Schermo marks.",
+   "images": [
+    "gc-backpack-1.webp",
+    "gc-backpack-2.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 15",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-019",
+   "name": "Glasgow Cosmic Kit Bag",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Navy wheeled kit bag with Glasgow Cosmic graphics and the Schermo mark.",
+   "images": [
+    "gc-kit-bag-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 38",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-020",
+   "name": "Glasgow Cosmic Travel Bag 02",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Structured navy travel bag with top handles and a Glasgow Cosmic wordmark.",
+   "images": [
+    "gc-travel-bag-02-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 38",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-021",
+   "name": "Glasgow Cosmic Socks",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Crew socks in navy, electric blue and white with the Glasgow Cosmic crest.",
+   "images": [
+    "gc-socks-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 40",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-022",
+   "name": "Glasgow Cosmic Sneakers",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Black leather sneakers with a GC mark on the side and electric blue details.",
+   "images": [
+    "gc-sneakers-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 40",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-023",
+   "name": "Glasgow Cosmic Sipper",
+   "category": "Accessories",
+   "sizes": false,
+   "description": "Electric blue steel sipper with a Glasgow Cosmic wordmark.",
+   "images": [
+    "gc-sipper-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 40",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-024",
+   "name": "Glasgow Cosmic Bag Tag",
+   "category": "Fan Merch",
+   "sizes": false,
+   "description": "Navy bag tag with the Glasgow Cosmic crest, player name and number.",
+   "images": [
+    "gc-bag-tag-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 40",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-025",
+   "name": "Glasgow Cosmic Lanyard",
+   "category": "Fan Merch",
+   "sizes": false,
+   "description": "Navy lanyard printed with the Glasgow Cosmic wordmark.",
+   "images": [
+    "gc-lanyard-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 40",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-026",
+   "name": "Glasgow Cosmic Keychain",
+   "category": "Fan Merch",
+   "sizes": false,
+   "description": "Glasgow Cosmic keychains: woven strap and enamel script.",
+   "images": [
+    "gc-keychain-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 40",
+   "image_version": 1
+  },
+  {
+   "sku": "GC-027",
+   "name": "Glasgow Cosmic Medal",
+   "category": "Fan Merch",
+   "sizes": false,
+   "description": "Gold Glasgow Cosmic medal on a navy printed ribbon.",
+   "images": [
+    "gc-medal-1.webp"
+   ],
+   "source": "Schermo · The Art of Dressing.pdf, page 40",
+   "image_version": 1
+  }
+ ],
+ "removed": [],
+ "image_version": 1
+}
