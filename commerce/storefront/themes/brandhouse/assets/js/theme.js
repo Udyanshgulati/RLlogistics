@@ -71,6 +71,34 @@
     });
   }
 
+  // Product photos: a thumbnail shows its photo in the large frame (quick fade); arrow keys move along the row.
+  $$('[data-gallery]').forEach((g) => {
+    const main = $('[data-gallery-main]', g);
+    const thumbs = $$('[data-gallery-thumb]', g);
+    if (!main || !thumbs.length) return;
+    const show = (t) => {
+      if (t.getAttribute('aria-current') === 'true') return;
+      thumbs.forEach((x) => x.removeAttribute('aria-current'));
+      t.setAttribute('aria-current', 'true');
+      const next = new Image();
+      next.srcset = t.dataset.srcset; next.src = t.dataset.src;
+      const swap = () => { main.srcset = t.dataset.srcset; main.src = t.dataset.src; main.alt = t.dataset.alt; main.classList.remove('is-swapping'); };
+      main.classList.add('is-swapping');
+      // Swap once the photo is decoded, or after 250 ms at most, so a click always gets an answer.
+      Promise.race([next.decode ? next.decode() : Promise.resolve(), new Promise((r) => setTimeout(r, 250))]).then(swap, swap);
+    };
+    thumbs.forEach((t, i) => {
+      t.addEventListener('click', (e) => { e.preventDefault(); show(t); });
+      t.addEventListener('mouseenter', () => show(t));
+      t.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        const n = thumbs[(i + d + thumbs.length) % thumbs.length]; n.focus(); show(n);
+      });
+    });
+  });
+
   // Phone photo slider counter.
   $$('[data-swipe]').forEach((row) => {
     const out = row.parentElement.querySelector('[data-swipe-index]');

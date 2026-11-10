@@ -216,6 +216,10 @@ Done and live (commits up to "In-place shop filters"):
   accordions, pressed/focus/disabled/loading states, add-to-bag loading + no double submit (`brandhouse/assets/js/theme.js`),
   short cross-page fade (`@view-transition`), all off under prefers-reduced-motion.
 
+Also done (later on 11 Nov): phone journey checked locally (product → size → bag → cart → checkout link); cart fits phones;
+sale prices readable; product gallery thumbnails on desktop; client sheet now lists all SC-/SA-/GC- SKUs (Products rows
+to 116, Stock rows to 446); import-sheet.php keeps each product's collection and only swaps the type.
+
 Still to do:
 1. Review the whole journey on live, desktop and phone: home → collection → product → size → add to bag → cart.
    Check the filter drawer on a phone, the bag button loading state, and that checkout is unchanged.

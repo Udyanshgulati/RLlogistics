@@ -199,9 +199,13 @@ foreach ($table($book['Products'], 'SKU') as $r) {
         $p->set_name((string) $v);
         $note($sku, 'name');
     }
-    if (($v = $col($r, 'Category')) && $collection) {
+    if ($v = $col($r, 'Category')) {
+        // The sheet's Category is the product type. Keep the product's collection (and any other non-type
+        // category) as it is, and swap only the type.
         $cat = term_exists((string) $v, 'product_cat') ?: wp_insert_term((string) $v, 'product_cat');
-        $want = [(int) $collection->term_id, (int) $cat['term_id']];
+        $type_ids = array_filter(array_map(static fn ($n) => ($t = get_term_by('name', $n, 'product_cat')) ? (int) $t->term_id : 0, ['Clothing', 'Sportswear', 'Accessories', 'Fan Merch']));
+        $keep = array_values(array_diff(array_map('intval', $p->get_category_ids()), $type_ids));
+        $want = array_values(array_unique(array_merge($keep, [(int) $cat['term_id']])));
         if (array_diff($want, $p->get_category_ids()) || array_diff($p->get_category_ids(), $want)) {
             $p->set_category_ids($want);
             $note($sku, "category {$v}");
