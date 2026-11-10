@@ -220,6 +220,15 @@ Also done (later on 11 Nov): phone journey checked locally (product → size →
 sale prices readable; product gallery thumbnails on desktop; client sheet now lists all SC-/SA-/GC- SKUs (Products rows
 to 116, Stock rows to 446); import-sheet.php keeps each product's collection and only swaps the type.
 
+Update (11 Nov, later): product types added under Clothing (T-shirts & Polos, Trousers, Shorts, Knitwear & Hoodies) and
+Accessories (Caps & Hats, Bags & Backpacks, Other Accessories), assigned once from product names (`schermo_types_v`).
+Menu v4: New In · Shop (grouped by type) · Collections. Cards: Quick add (sized pieces open a sheet with real sizes;
+one-size pieces add directly) instead of a size row. Hero fixed on phones. Collection tiles show real availability.
+Milan Icons / Glasgow Cosmic headers use photos from the deck. Footer links to unpublished pages are hidden — the
+Shipping, Returns & Refunds, Terms, Privacy and Contact pages are DRAFTS with [BRACKETED] blanks for the owner
+(docker/store-pages.php); publish each in WP admin once filled and reviewed, and it appears in the footer.
+Owner to confirm: Milan Icons Bag Tag is in Accessories while Glasgow Cosmic Bag Tag is in Fan Merch.
+
 Still to do:
 1. Review the whole journey on live, desktop and phone: home → collection → product → size → add to bag → cart.
    Check the filter drawer on a phone, the bag button loading state, and that checkout is unchanged.
