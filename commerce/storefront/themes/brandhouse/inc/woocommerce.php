@@ -216,6 +216,55 @@ function brandhouse_card_context(WC_Product $p): string
     return (string) apply_filters('brandhouse_card_context', $default, $p);
 }
 
+/**
+ * Quick add data for a card, from real WooCommerce data only: null unless the product can be ordered now.
+ * Variable products list each size with its variation ID and whether it can be bought; others add directly.
+ */
+function brandhouse_quick_add_data(WC_Product $p): ?array
+{
+    if (!$p->is_purchasable() || !$p->is_in_stock() || $p->get_price() === '') {
+        return null;
+    }
+    $data = ['id' => $p->get_id(), 'name' => $p->get_name(), 'url' => $p->get_permalink(), 'price' => wp_strip_all_tags(html_entity_decode($p->get_price_html())), 'image' => (string) wp_get_attachment_image_url((int) $p->get_image_id(), 'woocommerce_thumbnail'), 'sizes' => []];
+    if ($p->is_type('variable')) {
+        $order = ['s', 'm', 'l', 'xl', 'xxl', 'xxxl'];
+        foreach ($p->get_available_variations('objects') as $v) {
+            $slug = (string) ($v->get_attributes()['pa_size'] ?? '');
+            if ($slug === '') {
+                return null; // a variation without a size: let the product page handle the choice
+            }
+            $term = get_term_by('slug', $slug, 'pa_size');
+            $data['sizes'][$slug] = ['label' => $term ? $term->name : strtoupper($slug), 'id' => $v->get_id(), 'ok' => $v->is_purchasable() && $v->is_in_stock()];
+        }
+        if (!$data['sizes']) {
+            return null;
+        }
+        uksort($data['sizes'], static fn ($a, $b) => ((($i = array_search($a, $order, true)) === false ? 99 : $i) <=> (($j = array_search($b, $order, true)) === false ? 99 : $j)));
+        $data['sizes'] = array_values($data['sizes']);
+    }
+    return $data;
+}
+
+// The Quick add sheet and a small status toast, once per page that lists products.
+add_action('wp_footer', static function (): void {
+    if (is_admin() || is_checkout() || is_cart()) {
+        return;
+    }
+    ?>
+    <dialog class="sheet qa-sheet" id="quick-add" aria-labelledby="qa-title">
+      <div class="sheet-head"><h2 id="qa-title"><?php esc_html_e('Choose a size', 'brandhouse'); ?></h2><button type="button" class="icon-btn" data-dialog-close aria-label="<?php esc_attr_e('Close', 'brandhouse'); ?>"><?php echo brandhouse_icon('close'); ?></button></div>
+      <div class="sheet-body">
+        <div class="qa-prod"><img class="qa-img" alt="" width="96" height="120"><div><p class="qa-name"></p><p class="qa-price"></p></div></div>
+        <fieldset class="qa-sizes"><legend class="sr-only"><?php esc_html_e('Size', 'brandhouse'); ?></legend><div class="qa-grid"></div></fieldset>
+        <p class="qa-msg" role="status" aria-live="polite"></p>
+        <div class="qa-actions"><button type="button" class="btn qa-add" disabled><?php esc_html_e('Add to bag', 'brandhouse'); ?></button><a class="btn btn-outline qa-more" href="#"><?php esc_html_e('View details', 'brandhouse'); ?></a></div>
+        <a class="link-btn qa-bag" href="<?php echo esc_url(wc_get_cart_url()); ?>" hidden><?php esc_html_e('View bag', 'brandhouse'); ?></a>
+      </div>
+    </dialog>
+    <div class="bh-toast" role="status" aria-live="polite" hidden></div>
+    <?php
+}, 30);
+
 /** Sizes in stock for a variable product, from WooCommerce's variation data (never hard-coded). */
 function brandhouse_card_sizes(WC_Product $p): array
 {

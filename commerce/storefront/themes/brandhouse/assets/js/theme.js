@@ -44,6 +44,70 @@
     window.addEventListener('pageshow', () => { form.dataset.busy = ''; btn.classList.remove('is-loading'); btn.removeAttribute('aria-busy'); }, { once: true });
   });
 
+  // Quick add from product cards. Uses WooCommerce's own AJAX add-to-cart (the same cart the product page uses);
+  // sized products must have a size chosen first. The bag count updates from WooCommerce's cart fragments.
+  const qa = document.getElementById('quick-add');
+  const toast = $('.bh-toast');
+  const ajaxUrl = (window.wc_add_to_cart_params && window.wc_add_to_cart_params.wc_ajax_url) ? window.wc_add_to_cart_params.wc_ajax_url.replace('%%endpoint%%', 'add_to_cart') : '/?wc-ajax=add_to_cart';
+  let toastTimer;
+  const say = (msg) => { if (!toast) return; toast.textContent = msg; toast.hidden = false; toast.classList.add('is-on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.classList.remove('is-on'); setTimeout(() => { toast.hidden = true; }, 250); }, 2600); };
+  const addToBag = async (id, url) => {
+    const body = new URLSearchParams({ product_id: String(id), quantity: '1' });
+    const res = await fetch(ajaxUrl, { method: 'POST', body, credentials: 'same-origin' });
+    const data = await res.json();
+    if (!data || data.error) { const e = new Error('add failed'); e.url = (data && data.product_url) || url; throw e; }
+    Object.entries(data.fragments || {}).forEach(([sel, html]) => $$(sel).forEach((el) => { el.outerHTML = html; }));
+    if (window.jQuery) window.jQuery(document.body).trigger('added_to_cart', [data.fragments, data.cart_hash]);
+    return data;
+  };
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.card-qa');
+    if (!btn) return;
+    e.preventDefault();
+    const d = JSON.parse(btn.dataset.qa);
+    if (!d.sizes.length) {
+      btn.classList.add('is-busy'); btn.disabled = true;
+      try { await addToBag(d.id, d.url); say(`${d.name} added to bag`); btn.classList.add('is-done'); setTimeout(() => btn.classList.remove('is-done'), 1600); }
+      catch (err) { location.href = err.url || d.url; }
+      finally { btn.classList.remove('is-busy'); btn.disabled = false; }
+      return;
+    }
+    if (!qa) { location.href = d.url; return; }
+    $('.qa-img', qa).src = d.image; $('.qa-name', qa).textContent = d.name; $('.qa-price', qa).textContent = d.price;
+    $('.qa-more', qa).href = d.url; $('.qa-msg', qa).textContent = ''; $('.qa-bag', qa).hidden = true;
+    const grid = $('.qa-grid', qa); grid.replaceChildren();
+    d.sizes.forEach((s) => {
+      const label = document.createElement('label'); label.className = 'qa-size';
+      const input = document.createElement('input'); input.type = 'radio'; input.name = 'qa_size'; input.value = String(s.id); input.disabled = !s.ok;
+      const span = document.createElement('span'); span.textContent = s.label;
+      if (!s.ok) { const sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = ' (sold out)'; span.append(sr); }
+      label.append(input, span); grid.append(label);
+    });
+    const add = $('.qa-add', qa); add.disabled = true; add.classList.remove('is-loading');
+    qa.dataset.url = d.url; qa.dataset.name = d.name;
+    qa.showModal();
+    const first = $('input:not(:disabled)', grid); if (first) first.focus();
+  });
+  if (qa) {
+    qa.addEventListener('change', (e) => { if (e.target.name === 'qa_size') { $('.qa-add', qa).disabled = false; $('.qa-msg', qa).textContent = ''; } });
+    $('.qa-add', qa).addEventListener('click', async () => {
+      const picked = $('input[name=qa_size]:checked', qa);
+      const add = $('.qa-add', qa);
+      if (!picked) { $('.qa-msg', qa).textContent = 'Choose a size first.'; return; }
+      add.classList.add('is-loading'); add.disabled = true;
+      try {
+        await addToBag(picked.value, qa.dataset.url);
+        $('.qa-msg', qa).textContent = `Added to bag: ${qa.dataset.name}, size ${picked.nextElementSibling.firstChild.textContent}.`;
+        $('.qa-bag', qa).hidden = false;
+        setTimeout(() => { if (qa.open) qa.close(); }, 1400);
+        say(`${qa.dataset.name} added to bag`);
+      } catch (err) {
+        $('.qa-msg', qa).textContent = 'Could not add this size. Opening the product page…';
+        setTimeout(() => { location.href = err.url || qa.dataset.url; }, 900);
+      } finally { add.classList.remove('is-loading'); add.disabled = false; }
+    });
+  }
+
   // Dialogs: [data-dialog="id"] opens, [data-dialog-close] / backdrop click closes.
   document.addEventListener('click', (e) => {
     const open = e.target.closest('[data-dialog]');
