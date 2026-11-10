@@ -518,3 +518,20 @@ input[type=text], input[type=email], input[type=search], input[type=tel], input[
 @media (max-width: 520px) {
   .sb-crests img { width: 120px; }
 }
+
+/* Shop toolbar v2: row 1 = collections | categories (one line, scrolls sideways if needed);
+   row 2 = sizes on the left, sorting on the right. Card radius instead of a pill, since it has two rows. */
+.sx-bar { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 0; padding: 10px; border-radius: var(--r-lg); }
+.sx-cats { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 10px; }
+.sx-cats::-webkit-scrollbar { display: none; }
+.sx-pill { flex: none; white-space: nowrap; }
+.sx-sep { flex: none; width: 1px; height: 22px; margin: 0 8px; background: var(--line-strong); }
+.sx-tools { justify-content: space-between; flex-wrap: nowrap; gap: 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.sx-sizes { flex-wrap: nowrap; }
+.sx-bar .woocommerce-ordering { margin-left: auto; }
+@media (max-width: 640px) {
+  .sx-tools { flex-wrap: wrap; }
+  .sx-sizes { overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+  .sx-bar .woocommerce-ordering { margin-left: 0; width: 100%; }
+  .sx-bar .woocommerce-ordering select { width: 100%; }
+}

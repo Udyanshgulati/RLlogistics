@@ -57,9 +57,20 @@ foreach (['SC-016', 'SA-003', 'GC-001'] as $sku) {
     <?php if (is_array($cats) && $cats): ?>
       <nav class="sx-cats" aria-label="<?php esc_attr_e('Categories', 'schermo'); ?>">
         <a class="sx-pill<?php echo $current ? '' : ' is-on'; ?>" href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"<?php echo $current ? '' : ' aria-current="page"'; ?>><?php esc_html_e('All', 'schermo'); ?></a>
-        <?php foreach ($cats as $c): $on = $current && $current->term_id === $c->term_id; ?>
-          <a class="sx-pill<?php echo $on ? ' is-on' : ''; ?>" href="<?php echo esc_url(get_term_link($c)); ?>"<?php echo $on ? ' aria-current="page"' : ''; ?>><?php echo esc_html($c->name); ?></a>
-        <?php endforeach; ?>
+        <?php
+        // Collections first (deck order, short names), then a divider, then the product categories.
+        $colls = function_exists('schermo_collections') ? array_column(schermo_collections(), 'label', 'slug') : [];
+        $groups = [[], []];
+        foreach ($cats as $c) {
+            $groups[isset($colls[$c->slug]) ? 0 : 1][] = $c;
+        }
+        $rank = array_flip(array_keys($colls));
+        usort($groups[0], static fn ($x, $y) => $rank[$x->slug] <=> $rank[$y->slug]);
+        foreach ($groups as $g => $list):
+            if ($g === 1 && $groups[0] && $list): ?><span class="sx-sep" aria-hidden="true"></span><?php endif;
+            foreach ($list as $c): $on = $current && $current->term_id === $c->term_id; ?>
+          <a class="sx-pill<?php echo $on ? ' is-on' : ''; ?>" href="<?php echo esc_url(get_term_link($c)); ?>"<?php echo $on ? ' aria-current="page"' : ''; ?>><?php echo esc_html($colls[$c->slug] ?? $c->name); ?></a>
+        <?php endforeach; endforeach; ?>
       </nav>
     <?php endif; ?>
     <div class="sx-tools">
