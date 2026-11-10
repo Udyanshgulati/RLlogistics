@@ -899,3 +899,7 @@ dialog.qa-sheet { width: min(440px, calc(100vw - 24px)); border-radius: var(--r-
 .sx-copy .crumbs { margin-bottom: 14px; }
 @media (max-width: 760px) { .sx-title { font-size: clamp(28px, 9vw, 40px); } }
 .nav-primary li.is-closed > .sub-menu { opacity: 0 !important; visibility: hidden !important; }
+/* Dropdown cards line up at the top whatever the length of their names. */
+.nav-primary .sub-menu > li { align-items: flex-start; }
+.nav-primary .sub-menu:has(.nm-media) > li > a { align-content: start; width: 100%; }
+.nav-primary .sub-menu .nm-name { line-height: 1.25; }
