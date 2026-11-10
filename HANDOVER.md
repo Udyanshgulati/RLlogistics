@@ -198,3 +198,28 @@ fee, courier plugin, footer/contact details, full returns page.
 - Prices for 22 products come from `catalog/milan-icons/products.json` (`regular_price` = MRP, `sale_price` = selling price,
   applied once per `price_version`).
 - **Full task list: `commerce/docs/Schermo_Task_Sheet.xlsx`** (done / owner & client to-dos / development to-dos / sheet gaps / risks).
+
+## 10. Latest state and open work (11 Nov 2026) — read this when you pick up
+
+Done and live (commits up to "In-place shop filters"):
+- 4 collections (Core 52, Atelier 12, Milan Icons, Glasgow Cosmic 26 — Blazer and Medal removed; Milan medal removed earlier).
+- Header: Shop · Clothing · Accessories · Sportswear · Fan Merch · Collections ▾ (menu rebuilt once, `schermo_menu_v` = 3).
+- Shop: type pills, quiet collection links, Filters drawer (collection, size, price, available to order), chips + Clear all,
+  sort Newest / price ↑ / price ↓ — `themes/schermo/inc/shop-filters.php`, `themes/schermo/woocommerce/archive-product.php`.
+- Filters, sorting and pagination update **in place** without a page reload: `themes/schermo/assets/js/shop.js`
+  (fetches the same URL, swaps `.sx-copy`, `.sx-bar`, `#shop-filters`, `.sx-grid-wrap`, nav; pushState + Back/Forward;
+  AbortController + sequence number so stale responses never win; grid loading state; error state with Retry).
+  Do NOT wrap the swap in `document.startViewTransition` — browsers hold the callback in hidden/background tabs.
+- Cards (`brandhouse/woocommerce/content-product.php`): one link per card, "Collection · Type", "Coming soon", one label.
+- Product page: collection/type context, visible description + specs, related from the same collection (`schermo/inc/product.php`).
+- Motion/states: block at the end of `schermo/assets/css/schermo.css` ("Motion & states v1"): dropdown fade, smooth
+  accordions, pressed/focus/disabled/loading states, add-to-bag loading + no double submit (`brandhouse/assets/js/theme.js`),
+  short cross-page fade (`@view-transition`), all off under prefers-reduced-motion.
+
+Still to do:
+1. Review the whole journey on live, desktop and phone: home → collection → product → size → add to bag → cart.
+   Check the filter drawer on a phone, the bag button loading state, and that checkout is unchanged.
+2. Product page gallery thumbnails were not added (desktop shows a large photo + stacked gallery, phone swipes).
+3. Data gaps: no colour attribute (no colour filter), no ratings/sales (no popularity sort), prices only for ~20 Milan
+   Icons pieces, stock not counted. Add the new SC-/SA-/GC- SKUs to the client sheet so the client can price them.
+4. Owner questions: keep Glasgow Cosmic helmet & pads and gloves? Founders' names on the homepage OK? "Schermo Atelier" OK?
