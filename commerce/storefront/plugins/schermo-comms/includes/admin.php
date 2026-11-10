@@ -147,12 +147,19 @@ add_action('admin_post_scm_admin_review', static function (): void {
     $verified = 0;
     $order_id = absint($in['order_id'] ?? 0);
     $email = sanitize_email($in['email'] ?? '');
+    $item_id = 0;
     if ($order_id && ($o = wc_get_order($order_id)) && $o->get_status() === 'completed' && $email && strtolower($o->get_billing_email()) === strtolower($email)) {
-        foreach ($o->get_items() as $it) {
+        foreach ($o->get_items() as $iid => $it) {
             if ($it instanceof WC_Order_Item_Product && (int) $it->get_product_id() === $pid) {
                 $verified = 1;
+                $item_id = (int) $iid;
             }
         }
+    }
+    // One review per order item: the customer's own link and an admin entry can't both review the same purchase.
+    if ($item_id && scm_item_reviewed($item_id)) {
+        wp_safe_redirect(add_query_arg('err', 'dup', $back));
+        exit;
     }
     $date = sanitize_text_field($in['date'] ?? '');
     $cid = (int) wp_insert_comment([
@@ -167,7 +174,11 @@ add_action('admin_post_scm_admin_review', static function (): void {
     add_comment_meta($cid, 'scm_consent_note', sanitize_text_field($in['consent_note'] ?? ''), true);
     if ($verified) {
         add_comment_meta($cid, 'scm_order_id', $order_id, true);
+        add_comment_meta($cid, 'scm_item_id', $item_id, true);
+        global $wpdb;
+        $wpdb->update($wpdb->prefix . 'scm_review_invites', ['review_id' => $cid], ['item_id' => $item_id]); // the customer's link now edits this review
     }
+    scm_review_audit($cid, 'entered by admin from customer feedback', 'consent: ' . sanitize_text_field($in['consent_note'] ?? '') . ($verified ? ' · verified against delivered order #' . $order_id : ' · not verified'));
     WC_Comments::clear_transients($pid);
     wp_safe_redirect(add_query_arg('added', $cid, $back));
     exit;
@@ -178,7 +189,8 @@ function scm_admin_review_page(): void
     echo '<div class="wrap"><h1>Add a customer review</h1>';
     echo '<p>Use this only for a <strong>real review a customer gave you</strong> (for example by email or WhatsApp) and <strong>agreed to have published</strong>. Paste their words as they wrote them. It is marked “admin-entered” in the backend. It is marked “verified purchase” only if you give a delivered order number with the same email and this product.</p>';
     if (isset($_GET['err'])) { // phpcs:ignore
-        echo '<div class="notice notice-error"><p>Fill product, name, rating, text and the permission box.</p></div>';
+        $dup = $_GET['err'] === 'dup'; // phpcs:ignore
+        echo '<div class="notice notice-error"><p>' . esc_html($dup ? 'That delivered order item already has a review (from the customer\'s link or an earlier entry). Edit that review instead.' : 'Please fill in the product, rating, name and text, and confirm the customer agreed to publication.') . '</p></div>';
     }
     if (isset($_GET['added'])) { // phpcs:ignore
         echo '<div class="notice notice-success"><p>Review added.</p></div>';

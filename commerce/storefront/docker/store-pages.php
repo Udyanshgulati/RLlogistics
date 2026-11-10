@@ -115,6 +115,10 @@ $pages = [
         . $h('Grievances')
         . $sc('[tl_store_block type="grievance"]')],
 
+    // About: the theme's page-about.php renders the brand story from the owner's deck; the page body stays empty
+    // unless someone writes their own text in WordPress.
+    'about' => ['About Schermo', ''],
+
     'faq' => ['FAQ',
         $h('Do you ship to my country?')
         . $p('We deliver worldwide. Enter your address at checkout to see the delivery options and charges for your country.')

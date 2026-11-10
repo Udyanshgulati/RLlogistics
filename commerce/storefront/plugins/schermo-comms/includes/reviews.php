@@ -108,6 +108,7 @@ function scm_review_submit(): void
         update_comment_meta($existing->comment_ID, 'rating', $rating);
         update_comment_meta($existing->comment_ID, 'scm_edited_at', time());
         $cid = (int) $existing->comment_ID;
+        scm_review_audit($cid, 'edited by customer', 'order #' . $o->get_order_number() . ', item ' . (int) $inv['item_id']);
     } else {
         $cid = (int) wp_insert_comment([
             'comment_post_ID' => (int) $inv['product_id'],
@@ -123,6 +124,7 @@ function scm_review_submit(): void
         add_comment_meta($cid, 'scm_order_id', $o->get_id(), true);
         add_comment_meta($cid, 'scm_item_id', (int) $inv['item_id'], true);
         add_comment_meta($cid, 'scm_source', 'delivered-order-link', true);
+        scm_review_audit($cid, 'submitted by customer', 'delivered order #' . $o->get_order_number() . ', item ' . (int) $inv['item_id']);
         global $wpdb;
         $wpdb->update($wpdb->prefix . 'scm_review_invites', ['review_id' => $cid], ['id' => $inv['id']]);
     }
@@ -206,6 +208,40 @@ function scm_reviews_section(): void
         echo '<p class="rv-empty">' . esc_html__('No reviews yet.', 'schermo-comms') . ' ' . esc_html__('Bought this piece? Once your order is delivered we send you a personal link to leave the first review.', 'schermo-comms') . '</p>';
     }
     echo '</section>';
+}
+
+/**
+ * Audit trail on every review: who created or changed it, when, how and why (kept in comment meta "scm_audit";
+ * never shown publicly). Customer edits, admin entries, admin edits and status changes are all recorded.
+ */
+function scm_review_audit(int $cid, string $event, string $note = ''): void
+{
+    $log = get_comment_meta($cid, 'scm_audit', true);
+    $log = is_array($log) ? $log : [];
+    $u = wp_get_current_user();
+    $log[] = ['at' => gmdate('c'), 'event' => $event, 'by' => $u && $u->ID ? $u->user_login . ' (#' . $u->ID . ')' : 'customer via verified link', 'note' => mb_substr($note, 0, 300)];
+    update_comment_meta($cid, 'scm_audit', $log);
+}
+
+add_action('edit_comment', static function ($cid): void {
+    if (is_admin() && get_comment_type((int) $cid) === 'review') {
+        scm_review_audit((int) $cid, 'edited in admin');
+    }
+});
+add_action('transition_comment_status', static function ($new, $old, $c): void {
+    if ($c instanceof WP_Comment && $c->comment_type === 'review' && $new !== $old) {
+        scm_review_audit((int) $c->comment_ID, 'status ' . $old . ' → ' . $new);
+    }
+}, 10, 3);
+
+/** True when this order item already has a review (customer link or admin entry). */
+function scm_item_reviewed(int $item_id): bool
+{
+    global $wpdb;
+    if ($wpdb->get_var($wpdb->prepare("SELECT review_id FROM {$wpdb->prefix}scm_review_invites WHERE item_id = %d AND review_id > 0", $item_id))) { // phpcs:ignore
+        return true;
+    }
+    return (bool) get_comments(['type' => 'review', 'status' => 'all', 'count' => true, 'meta_key' => 'scm_item_id', 'meta_value' => $item_id]);
 }
 
 function scm_stars(float $r): string

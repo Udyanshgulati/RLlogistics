@@ -1006,3 +1006,125 @@ dialog.qa-sheet { width: min(440px, calc(100vw - 24px)); border-radius: var(--r-
 .nav-primary li:focus-within > .sub-menu, .nav-primary li.is-open > .sub-menu { pointer-events: auto; }
 .nav-primary li.is-closed > .sub-menu { pointer-events: none; }
 .nav-primary .sub-menu .sub-menu { pointer-events: inherit; }
+
+/* ═════════════ v0.3 — calm pass: clearer hierarchy, fewer heavy blocks, mobile first ═════════════ */
+/* Shared */
+.hm-kicker { margin: 0 0 12px; font: 600 11px/1.2 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--gold); }
+.hm-fine { font-size: 13px; color: var(--muted); }
+.hm-link { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font: 600 11px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: var(--line-strong); }
+.hm-link:hover { text-decoration-color: currentColor; }
+.hm-section { margin-top: clamp(48px, 7vw, 88px); }
+.hm-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.hm-head h2, .hm-story h2, .ab-section h2 { margin: 0; font: 700 clamp(18px, 2.2vw, 26px)/1.15 var(--font-display); letter-spacing: .02em; text-transform: uppercase; }
+
+/* Hero: what Schermo sells + one action; product image framed, never cropped */
+.hm-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 56px); align-items: center; padding-top: 16px; }
+.hm-title { margin: 0 0 14px; font: 700 clamp(26px, 4.2vw, 52px)/1.06 var(--font-display); letter-spacing: .01em; text-transform: uppercase; text-wrap: balance; }
+.hm-lede { margin: 0 0 24px; max-width: 46ch; color: var(--ink-2); font-size: clamp(15px, 1.3vw, 17px); line-height: 1.55; }
+.hm-cta { min-height: 48px; }
+.hm-hero-media { position: relative; display: block; border-radius: var(--r-lg); overflow: hidden; aspect-ratio: 4 / 5; max-height: min(78vh, 720px); background: radial-gradient(70% 60% at 50% 45%, rgba(142, 15, 29, .55), transparent 70%), var(--surface); border: 1px solid var(--line); }
+.hm-hero-media img { width: 100%; height: 100%; object-fit: contain; padding: 6%; filter: drop-shadow(0 24px 40px rgba(0, 0, 0, .55)); }
+.hm-hero-tag { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: 14px; background: rgba(10, 10, 11, .72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 13px; }
+.hm-hero-tag span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-hero-price { white-space: nowrap; color: var(--ink-2); }
+.hm-hero-price del { color: var(--muted); margin-right: 4px; }
+.hm-hero-price ins { text-decoration: none; }
+
+/* Shop by category: compact tiles; a scroll row on phones */
+.hm-types { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.hm-types a { display: grid; gap: 6px; }
+.hm-type-media { display: block; aspect-ratio: 1; border-radius: var(--r-md); overflow: hidden; background: radial-gradient(70% 60% at 50% 42%, #f6f6f3, #e6e6e2); }
+.hm-type-media img { width: 100%; height: 100%; object-fit: contain; padding: 10%; transition: transform .4s var(--ease); }
+.hm-types a:hover .hm-type-media img { transform: scale(1.04); }
+.hm-type-name { font: 600 11px/1.3 var(--font-label); letter-spacing: .08em; text-transform: uppercase; }
+.hm-type-count { font-size: 12px; color: var(--muted); }
+
+/* Brand story: one short block */
+.hm-story { margin-top: clamp(48px, 7vw, 88px); display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(20px, 4vw, 48px); align-items: center; }
+.hm-story-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-lg); }
+.hm-story-copy p { color: var(--ink-2); max-width: 52ch; line-height: 1.6; }
+.hm-story h2 { margin-bottom: 12px; }
+
+/* Collections: four equal cards with a photo, line and live availability */
+.hm-colls { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.hm-coll a { display: grid; gap: 4px; }
+.hm-coll-media { display: block; aspect-ratio: 4 / 5; border-radius: var(--r-md); overflow: hidden; background: radial-gradient(70% 60% at 50% 42%, #f6f6f3, #e6e6e2); margin-bottom: 6px; }
+.hm-coll-media img { width: 100%; height: 100%; object-fit: contain; padding: 8%; transition: transform .4s var(--ease); }
+.hm-coll a:hover .hm-coll-media img { transform: scale(1.04); }
+.hm-coll-name { font: 700 14px/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .03em; }
+.hm-coll-line { font-size: 13px; color: var(--muted); }
+.hm-state { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.hm-state::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--faint); }
+.hm-state.is-ready { color: var(--ink); }
+.hm-state.is-ready::before { background: #3ecf72; }
+
+/* About page */
+.ab { padding-top: 24px; max-width: 860px; }
+.ab-title { margin: 0 0 14px; font: 700 clamp(26px, 4vw, 44px)/1.08 var(--font-display); text-transform: uppercase; }
+.ab-lede { font-size: clamp(16px, 1.6vw, 19px); line-height: 1.55; color: var(--ink-2); max-width: 56ch; }
+.ab-section { margin-top: clamp(40px, 6vw, 72px); }
+.ab-section h2 { margin-bottom: 16px; }
+.ab-ways, .ab-crests { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.ab-ways { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ab-ways li { padding: 18px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--glass); }
+.ab-ways h3 { margin: 0 0 8px; font: 700 13px/1.3 var(--font-label); letter-spacing: .06em; text-transform: uppercase; }
+.ab-ways p, .ab-section > p, .ab-journey p { margin: 0; color: var(--ink-2); line-height: 1.6; }
+.ab-crests { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin-top: 16px; }
+.ab-crests a { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 14px; border-radius: var(--r-md); border: 1px solid var(--line); }
+.ab-crests img { width: 44px; height: 44px; object-fit: contain; }
+.ab-journey { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.ab-journey li { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); }
+.ab-year { font: 700 15px/1.3 var(--font-display); text-transform: uppercase; }
+.ab-phil p { font-size: 16px; max-width: 60ch; margin-bottom: 12px; }
+
+/* Footer: About link */
+.foot-about a { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--line-strong); }
+
+/* Shop: compact header, product types that scroll with a visible edge, one-line card context */
+.sx-cats { scroll-snap-type: x proximity; }
+.sx-pill { scroll-snap-align: start; min-height: 40px; display: inline-flex; align-items: center; }
+.card-cat { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: none; letter-spacing: .02em; font-size: 12px; }
+.card-price .price-soon { color: var(--muted); font-size: 13px; }
+
+/* Product page: coming-soon note reads as information, not as a disabled buy box */
+.preorder-preview { margin: 8px 0 16px; padding: 14px 16px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--glass); }
+.preorder-preview .preview-note { margin: 0; color: var(--ink-2); font-size: 14px; }
+.preview-sizes { margin: 10px 0 4px; font-size: 14px; }
+.preview-sizes span { font: 600 11px/1 var(--font-label); letter-spacing: var(--label-tracking); text-transform: uppercase; color: var(--muted); margin-right: 6px; }
+
+@media (max-width: 960px) {
+  .hm-types { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 132px; overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: var(--gutter); scrollbar-width: none; margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter) 4px; }
+  .hm-types::-webkit-scrollbar { display: none; }
+  .hm-types li { scroll-snap-align: start; }
+  .hm-colls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ab-ways { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .hm-hero { grid-template-columns: 1fr; gap: 18px; }
+  .hm-hero-media { order: -1; aspect-ratio: auto; height: clamp(260px, 44vh, 380px); }
+  .hm-hero-media img { padding: 4% 10% 52px; }
+  .hm-story { grid-template-columns: 1fr; }
+  .hm-story-img { aspect-ratio: 16 / 9; }
+  .ab-journey li { grid-template-columns: 1fr; gap: 6px; }
+  /* Shop header: title, line and count only */
+  .sx-panel { min-height: 0; padding: 20px; }
+  .sx-stack, .sx-banner, .sx-mark { display: none; }
+  .sx-title { font-size: clamp(24px, 7vw, 32px); }
+  .sx-line { font-size: 14px; margin-bottom: 6px; }
+  .sx-bar { padding: 8px; gap: 10px; }
+  .sx-cats { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); padding-right: 32px; }
+  .sx-cats.is-end { -webkit-mask-image: none; mask-image: none; }
+  .sx-tools { width: 100%; justify-content: space-between; }
+  /* Product page: name, price, size and buy button come sooner */
+  .single-product .crumbs, .single-product .woocommerce-breadcrumb { display: none; }
+  /* Phones: the quick-add button is a solid round + that is always visible (no hover on touch) */
+  .card-qa { opacity: 1; transform: none; width: 38px; padding: 0; justify-content: center; background: rgba(10, 10, 11, .9); }
+  .card-qa .card-qa-text { display: none; }
+  .pdp-swipe .pdp-shot .pdp-img, .pdp-media.is-single .pdp-hero .pdp-img { aspect-ratio: auto; height: min(46vh, 400px); object-fit: contain; background: radial-gradient(70% 60% at 50% 42%, #f6f6f3, #e6e6e2); }
+  .single-product div.product { padding-top: 8px; gap: 16px; }
+  .summary .product_title { font-size: 22px; margin-bottom: 6px; }
+  .summary .price { margin-bottom: 12px; }
+  /* Up to six sizes fit on one row on phones (44px+ tap targets), so the buy button comes sooner */
+  .summary .size-options { grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); }
+  .summary .size-opt { min-height: 44px; padding: 0 4px; }
+}

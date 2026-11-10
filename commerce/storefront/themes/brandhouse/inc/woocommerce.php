@@ -84,28 +84,23 @@ remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_re
 add_action('woocommerce_after_single_product', 'woocommerce_upsell_display', 15);
 add_action('woocommerce_after_single_product', 'woocommerce_output_related_products', 20);
 
-// Products without a price cannot be bought, so WooCommerce hides the buy form. Show the sizes and the buttons
-// anyway, disabled, so the page reads complete; they work as soon as a price is set.
+// Products without a price cannot be bought, so WooCommerce hides the buy form. Say so plainly: a "Coming soon" note
+// with the sizes it will come in (as text, not selectable buttons) and the size guide — nothing that looks orderable.
 add_action('woocommerce_single_product_summary', static function (): void {
     global $product;
     if (!$product instanceof WC_Product || $product->get_price() !== '' || $product->is_purchasable()) {
         return;
     }
-    echo '<div class="preorder-preview">';
+    echo '<div class="preorder-preview" role="note">';
+    echo '<p class="preview-note">' . esc_html__('Not available to order yet. Ordering opens when the price is announced.', 'brandhouse') . '</p>';
     if ($product->is_type('variable')) {
         $sizes = wc_get_product_terms($product->get_id(), 'pa_size', ['fields' => 'names']);
         if ($sizes) {
-            echo '<p class="preview-label">' . esc_html__('Size', 'brandhouse') . '</p><div class="size-options" role="radiogroup" aria-label="' . esc_attr__('Size', 'brandhouse') . '">';
-            foreach ($sizes as $i => $s) {
-                printf('<button type="button" class="size-opt" role="radio" aria-checked="%s" data-preview-size>%s</button>', $i === 0 ? 'true' : 'false', esc_html($s));
-            }
-            echo '</div>';
+            echo '<p class="preview-sizes"><span>' . esc_html__('Sizes', 'brandhouse') . '</span> ' . esc_html(implode(' · ', $sizes)) . '</p>';
             brandhouse_size_guide_link();
         }
     }
-    echo '<div class="preview-actions"><button type="button" class="button single_add_to_cart_button" disabled>' . esc_html__('Add to cart', 'brandhouse') . '</button>';
-    echo '<button type="button" class="button buy-now btn-outline" disabled>' . esc_html__('Buy now', 'brandhouse') . '</button></div>';
-    echo '<p class="preview-note">' . esc_html__('Ordering opens when the price is announced.', 'brandhouse') . '</p></div>';
+    echo '</div>';
 }, 30);
 
 add_filter('woocommerce_output_related_products_args', static fn (array $a): array => array_merge($a, ['posts_per_page' => 4, 'columns' => 4]));

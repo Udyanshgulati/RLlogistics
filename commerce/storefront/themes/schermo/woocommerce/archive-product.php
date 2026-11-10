@@ -21,7 +21,7 @@ $ctx = schermo_shop_context($current);
 $chips = schermo_filter_chips();
 $total = (int) wc_get_loop_prop('total');
 $title = woocommerce_page_title(false);
-$line = $current && $current->description !== '' ? wp_strip_all_tags($current->description) : __('Sportswear, everyday pieces and team merchandise across four collections, designed in Milan.', 'schermo');
+$line = $current && $current->description !== '' ? wp_strip_all_tags($current->description) : __('Sportswear, everyday pieces and team merchandise across four collections.', 'schermo');
 $hero = get_stylesheet_directory_uri() . '/assets/img/hero/';
 $shop = wc_get_page_permalink('shop');
 $keep = array_filter(['orderby' => sanitize_key(wp_unslash($_GET['orderby'] ?? '')), 's' => get_search_query()]); // phpcs:ignore WordPress.Security.NonceVerification
@@ -165,23 +165,10 @@ $active = count($chips);
 if (woocommerce_product_loop()) {
     woocommerce_output_all_notices();
     woocommerce_product_loop_start();
-    $n = 0;
-    $promo = get_term_by('slug', 'schermo-atelier', 'product_cat');
     while (have_posts()) {
         the_post();
         do_action('woocommerce_shop_loop');
         wc_get_template_part('content', 'product');
-        if (++$n === 8 && $promo && !$is_coll && !$chips && $f['collection'] === '') {
-            ?>
-            <li class="sx-promo">
-              <a href="<?php echo esc_url(get_term_link($promo)); ?>">
-                <?php if ($stack[1]): ?><img class="sx-promo-img" src="<?php echo esc_url($stack[1]); ?>" alt="" loading="lazy"><?php endif; ?>
-                <span class="sx-promo-copy"><span class="eyebrow"><?php esc_html_e('Limited drops', 'schermo'); ?></span><span class="sx-promo-title"><?php echo esc_html($promo->name); ?></span><span class="sx-promo-line"><?php esc_html_e('Limited pieces. Made to be noticed.', 'schermo'); ?></span></span>
-                <span class="btn gx-gold"><?php esc_html_e('Shop the drop', 'schermo'); ?><?php echo brandhouse_icon('arrow'); ?></span>
-              </a>
-            </li>
-            <?php
-        }
     }
     woocommerce_product_loop_end();
     do_action('woocommerce_after_shop_loop');

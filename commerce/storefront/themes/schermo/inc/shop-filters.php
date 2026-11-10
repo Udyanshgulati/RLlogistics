@@ -105,11 +105,32 @@ add_action('woocommerce_product_query', static function (WP_Query $q): void {
 
 // Sorting: only orders the catalogue can back. No ratings or sales history exist yet, so no popularity/rating sort.
 add_filter('woocommerce_catalog_orderby', static fn (): array => [
+    'available' => __('Available first', 'schermo'),
     'date' => __('Newest', 'schermo'),
     'price' => __('Price: low to high', 'schermo'),
     'price-desc' => __('Price: high to low', 'schermo'),
 ]);
-add_filter('woocommerce_default_catalog_orderby', static fn (): string => 'date');
+// Default: pieces that can be ordered now (priced and in stock) first, newest first within each group — so a listing
+// never opens on a wall of "Coming soon".
+add_filter('woocommerce_default_catalog_orderby', static fn (): string => 'available');
+add_filter('woocommerce_get_catalog_ordering_args', static function (array $args, string $orderby): array {
+    if ($orderby === 'available') {
+        $args = ['orderby' => 'date ID', 'order' => 'DESC', 'meta_key' => ''];
+        add_filter('posts_clauses', 'schermo_available_first_clauses', 30, 2);
+    }
+    return $args;
+}, 10, 2);
+
+function schermo_available_first_clauses(array $c, WP_Query $q): array
+{
+    global $wpdb;
+    if (!$q->is_main_query() || str_contains((string) $c['join'], 'schermo_av')) {
+        return $c;
+    }
+    $c['join'] .= " LEFT JOIN {$wpdb->wc_product_meta_lookup} schermo_av ON schermo_av.product_id = {$wpdb->posts}.ID";
+    $c['orderby'] = "(schermo_av.max_price > 0 AND schermo_av.stock_status = 'instock') DESC, " . ($c['orderby'] ?: "{$wpdb->posts}.post_date DESC");
+    return $c;
+}
 // When sorting by price, products without a price go last instead of first.
 add_filter('posts_clauses', static function (array $c, WP_Query $q): array {
     if ($q->is_main_query() && str_contains((string) $c['orderby'], 'wc_product_meta_lookup.m')) {

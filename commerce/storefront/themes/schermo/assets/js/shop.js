@@ -129,3 +129,22 @@
   window.addEventListener('popstate', () => { if (isListing(new URL(location.href))) load(location.href, { push: false }); });
   history.replaceState({ sx: true }, '', location.href);
 })();
+
+// Product-type pills on phones: bring the selected type into view and drop the edge fade once the row is scrolled to
+// its end, so it is clear when more types are hidden to the right.
+(() => {
+  'use strict';
+  const setup = () => {
+    const row = document.querySelector('.sx-cats');
+    if (!row || row.dataset.scrollSetup) return;
+    row.dataset.scrollSetup = '1';
+    const update = () => row.classList.toggle('is-end', row.scrollLeft + row.clientWidth >= row.scrollWidth - 4);
+    row.addEventListener('scroll', update, { passive: true });
+    const on = row.querySelector('.is-on');
+    if (on && on.offsetLeft + on.offsetWidth > row.clientWidth) row.scrollLeft = on.offsetLeft - 16;
+    update();
+  };
+  setup();
+  const wrap = document.querySelector('.sx-bar-wrap');
+  if (wrap && window.MutationObserver) new MutationObserver(setup).observe(wrap, { childList: true, subtree: true });
+})();

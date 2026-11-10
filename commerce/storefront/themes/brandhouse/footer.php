@@ -5,6 +5,7 @@
     <div class="foot-brand">
       <?php brandhouse_logo('footer'); ?>
       <p><?php echo esc_html(brandhouse_mod('brandhouse_footer_note', __('The art of dressing. Milano · Est. 2021.', 'brandhouse'))); ?></p>
+      <?php $about = get_page_by_path('about'); if ($about && $about->post_status === 'publish'): ?><p class="foot-about"><a href="<?php echo esc_url(get_permalink($about)); ?>"><?php esc_html_e('About Schermo', 'brandhouse'); ?></a></p><?php endif; ?>
     </div>
     <?php foreach (['footer-shop' => __('Shop', 'brandhouse'), 'footer-help' => __('Help', 'brandhouse'), 'footer-legal' => __('Policies', 'brandhouse')] as $loc => $title): ?>
       <?php $menu = has_nav_menu($loc) ? (string) wp_nav_menu(['theme_location' => $loc, 'container' => false, 'depth' => 1, 'echo' => false, 'fallback_cb' => false]) : ''; ?>
