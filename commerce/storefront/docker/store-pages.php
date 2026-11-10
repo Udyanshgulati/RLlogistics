@@ -91,4 +91,8 @@ if (get_option('schermo_email_branding') !== '1') {
     update_option('woocommerce_email_footer_text', get_bloginfo('name') . ' · Shipped from Delhi, India' . "\n" . 'Store managed by Thoda Logic');
     update_option('schermo_email_branding', '1');
 }
+// The hub plugin's public "Track your order" page joins the Policies menu once the menu exists.
+if (function_exists('tli_install_tracking')) {
+    tli_install_tracking();
+}
 echo "store pages: " . count($ids) . " policy drafts ready; email branding set\n";

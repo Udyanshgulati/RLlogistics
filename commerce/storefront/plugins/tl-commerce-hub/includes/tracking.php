@@ -191,3 +191,20 @@ add_action('wp_head', static function (): void {
         echo '<style>.tl-track{display:grid;gap:12px;max-width:440px;margin:0 0 24px}.tl-track label{display:grid;gap:6px;font-weight:600}.tl-track input{padding:12px;border:1px solid rgba(127,127,127,.4);border-radius:8px;background:transparent;color:inherit}.tl-track-msg{padding:12px 14px;border-radius:8px;background:rgba(220,38,38,.12)}.tl-track-result,.tl-tracking{padding:18px;border:1px solid rgba(127,127,127,.3);border-radius:12px;margin:0 0 24px}.tl-track-stage{display:inline-block;margin-top:6px;font-weight:700}.tl-timeline{list-style:none;margin:16px 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.tl-timeline li{display:grid;gap:4px;opacity:.45;font-size:13px}.tl-timeline li.done{opacity:1}.tl-timeline .dot{width:12px;height:12px;border-radius:50%;border:2px solid currentColor}.tl-timeline li.done .dot{background:currentColor}@media(max-width:600px){.tl-timeline{grid-template-columns:1fr 1fr}}</style>';
     }
 });
+
+// In this store "Completed" means delivered: WooCommerce's completed-order email is worded that way unless the owner
+// has written their own subject/heading in WooCommerce → Settings → Emails. It also carries the invoice link.
+add_filter('woocommerce_email_subject_customer_completed_order', static function ($subject, $order, $email = null) {
+    return $email instanceof WC_Email && in_array((string) $email->get_option('subject', ''), ['', $email->get_default_subject()], true) ? $email->format_string('Your {site_title} order #{order_number} has been delivered') : $subject;
+}, 10, 3);
+add_filter('woocommerce_email_heading_customer_completed_order', static function ($heading, $order, $email = null) {
+    return $email instanceof WC_Email && in_array((string) $email->get_option('heading', ''), ['', $email->get_default_heading()], true) ? 'Your order has been delivered' : $heading;
+}, 10, 3);
+add_action('woocommerce_email_order_details', static function ($order, $admin, $plain, $email): void {
+    if ($admin || $plain || !$order instanceof WC_Order || !$email instanceof WC_Email || $email->id !== 'customer_completed_order' || !function_exists('tli_invoice_link')) {
+        return;
+    }
+    if ($link = tli_invoice_link($order)) {
+        printf('<p>Your GST invoice: <a href="%s">download / print</a></p>', esc_url($link));
+    }
+}, 5, 4);
