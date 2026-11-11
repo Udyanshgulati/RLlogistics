@@ -250,3 +250,24 @@ Still to do:
 - **Share previews:** `themes/brandhouse/inc/seo.php` (meta description + Open Graph), image `themes/schermo/assets/img/share.jpg`.
 - Tested end to end locally (phone checkout with COD enabled only in the local test copy → delivered → tracking → invoice →
   refund/credit note; store → hub sync; remote invoice). Live crawl: no JS errors, no broken images, no mobile overflow.
+
+### Wrap-up 11 Nov 2026 (this session)
+Live and verified on schermo.thodalogic.com:
+- Catalogue: Core and Atelier renamed with Italian, fashion-led names (Dieci Oversized Tee, Bandiera Washed Tee…);
+  Glasgow Cosmic medal removed; product types (T-shirts & Polos, Trousers, Shorts, Knitwear & Hoodies, Caps & Hats,
+  Bags & Backpacks, Other Accessories); client sheet lists all SKUs; sheet importer keeps each product's collection.
+- Navigation: New In · Shop (grouped, with images) · Collections (image cards, real availability) → /collections/ page.
+  Fixed: Collections underline, closed dropdowns catching the mouse.
+- Shop: filters/sort/pagination in place (no reload); Quick add; collection headers with deck photos.
+- Product pages: thumbnails, verified product reviews (delivered-order links; admin entry for real consented reviews).
+- Checkout: calm Schermo design (steps, "Your Schermo selection"), only a required Terms checkbox, Grazie
+  confirmation page; no white frames; readable quantity badges.
+- Visitor journey: currency note at ~6 s, welcome once, Schermo list with a personal 10% code after real interest.
+- Messages plugin (plugins/schermo-comms): consent records, idempotent queue, order + marketing triggers — DRY-RUN.
+- Sign in with Google: built, hidden until GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET are set.
+- Homepage (other session made it calmer) + this session added "The Core edit" grid and "Schermo Atelier" bento.
+- Footer credit: "Designed and developed by Thoda Logic".
+Owner inputs still needed (blocking sales): Razorpay keys (live checkout has NO payment method until then),
+prices/stock for Core, Atelier and Glasgow Cosmic, SMTP credentials, WhatsApp Cloud API + approved templates,
+Google OAuth client. Decisions: "Schermo Atelier" name, Made in Milan claim, Matthew M. Williams line, founders'
+names, Cosmic helmet/pads/gloves, Milan Icons bag tag category. Security: rotate the credentials shared in chat.
