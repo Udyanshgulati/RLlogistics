@@ -21,6 +21,8 @@ add_action('admin_post_scm_save', static function (): void {
     $s['mode'] = ($in['mode'] ?? '') === 'live' ? 'live' : 'dry-run';
     $s['review_moderation'] = !empty($in['review_moderation']) ? 1 : 0;
     $s['cart_reminder_hours'] = max(1, (int) ($in['cart_reminder_hours'] ?? 3));
+    $s['newsletter_offer_on'] = !empty($in['newsletter_offer_on']) ? 1 : 0;
+    $s['newsletter_offer_percent'] = max(1, min(50, (int) ($in['newsletter_offer_percent'] ?? 10)));
     $s['flows'] = [];
     foreach ((array) ($in['flows'] ?? []) as $k => $v) {
         if (preg_match('/^[a-z_]+:(email|whatsapp)$/', (string) $k)) {
@@ -81,6 +83,8 @@ function scm_admin_page(): void
     printf('<p><label><input type="radio" name="mode" value="dry-run"%s> Dry-run</label> &nbsp; <label><input type="radio" name="mode" value="live"%s> Live (only after providers, approved templates and consent wording are confirmed)</label></p>', checked(!$live, true, false), checked($live, true, false));
     printf('<p><label><input type="checkbox" name="review_moderation" value="1"%s> Hold customer reviews for approval (Products → Reviews) before they appear</label></p>', checked($s['review_moderation'], 1, false));
     printf('<p><label>Bag reminder after <input type="number" min="1" name="cart_reminder_hours" value="%d" style="width:60px"> hours (signed-in customers with marketing consent only)</label></p>', (int) $s['cart_reminder_hours']);
+    printf('<p><label><input type="checkbox" name="newsletter_offer_on" value="1"%s> Schermo list welcome offer: <input type="number" min="1" max="50" name="newsletter_offer_percent" value="%d" style="width:60px">%% off the first order (one personal code, single use, 30 days, not on sale items)</label></p>', checked((int) ($s['newsletter_offer_on'] ?? 1), 1, false), (int) ($s['newsletter_offer_percent'] ?? 10));
+    printf('<p><strong>Sign in with Google:</strong> %s</p>', scm_google_ready() ? 'configured' : 'not configured (set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET; redirect URI ' . esc_html(scm_google_redirect_uri()) . ')');
     echo '<table class="widefat striped"><thead><tr><th>Event</th><th>Purpose</th><th>Email</th><th>WhatsApp</th><th>WhatsApp approved template (name / language)</th><th>Template must have these body parameters, in order</th></tr></thead><tbody>';
     foreach (scm_events() as $ev => $d) {
         $cell = static function (string $ch) use ($ev, $d, $s): string {

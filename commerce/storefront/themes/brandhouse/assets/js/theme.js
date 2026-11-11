@@ -128,7 +128,7 @@
 
   // Country/currency popup: opens on a first visit. Closing it without choosing keeps the detected market.
   const market = document.getElementById('market-picker');
-  if (market && market.hasAttribute('data-autoopen')) {
+  if (market && market.hasAttribute('data-autoopen') && !document.body.classList.contains('has-engage')) {
     market.showModal();
     const note = market.querySelector('[data-detect-url]');
     if (note && window.fetch) fetch(note.dataset.detectUrl, { credentials: 'same-origin' }).then((r) => r.json()).then((d) => {

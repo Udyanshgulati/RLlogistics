@@ -72,7 +72,8 @@ add_action('woocommerce_order_refunded', static function (int $order_id, int $re
 
 // ---- Marketing: welcome after a new opt-in (one per contact and channel, ever).
 add_action('scm_marketing_opt_in', static function (string $channel, string $contact): void {
-    scm_queue('welcome', $channel, 'marketing', $contact, ['shop_link' => wc_get_page_permalink('shop')], "welcome:{$channel}:" . md5($contact));
+    $vars = apply_filters('scm_welcome_vars', ['shop_link' => wc_get_page_permalink('shop')]) + ['coupon_line' => ''];
+    scm_queue('welcome', $channel, 'marketing', $contact, $vars, "welcome:{$channel}:" . md5($contact));
 }, 10, 2);
 
 // ---- Marketing: bag reminder for signed-in customers who opted in (we only know who a guest is once they order).

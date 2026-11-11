@@ -21,6 +21,8 @@ require_once SCM_DIR . '/includes/templates.php';
 require_once SCM_DIR . '/includes/triggers.php';
 require_once SCM_DIR . '/includes/reviews.php';
 require_once SCM_DIR . '/includes/admin.php';
+require_once SCM_DIR . '/includes/newsletter.php';
+require_once SCM_DIR . '/includes/google-login.php';
 
 /** Tables: consent records, the message log/queue, and review invitations. Created/updated on version change. */
 function scm_install(): void
@@ -99,6 +101,8 @@ function scm_settings(): array
         'flows' => [],                    // "event:channel" => 1 when enabled
         'wa_templates' => [],             // event => ['name' => approved template name, 'lang' => 'en', 'category' => 'utility|marketing']
         'cart_reminder_hours' => 3,
+        'newsletter_offer_on' => 1,       // welcome offer for the Schermo list (owner's request)
+        'newsletter_offer_percent' => 10,
     ];
     $s = get_option('scm_settings', []);
     return array_replace($defaults, is_array($s) ? $s : []);

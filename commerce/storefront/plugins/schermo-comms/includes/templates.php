@@ -28,7 +28,7 @@ function scm_events(): array
         'review_request' => ['label' => 'Review request (after delivery)', 'purpose' => 'updates', 'channels' => ['email', 'whatsapp'], 'wa' => ['first_name', 'product_name', 'review_link'],
             'subject' => 'How is your {product_list_short}?', 'body' => "Hi {first_name},\n\nYour Schermo order {order_number} was delivered. If you have a moment, tell other shoppers what you think — each link below is for one piece from your order:\n\n{review_links}\n\nThe links are only for you and work once per piece. Reviews are optional."],
         'welcome' => ['label' => 'Welcome (after marketing opt-in)', 'purpose' => 'marketing', 'channels' => ['email', 'whatsapp'], 'wa' => [],
-            'subject' => 'Welcome to Schermo', 'body' => "Thanks for joining. We will write when there is a new drop or something worth knowing — not more.\n\nShop the collections: {shop_link}"],
+            'subject' => 'Welcome to Schermo', 'body' => "Thanks for joining. We will write when there is a new drop or something worth knowing — not more.\n\n{coupon_line}\n\nShop the collections: {shop_link}"],
         'cart_reminder' => ['label' => 'Bag reminder (signed-in customers)', 'purpose' => 'marketing', 'channels' => ['email', 'whatsapp'], 'wa' => ['first_name', 'cart_link'],
             'subject' => 'Your Schermo bag is waiting', 'body' => "Hi {first_name},\n\nYou left these in your bag:\n\n{cart_items}\n\nPick up where you left off: {cart_link}"],
         'drop' => ['label' => 'Drop / collection announcement', 'purpose' => 'marketing', 'channels' => ['email', 'whatsapp'], 'wa' => ['headline', 'link'],
