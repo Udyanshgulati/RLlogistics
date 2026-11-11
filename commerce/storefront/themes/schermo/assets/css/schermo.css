@@ -1305,3 +1305,8 @@ dialog.eg-list { width: min(480px, calc(100vw - 24px)); background: radial-gradi
 .tl-credit img { width: 20px; height: 20px; object-fit: contain; }
 /* Atelier bento: always two columns of cards next to the feature. */
 .hm-bento .hm-bento-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+/* Thoda Logic credit — text only, wide tracking (owner's reference). */
+.tl-credit { background: #111112; border-top: 1px solid rgba(255, 255, 255, .08); padding: 22px 16px calc(22px + env(safe-area-inset-bottom)); }
+.tl-credit a { display: inline; gap: 0; font: 500 clamp(10px, 1vw, 13px)/1.6 var(--font-label); letter-spacing: .24em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
+.tl-credit strong { color: rgba(255, 255, 255, .92); font-weight: 700; }
+.tl-credit a:hover strong { color: #fff; }

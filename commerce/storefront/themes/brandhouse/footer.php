@@ -20,10 +20,7 @@
   </div>
 </footer>
 <div class="tl-credit">
-  <a href="https://thodalogic.com" target="_blank" rel="noopener">
-    <img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/img/thoda-logic-mark.png'); ?>" alt="" width="20" height="20" loading="lazy">
-    <span><?php esc_html_e('Designed & developed by', 'brandhouse'); ?> <strong>Thoda Logic</strong></span>
-  </a>
+  <a href="https://thodalogic.com" target="_blank" rel="noopener"><?php esc_html_e('Designed and developed by', 'brandhouse'); ?> <strong>Thoda Logic</strong></a>
 </div>
 <?php wp_footer(); ?>
 </body>
