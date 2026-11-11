@@ -19,6 +19,12 @@
     <?php if (function_exists('brandhouse_market_button')) echo brandhouse_market_button('foot-market'); ?>
   </div>
 </footer>
+<div class="tl-credit">
+  <a href="https://thodalogic.com" target="_blank" rel="noopener">
+    <img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/img/thoda-logic-mark.png'); ?>" alt="" width="20" height="20" loading="lazy">
+    <span><?php esc_html_e('Designed & developed by', 'brandhouse'); ?> <strong>Thoda Logic</strong></span>
+  </a>
+</div>
 <?php wp_footer(); ?>
 </body>
 </html>

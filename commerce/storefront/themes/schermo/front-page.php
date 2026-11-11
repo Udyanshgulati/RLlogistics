@@ -14,6 +14,10 @@ $lead = $slides[0] ?? null;
 $collections = schermo_collections();
 $types = schermo_home_types();
 $ready = function_exists('schermo_available_ids') ? schermo_home_available(12) : [];
+$core = schermo_home_pick(['SC-001', 'SC-016', 'SC-045', 'SC-029', 'SC-008', 'SC-026', 'SC-037', 'SC-013']);
+$atelier = schermo_home_pick(['SA-003', 'SA-001', 'SA-002', 'SA-006', 'SA-011']);
+$core_term = get_term_by('slug', 'schermo-core', 'product_cat');
+$atelier_term = get_term_by('slug', 'schermo-atelier', 'product_cat');
 $about = get_page_by_path('about');
 $about_url = $about && $about->post_status === 'publish' ? get_permalink($about) : '';
 ?>
@@ -59,6 +63,18 @@ $about_url = $about && $about->post_status === 'publish' ? get_permalink($about)
   </section>
   <?php endif; ?>
 
+  <?php if (count($core) >= 4 && $core_term): ?>
+  <section class="hm-section container" aria-labelledby="core-title">
+    <div class="hm-head">
+      <div><p class="hm-kicker"><?php esc_html_e('Schermo Essentials', 'schermo'); ?></p><h2 id="core-title"><?php esc_html_e('The Core edit', 'schermo'); ?></h2></div>
+      <a class="hm-link" href="<?php echo esc_url(get_term_link($core_term)); ?>"><?php echo esc_html(sprintf(__('All %d pieces', 'schermo'), (int) $core_term->count)); ?></a>
+    </div>
+    <ul class="products hm-grid" role="list">
+      <?php foreach ($core as $pid) { $GLOBALS['product'] = wc_get_product($pid); $GLOBALS['post'] = get_post($pid); setup_postdata($GLOBALS['post']); wc_get_template_part('content', 'product'); } wp_reset_postdata(); ?>
+    </ul>
+  </section>
+  <?php endif; ?>
+
   <section class="hm-story container" aria-labelledby="story-title">
     <img class="hm-story-img" src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/img/banner-milan-icons.webp'); ?>" alt="<?php esc_attr_e('Milan Cathedral (Duomo) at sunset', 'schermo'); ?>" width="1183" height="1400" loading="lazy">
     <div class="hm-story-copy">
@@ -69,6 +85,28 @@ $about_url = $about && $about->post_status === 'publish' ? get_permalink($about)
       <?php if ($about_url): ?><a class="hm-link" href="<?php echo esc_url($about_url); ?>"><?php esc_html_e('Our story', 'schermo'); ?></a><?php endif; ?>
     </div>
   </section>
+
+  <?php if (count($atelier) >= 3 && $atelier_term): $feat = wc_get_product($atelier[0]); ?>
+  <section class="hm-section container hm-atelier" aria-labelledby="atelier-title">
+    <div class="hm-head">
+      <div><p class="hm-kicker"><?php esc_html_e('Limited drops', 'schermo'); ?></p><h2 id="atelier-title"><?php echo esc_html($atelier_term->name); ?></h2></div>
+      <a class="hm-link" href="<?php echo esc_url(get_term_link($atelier_term)); ?>"><?php esc_html_e('See the drop', 'schermo'); ?></a>
+    </div>
+    <div class="hm-bento">
+      <a class="hm-feature" href="<?php echo esc_url($feat->get_permalink()); ?>">
+        <?php echo wp_get_attachment_image((int) $feat->get_image_id(), 'woocommerce_single', false, ['alt' => $feat->get_name(), 'loading' => 'lazy']); ?>
+        <span class="hm-feature-copy">
+          <span class="hm-feature-kicker"><?php esc_html_e('Hand stitched · Limited', 'schermo'); ?></span>
+          <span class="hm-feature-name"><?php echo esc_html($feat->get_name()); ?></span>
+          <span class="hm-feature-price"><?php echo $feat->get_price() !== '' ? wp_kses_post($feat->get_price_html()) : esc_html__('Coming soon', 'schermo'); ?></span>
+        </span>
+      </a>
+      <ul class="products hm-bento-grid" role="list">
+        <?php foreach (array_slice($atelier, 1, 4) as $pid) { $GLOBALS['product'] = wc_get_product($pid); $GLOBALS['post'] = get_post($pid); setup_postdata($GLOBALS['post']); wc_get_template_part('content', 'product'); } wp_reset_postdata(); ?>
+      </ul>
+    </div>
+  </section>
+  <?php endif; ?>
 
   <?php if ($collections): ?>
   <section class="hm-section container" id="collections" aria-labelledby="coll-title">

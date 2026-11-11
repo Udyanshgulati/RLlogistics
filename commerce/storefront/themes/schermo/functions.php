@@ -309,3 +309,16 @@ add_filter('woocommerce_available_payment_gateways', static function ($gateways)
     unset($gateways['cod']);
     return $gateways;
 });
+
+/** Published products for the given SKUs, in that order (missing or unpublished ones are skipped). */
+function schermo_home_pick(array $skus): array
+{
+    $ids = [];
+    foreach ($skus as $sku) {
+        $id = wc_get_product_id_by_sku($sku);
+        if ($id && get_post_status($id) === 'publish') {
+            $ids[] = $id;
+        }
+    }
+    return $ids;
+}
