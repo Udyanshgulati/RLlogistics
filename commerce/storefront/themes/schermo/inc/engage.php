@@ -57,7 +57,7 @@ add_action('wp_footer', static function (): void {
       <div class="eg-body">
         <p class="eg-kicker"><?php esc_html_e('Benvenuto', 'schermo'); ?></p>
         <h2 id="eg-welcome-title"><?php esc_html_e('Welcome to Schermo.', 'schermo'); ?></h2>
-        <p><?php esc_html_e('A new expression of sport. A new language of style. Four collections, one language.', 'schermo'); ?></p>
+        <p><?php esc_html_e('A new expression of sport. A new language of style. Three collections, one language.', 'schermo'); ?></p>
         <div class="eg-actions">
           <?php if ($ready): $t = $ready[0]['term']; ?>
             <a class="btn" href="<?php echo esc_url(get_term_link($t)); ?>"><?php echo esc_html(sprintf(__('Shop %s', 'schermo'), $t->name)); ?></a>

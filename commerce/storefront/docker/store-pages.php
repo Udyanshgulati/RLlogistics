@@ -94,7 +94,7 @@ $pages = [
         $h('Where we deliver')
         . $p('We deliver worldwide. Enter your address at checkout to see the delivery options and charges for your country before you pay.')
         . $h('When your order ships')
-        . $p("Orders are packed at our warehouse in India and usually dispatched within {$dispatch} of payment. As soon as your order is dispatched you get an email with the courier name and tracking number.")
+        . $p("Orders are packed at our warehouse and usually dispatched within {$dispatch} of payment. Some pieces have their own dispatch time, shown on the product page and in your bag; an order with several pieces ships when all of them are ready unless we tell you otherwise. As soon as your order is dispatched you get an email with the courier name and tracking number.")
         . $h('Delivery times')
         . $ul(['<strong>India:</strong> [tl_store field="eta_in" after=" after dispatch" fallback="usually a few working days after dispatch, depending on your location"].',
             '<strong>Rest of the world:</strong> [tl_store field="eta_world" after=" after dispatch" fallback="depends on the destination and on customs clearance; your tracking link shows the latest estimate"].',
@@ -123,7 +123,7 @@ $pages = [
         $h('Do you ship to my country?')
         . $p('We deliver worldwide. Enter your address at checkout to see the delivery options and charges for your country.')
         . $h('How long will delivery take?')
-        . $p("Orders are usually dispatched within {$dispatch} of payment. Delivery in India takes [tl_store field=\"eta_in\" fallback=\"a few working days\"] after dispatch; elsewhere it depends on the destination and customs. Details in our " . $link('shipping-policy', 'Shipping Policy') . '.')
+        . $p("Orders are usually dispatched within {$dispatch} of payment (some pieces show their own dispatch time on the product page). Delivery in India takes [tl_store field=\"eta_in\" fallback=\"a few working days\"] after dispatch; elsewhere it depends on the destination and customs. Details in our " . $link('shipping-policy', 'Shipping Policy') . '.')
         . $h('How do I track my order?')
         . $p('You get an email with the courier and tracking number as soon as your order ships. You can also use our ' . $link('track-order', 'Track your order') . ' page with your order number and email.')
         . $h('How can I pay?')

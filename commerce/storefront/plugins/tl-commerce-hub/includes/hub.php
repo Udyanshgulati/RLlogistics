@@ -45,7 +45,10 @@ function tli_stock_map(array $skus = []): array
 /** Takes (sign -1) or returns (+1) the stock for a remote order's lines, recording each movement. */
 function tli_move_remote_stock(array $store, array $order, int $sign): array
 {
+    global $wpdb;
     $problems = [];
+    $alloc = [];
+    $prev = json_decode((string) ($order['alloc_json'] ?? ''), true) ?: [];
     foreach (json_decode($order['lines_json'], true) ?: [] as $l) {
         $id = wc_get_product_id_by_sku((string) $l['sku']);
         $p = $id ? wc_get_product($id) : null;
@@ -57,12 +60,19 @@ function tli_move_remote_stock(array $store, array $order, int $sign): array
             continue; // not counted yet: nothing to take
         }
         $before = (int) $p->get_stock_quantity();
+        // Warehouses: take each line from the product's warehouse (or the next one with stock); put it back where it came from.
+        if ($sign < 0) {
+            $alloc[$l['sku']] = function_exists('tli_wh_take') ? tli_wh_take($p, (int) $l['qty'], $before) : [];
+        } elseif (function_exists('tli_wh_give')) {
+            tli_wh_give($p, (array) ($prev[$l['sku']] ?? []), (int) $l['qty']);
+        }
         $new = tli_without_auto_log(static fn () => wc_update_product_stock($p, (int) $l['qty'], $sign < 0 ? 'decrease' : 'increase'));
         tli_log($p, (int) $new - $before, $before, (int) $new, $sign < 0 ? 'sold' : 'order_restored', $store['name'] . ' order #' . $order['number']);
         if ($new < 0) {
             $problems[] = "{$l['sku']} oversold (now {$new})";
         }
     }
+    $wpdb->update($wpdb->prefix . 'tl_remote_orders', ['alloc_json' => $sign < 0 ? wp_json_encode($alloc) : null], ['id' => (int) $order['id']]);
     return $problems;
 }
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TL Commerce Hub
  * Description: One central stock and order backend for several WooCommerce storefronts — inventory, stock movements, orders and fulfilment. By Thoda Logic.
- * Version: 1.5.0
+ * Version: 1.6.0
  * Author: Thoda Logic
  * Author URI: https://thodalogic.com
  * Requires PHP: 8.2
@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-const TLI_VERSION = '1.5.0';
-const TLI_DB_VERSION = '5';
+const TLI_VERSION = '1.6.0';
+const TLI_DB_VERSION = '6';
 define('TLI_DIR', __DIR__);
 define('TLI_URL', plugin_dir_url(__FILE__));
 
@@ -34,6 +34,7 @@ require_once TLI_DIR . '/includes/purchasing.php';
 require_once TLI_DIR . '/includes/tracking.php';
 require_once TLI_DIR . '/includes/invoice.php';
 require_once TLI_DIR . '/includes/launch.php';
+require_once TLI_DIR . '/includes/warehouses.php';
 
 register_activation_hook(__FILE__, 'tli_install');
 // Upgrades run on the first request after a deploy (front end or admin), not only when someone opens wp-admin.
@@ -59,6 +60,7 @@ function tli_install(): void
         reason varchar(32) NOT NULL,
         note varchar(255) NOT NULL DEFAULT '',
         order_id bigint unsigned NULL,
+        warehouse_id bigint unsigned NULL,
         user_id bigint unsigned NULL,
         created_at datetime NOT NULL,
         PRIMARY KEY  (id),
@@ -96,6 +98,7 @@ function tli_install(): void
         courier varchar(60) NOT NULL DEFAULT '',
         awb varchar(60) NOT NULL DEFAULT '',
         track_url varchar(255) NOT NULL DEFAULT '',
+        alloc_json text NULL,
         placed_at datetime NOT NULL,
         updated_at datetime NOT NULL,
         PRIMARY KEY  (id),
@@ -105,6 +108,7 @@ function tli_install(): void
     tli_install_returns();
     tli_install_purchasing();
     tli_install_tracking();
+    tli_install_warehouses();
     tli_install_roles();
     update_option('tli_db_version', TLI_DB_VERSION);
     add_option('tli_mode', 'hub');

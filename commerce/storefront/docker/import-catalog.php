@@ -7,8 +7,10 @@ require_once ABSPATH . 'wp-admin/includes/image.php';
 
 $root = getenv('CATALOG_DIR') ?: '/opt/schermo/catalog';
 $sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-$cat = static function (string $name, int $parent = 0): int {
-    $t = term_exists($name, 'product_cat', $parent) ?: wp_insert_term($name, 'product_cat', ['parent' => $parent]);
+// A category by name, wherever it sits (Milan Icons and Glasgow Cosmic live under Schermo Sports); created at the top
+// level only when it does not exist yet.
+$cat = static function (string $name, ?int $parent = null): int {
+    $t = term_exists($name, 'product_cat', $parent) ?: wp_insert_term($name, 'product_cat', ['parent' => (int) $parent]);
     return (int) $t['term_id'];
 };
 $attach = static function (string $file, int $post, string $title): int {
@@ -48,9 +50,11 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
     if (!empty($data['collection_description']) && term_description($collection, 'product_cat') === '') {
         wp_update_term($collection, 'product_cat', ['description' => $data['collection_description']]);
     }
-    // Put the collection first in the main menu, once.
+    // A team collection (inside Schermo Sports) also belongs to its parent collection.
+    $collection_parent = (int) (get_term($collection, 'product_cat')->parent ?? 0);
+    // Put the collection first in the main menu, once (top-level collections only; menus are set up below).
     $loc = get_nav_menu_locations();
-    if (!empty($loc['primary'])) {
+    if (!empty($loc['primary']) && !$collection_parent && (int) get_option('schermo_menu_v') < 4) {
         $linked = array_filter(wp_get_nav_menu_items($loc['primary']) ?: [], static fn ($i) => (int) $i->object_id === $collection && $i->object === 'product_cat');
         if (!$linked) {
             wp_update_nav_menu_item($loc['primary'], 0, ['menu-item-object' => 'product_cat', 'menu-item-object-id' => $collection, 'menu-item-type' => 'taxonomy', 'menu-item-status' => 'publish', 'menu-item-position' => 0]);
@@ -97,7 +101,7 @@ foreach (glob($root . '/*/products.json') ?: [] as $json) {
         $product->set_name($p['name']);
         $product->set_sku($p['sku']);
         $product->set_description($p['description']);
-        $product->set_category_ids([$collection, $cat($p['category'])]);
+        $product->set_category_ids(array_values(array_filter([$collection, $collection_parent, $cat($p['category'])])));
         $product->set_status('publish');
         if ($p['sizes']) {
             $a = new WC_Product_Attribute();
@@ -201,7 +205,7 @@ foreach ([
     'clothing' => 'Tees, polos, trousers, shorts and knitwear from Schermo Core, Schermo Atelier and the team collections.',
     'accessories' => 'Caps and hats, bags and backpacks, and everyday accessories.',
     'sportswear' => 'Match and practice kits, track trousers and playing gear from Milan Icons and Glasgow Cosmic.',
-    'fan-merch' => 'Bag tags, lanyards and keychains for Milan Icons and Glasgow Cosmic supporters.',
+    'fan-merch' => 'Bag tags for Milan Icons and Glasgow Cosmic supporters.',
 ] as $slug => $line) {
     $t = get_term_by('slug', $slug, 'product_cat');
     if ($t && $t->description === '') {
@@ -238,7 +242,7 @@ if (!empty($loc['primary']) && (int) get_option('schermo_menu_v') < 4) {
         }
     }
     $coll = $add(['menu-item-title' => 'Collections', 'menu-item-type' => 'custom', 'menu-item-url' => home_url('/#collections')]);
-    foreach (['schermo-core', 'schermo-atelier', 'milan-icons', 'glasgow-cosmic'] as $slug) {
+    foreach (['schermo-core', 'schermo-atelier', 'schermo-sports'] as $slug) {
         if ($a = $term($slug, $coll)) {
             $add($a);
         }
@@ -297,3 +301,64 @@ if ((int) get_option('schermo_names_v') < 2) {
     update_option('schermo_names_v', 2, false);
     echo "catalog: {$n} products renamed\n";
 }
+
+// Schermo Sports (v1): Milan Icons and Glasgow Cosmic combined into one collection. Both teams stay as its
+// sub-categories (their pages and links keep working); every team product also joins Schermo Sports; the
+// Collections menu lists Core · Atelier · Schermo Sports. Runs once, so later edits in WP admin are kept.
+if ((int) get_option('schermo_sports_v') < 1) {
+    $sports = get_term_by('slug', 'schermo-sports', 'product_cat');
+    $sid = $sports ? (int) $sports->term_id : (int) (wp_insert_term('Schermo Sports', 'product_cat', ['slug' => 'schermo-sports', 'description' => 'Team merchandise designed by Schermo for Milan Icons and Glasgow Cosmic: match, practice, travel and off-field ranges.'])['term_id'] ?? 0);
+    $n = 0;
+    foreach (['milan-icons', 'glasgow-cosmic'] as $slug) {
+        $t = get_term_by('slug', $slug, 'product_cat');
+        if (!$t || !$sid) {
+            continue;
+        }
+        if ((int) $t->parent !== $sid) {
+            wp_update_term($t->term_id, 'product_cat', ['parent' => $sid]);
+        }
+        foreach (wc_get_products(['status' => ['publish', 'draft', 'private'], 'limit' => -1, 'category' => [$slug]]) as $prod) {
+            $cats = $prod->get_category_ids();
+            if (!in_array($sid, $cats, true)) {
+                $prod->set_category_ids(array_merge($cats, [$sid]));
+                $prod->save();
+                $n++;
+            }
+        }
+    }
+    $loc = get_nav_menu_locations();
+    if ($sid && !empty($loc['primary'])) {
+        $items = wp_get_nav_menu_items((int) $loc['primary']) ?: [];
+        $teams = array_filter([get_term_by('slug', 'milan-icons', 'product_cat'), get_term_by('slug', 'glasgow-cosmic', 'product_cat')]);
+        $team_ids = array_map(static fn ($t) => (int) $t->term_id, $teams);
+        $parent_item = 0;
+        $pos = 0;
+        foreach ($items as $it) {
+            if ($it->object === 'product_cat' && in_array((int) $it->object_id, $team_ids, true)) {
+                $parent_item = (int) $it->menu_item_parent;
+                $pos = $pos ?: (int) $it->menu_order;
+                wp_delete_post($it->ID, true);
+            }
+        }
+        if (!$parent_item) { // fresh install: the menu was built before Schermo Sports existed
+            foreach ($items as $it) {
+                if (!$it->menu_item_parent && $it->title === 'Collections') {
+                    $parent_item = (int) $it->ID;
+                    $pos = (int) $it->menu_order + 3;
+                }
+            }
+        }
+        $has = array_filter($items, static fn ($it) => $it->object === 'product_cat' && (int) $it->object_id === $sid);
+        if ($parent_item && !$has) {
+            wp_update_nav_menu_item((int) $loc['primary'], 0, ['menu-item-type' => 'taxonomy', 'menu-item-object' => 'product_cat', 'menu-item-object-id' => $sid, 'menu-item-parent-id' => $parent_item, 'menu-item-status' => 'publish', 'menu-item-position' => $pos]);
+        }
+    }
+    // Type line without the removed lanyards and keychains (only while it is still our earlier text).
+    $fm = get_term_by('slug', 'fan-merch', 'product_cat');
+    if ($fm && str_contains($fm->description, 'lanyards and keychains')) {
+        wp_update_term($fm->term_id, 'product_cat', ['description' => 'Bag tags for Milan Icons and Glasgow Cosmic supporters.']);
+    }
+    update_option('schermo_sports_v', 1, false);
+    echo "catalog: Schermo Sports collection ready ({$n} products added)\n";
+}
+

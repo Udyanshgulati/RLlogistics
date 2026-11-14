@@ -91,7 +91,7 @@ function tli_page_overview(): void
     foreach (['today' => 'Today', '7d' => 'Last 7 days', '30d' => 'Last 30 days'] as $k => $l) {
         $seg .= sprintf('<a class="%s" href="%s">%s</a>', $range === $k ? 'on' : '', esc_url(admin_url('admin.php?page=tl-inventory&range=' . $k)), $l);
     }
-    tli_head('Overview', ($hub ? 'All stores' : get_bloginfo('name')) . ' · Delhi warehouse', '<nav class="tli-seg">' . $seg . '</nav>');
+    tli_head('Overview', ($hub ? 'All stores' : get_bloginfo('name')) . ' · ' . (function_exists('tli_wh_multi') && tli_wh_multi() ? count(tli_warehouses()) . ' warehouses' : 'Warehouse'), '<nav class="tli-seg">' . $seg . '</nav>');
     $k = static fn ($label, $value, $hint, $href, $tone = '') => printf('<a class="tli-kpi %s" href="%s"><span class="k-label">%s</span><span class="k-value">%s</span><span class="k-hint">%s</span></a>', esc_attr($tone), esc_url($href), esc_html($label), esc_html((string) $value), esc_html($hint));
     echo '<div class="tli-kpis">';
     $k('New orders', $new, ['today' => 'Placed today', '7d' => 'Last 7 days', '30d' => 'Last 30 days'][$range] ?? '', admin_url('admin.php?page=tl-orders'));
@@ -105,7 +105,7 @@ function tli_page_overview(): void
 
     echo '<section class="tli-card tli-route"><div class="tli-card-head"><div><h2>Shipment journey</h2><p>Orders by stage. Counts change as the team marks orders packed, dispatched and delivered.</p></div></div>';
     $delivered = $count(['completed']) + $rcount(['completed']);
-    printf('<ol class="tli-stops"><li class="%s"><b>%d</b><span>To pack</span></li><li class="%s"><b>%d</b><span>Packed · Delhi</span></li><li class="%s"><b>%d</b><span>With courier</span></li><li class="%s"><b>%d</b><span>Delivered (all time)</span></li></ol></section>',
+    printf('<ol class="tli-stops"><li class="%s"><b>%d</b><span>To pack</span></li><li class="%s"><b>%d</b><span>Packed</span></li><li class="%s"><b>%d</b><span>With courier</span></li><li class="%s"><b>%d</b><span>Delivered (all time)</span></li></ol></section>',
         $topack ? 'done' : '', $topack, $packed ? 'done' : '', $packed, $transit ? 'live' : '', $transit, $delivered ? 'done' : '', $delivered);
 
     echo '<div class="tli-grid-2"><div class="tli-stack">';
@@ -210,8 +210,9 @@ function tli_page_inventory(): void
     $filter = sanitize_key($_GET['filter'] ?? 'all'); // phpcs:ignore WordPress.Security.NonceVerification
     $groups = tli_inventory_rows($q, $filter);
     $incoming = tli_incoming_map();
+    $multi_wh = function_exists('tli_wh_multi') && tli_wh_multi();
     $base = admin_url('admin.php?page=tl-stock');
-    tli_head('Inventory', 'Stock for every product and size, held at the Delhi warehouse.',
+    tli_head('Inventory', 'Stock for every product and size' . (function_exists('tli_wh_multi') && tli_wh_multi() ? ', per warehouse.' : '.'),
         '<a class="tli-btn" href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_export'), 'tli_export')) . '">Export CSV</a><a class="tli-btn primary" href="' . esc_url(admin_url('post-new.php?post_type=product')) . '">Add product</a>');
     if (tli_mode() === 'store') {
         echo '<div class="tli-flash is-ok">This storefront sells from the hub\'s central stock. Numbers here are synced from the hub every 5 minutes; record stock changes at the hub.</div>';
@@ -235,8 +236,17 @@ function tli_page_inventory(): void
             $i === 0 && $q !== '' ? ' open' : '', $i === 0 && $q !== '' ? 'true' : 'false', $img, esc_url((string) get_edit_post_link($p->get_id())), esc_html($p->get_name()), esc_html($p->get_sku()),
             esc_html($g['cats']), count($g['rows']), $g['total'] === null ? '—' : esc_html(number_format_i18n($g['total'])), tli_state_badge($worst), esc_url((string) get_edit_post_link($p->get_id())));
         foreach ($g['rows'] as $r) {
-            printf('<tr class="tli-vrow"><td></td><td><span class="tli-size">%s</span> <span class="mono">%s</span></td><td></td><td></td><td class="num"><b>%s</b>%s</td><td>%s</td><td class="num"><button type="button" class="tli-btn sm" ' . (tli_mode() === 'store' || !current_user_can('tl_adjust') ? 'disabled title="Not available here"' : '') . ' data-adjust data-id="%d" data-name="%s" data-qty="%s">Adjust</button></td></tr>',
-                esc_html($r['size']), esc_html($r['sku']), $r['qty'] === null ? '—' : (int) $r['qty'], !empty($incoming[$r['sku']]) ? ' <a class="tli-incoming" href="' . esc_url(admin_url('admin.php?page=tl-purchasing')) . '" title="On order from suppliers">+' . (int) $incoming[$r['sku']] . ' incoming</a>' : '', tli_state_badge($r['state']), $r['id'], esc_attr($p->get_name() . ($r['size'] !== '—' ? ' · ' . $r['size'] : '')), $r['qty'] === null ? '' : (int) $r['qty']);
+            $whq = $multi_wh && $r['qty'] !== null ? tli_wh_qty((int) $r['id']) : [];
+            $wh_html = '';
+            if ($whq) {
+                $bits = [];
+                foreach (tli_warehouses() as $w) {
+                    $bits[] = '<span title="' . esc_attr($w['name']) . '">' . esc_html($w['code']) . ' ' . (int) ($whq[(int) $w['id']] ?? 0) . '</span>';
+                }
+                $wh_html = ' <span class="tli-whs">' . implode('', $bits) . '</span>';
+            }
+            printf('<tr class="tli-vrow"><td></td><td><span class="tli-size">%s</span> <span class="mono">%s</span></td><td></td><td></td><td class="num"><b>%s</b>%s</td><td>%s</td><td class="num"><button type="button" class="tli-btn sm" ' . (tli_mode() === 'store' || !current_user_can('tl_adjust') ? 'disabled title="Not available here"' : '') . ' data-adjust data-id="%d" data-name="%s" data-qty="%s" data-wh="%s">Adjust</button></td></tr>',
+                esc_html($r['size']), esc_html($r['sku']), $r['qty'] === null ? '—' : (int) $r['qty'] . $wh_html, !empty($incoming[$r['sku']]) ? ' <a class="tli-incoming" href="' . esc_url(admin_url('admin.php?page=tl-purchasing')) . '" title="On order from suppliers">+' . (int) $incoming[$r['sku']] . ' incoming</a>' : '', tli_state_badge($r['state']), $r['id'], esc_attr($p->get_name() . ($r['size'] !== '—' ? ' · ' . $r['size'] : '')), $r['qty'] === null ? '' : (int) $r['qty'], esc_attr((string) wp_json_encode((object) $whq)));
         }
         echo '</tbody>';
     }
@@ -250,7 +260,19 @@ function tli_page_inventory(): void
     foreach (TLI_REASONS as $key => [$label, $sign]) {
         printf('<label class="tli-radio"><input type="radio" name="reason" value="%s" data-sign="%d"%s> %s</label>', esc_attr($key), $sign, $key === 'received' ? ' checked' : '', esc_html($label));
     }
-    echo '</fieldset><label class="tli-field"><span data-qlabel>Quantity</span><input class="tli-input" type="number" name="qty" min="0" step="1" required></label>';
+    if (function_exists('tli_wh_multi') && tli_wh_multi()) {
+        echo '<label class="tli-radio"><input type="radio" name="reason" value="transfer" data-sign="-1"> Move to another warehouse</label>';
+    }
+    echo '</fieldset>';
+    if (function_exists('tli_wh_multi') && tli_wh_multi()) {
+        $opts = '';
+        foreach (tli_warehouses() as $w) {
+            $opts .= sprintf('<option value="%d">%s</option>', (int) $w['id'], esc_html($w['name']));
+        }
+        echo '<label class="tli-field"><span>Warehouse</span><select class="tli-input" name="wh" data-f="wh">' . $opts . '</select></label>';
+        echo '<label class="tli-field" data-to hidden><span>Move to</span><select class="tli-input" name="to_wh">' . $opts . '</select></label>';
+    }
+    echo '<label class="tli-field"><span data-qlabel>Quantity</span><input class="tli-input" type="number" name="qty" min="0" step="1" required></label>';
     echo '<label class="tli-field"><span>Note (optional)</span><input class="tli-input" type="text" name="note" maxlength="200" placeholder="e.g. Delivery from supplier, invoice 1042"></label>';
     echo '<div class="tli-preview" data-preview>On hand <b data-f="before">—</b> → <b data-f="after">—</b></div>';
     echo '</div><div class="tli-panel-foot"><button type="button" class="tli-btn" data-close>Cancel</button><button class="tli-btn primary">Confirm change</button></div></form></dialog>';
@@ -264,8 +286,15 @@ add_action('admin_post_tli_adjust', static function (): void {
     check_admin_referer('tli_adjust');
     $back = wp_validate_redirect(esc_url_raw(wp_unslash($_POST['back'] ?? '')), admin_url('admin.php?page=tl-stock'));
     try {
-        [$before, $after] = tli_adjust(absint($_POST['id'] ?? 0), sanitize_key($_POST['reason'] ?? ''), (int) ($_POST['qty'] ?? 0), sanitize_text_field(wp_unslash($_POST['note'] ?? '')));
-        $msg = sprintf('Saved. On hand %d → %d.', $before, $after);
+        $wh = absint($_POST['wh'] ?? 0) ?: null;
+        if (sanitize_key($_POST['reason'] ?? '') === 'transfer') {
+            tli_wh_transfer(absint($_POST['id'] ?? 0), (int) $wh, absint($_POST['to_wh'] ?? 0), absint($_POST['qty'] ?? 0), sanitize_text_field(wp_unslash($_POST['note'] ?? '')));
+            $msg = sprintf('Moved %d to %s.', absint($_POST['qty'] ?? 0), tli_wh(absint($_POST['to_wh'] ?? 0))['name'] ?? 'the other warehouse');
+            wp_safe_redirect(add_query_arg(['tli_msg' => rawurlencode($msg), 'tli_ok' => '1'], $back));
+            exit;
+        }
+        [$before, $after] = tli_adjust(absint($_POST['id'] ?? 0), sanitize_key($_POST['reason'] ?? ''), (int) ($_POST['qty'] ?? 0), sanitize_text_field(wp_unslash($_POST['note'] ?? '')), null, $wh);
+        $msg = sprintf('Saved. On hand %d → %d%s.', $before, $after, $wh && tli_wh_multi() ? ' in ' . tli_wh($wh)['name'] : '');
         $ok = '1';
     } catch (Throwable $e) {
         $msg = $e->getMessage();
@@ -284,10 +313,12 @@ add_action('admin_post_tli_export', static function (): void {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="tl-inventory-' . wp_date('Y-m-d') . '.csv"');
     $f = fopen('php://output', 'w');
-    fputcsv($f, ['Product', 'SKU', 'Size', 'In stock', 'Status', 'Price (INR)']);
+    $whs = function_exists('tli_wh_multi') && tli_wh_multi() ? tli_warehouses() : [];
+    fputcsv($f, array_merge(['Product', 'SKU', 'Size', 'In stock', 'Status', 'Price (INR)'], array_map(static fn ($w) => 'In ' . $w['name'], $whs)));
     foreach (tli_inventory_rows() as $g) {
         foreach ($g['rows'] as $r) {
-            fputcsv($f, [$g['product']->get_name(), $r['sku'], $r['size'], $r['qty'] ?? '', $r['state'], $r['price']]);
+            $q = $whs && $r['qty'] !== null ? tli_wh_qty((int) $r['id']) : [];
+            fputcsv($f, array_merge([$g['product']->get_name(), $r['sku'], $r['size'], $r['qty'] ?? '', $r['state'], $r['price']], array_map(static fn ($w) => $r['qty'] === null ? '' : (int) ($q[(int) $w['id']] ?? 0), $whs)));
         }
     }
     exit;
@@ -319,7 +350,7 @@ function tli_orders_table(array $orders, bool $compact = false): void
         printf('<td class="nowrap"><a class="tli-link" href="%s">#%s</a><span class="muted small">%s</span>%s</td><td>%s</td>%s<td class="mono">%s</td><td>%s</td><td class="num">%s</td>',
             esc_url(current_user_can('edit_shop_orders') ? $o->get_edit_order_url() : '#'), esc_html($o->get_order_number()), esc_html($o->get_date_created() ? wp_date('d M, H:i', $o->get_date_created()->getTimestamp()) : ''), $inv,
             esc_html(trim($o->get_formatted_billing_full_name()) ?: '—'), $compact ? '' : '<td class="small">' . esc_html(mb_strimwidth($items, 0, 80, '…')) . '</td>',
-            esc_html($o->get_shipping_country() ?: $o->get_billing_country() ?: '—'), tli_badge($label, $tone) . tli_tracking_line(...array_values(tli_tracking($o))), esc_html(wp_strip_all_tags($o->get_formatted_order_total())));
+            esc_html($o->get_shipping_country() ?: $o->get_billing_country() ?: '—'), tli_badge($label, $tone) . tli_tracking_line(...array_values(tli_tracking($o))) . (function_exists('tli_wh_multi') && tli_wh_multi() && ($whs = tli_order_warehouses($o)) ? '<span class="tli-wh-chip">From ' . esc_html(implode(', ', array_map(static fn ($id) => tli_wh($id)['name'] ?? '#' . $id, $whs))) . '</span>' : ''), esc_html(wp_strip_all_tags($o->get_formatted_order_total())));
         if (!$compact) {
             echo '<td>';
             if (isset(TLI_NEXT[$o->get_status()]) && current_user_can('tl_fulfil')) {
@@ -360,7 +391,7 @@ function tli_remote_table(array $rows): void
         $items = implode(', ', array_map(static fn ($l) => $l['qty'] . '× ' . ($l['name'] ?: $l['sku']), json_decode($o['lines_json'], true) ?: []));
         printf('<tr><td class="tli-chk"><input type="checkbox" form="tli-print-form" name="o[]" value="R:%d" aria-label="Select order"></td><td class="nowrap"><b>#%s</b><span class="muted small">%s</span></td><td><span class="tli-store-chip">%s</span></td><td>%s</td><td class="small">%s</td><td class="mono">%s</td><td>%s</td><td class="num">%s %s</td><td>',
             (int) $o['id'], esc_html($o['number']), esc_html(wp_date('d M, H:i', strtotime($o['placed_at'] . ' UTC'))), esc_html($names[$o['store_id']] ?? $o['store_id']), esc_html($o['customer'] ?: '—'),
-            esc_html(mb_strimwidth($items, 0, 80, '…')), esc_html($o['country'] ?: '—'), tli_badge($label, $tone) . tli_tracking_line((string) ($o['courier'] ?? ''), (string) ($o['awb'] ?? ''), (string) ($o['track_url'] ?? '')), esc_html($o['currency']), esc_html(number_format_i18n((float) $o['total'])));
+            esc_html(mb_strimwidth($items, 0, 80, '…')), esc_html($o['country'] ?: '—'), tli_badge($label, $tone) . tli_tracking_line((string) ($o['courier'] ?? ''), (string) ($o['awb'] ?? ''), (string) ($o['track_url'] ?? '')) . (function_exists('tli_wh_multi') && tli_wh_multi() && !empty($o['alloc_json']) && ($ra = json_decode((string) $o['alloc_json'], true)) ? '<span class="tli-wh-chip">From ' . esc_html(implode(', ', array_unique(array_map(static fn ($id) => tli_wh((int) $id)['name'] ?? '#' . $id, array_merge(...array_map('array_keys', array_values(array_filter($ra)))))))) . '</span>' : ''), esc_html($o['currency']), esc_html(number_format_i18n((float) $o['total'])));
         if (isset(TLI_NEXT[$o['status']]) && current_user_can('tl_fulfil')) {
             printf('<form method="post" action="%s" class="tli-next"><input type="hidden" name="action" value="tli_remote_next"><input type="hidden" name="remote" value="%d">%s%s<button class="tli-btn sm primary">%s</button></form>',
                 esc_url(admin_url('admin-post.php')), (int) $o['id'], wp_nonce_field('tli_remote_' . $o['id'], '_wpnonce', true, false), $o['status'] === 'tl-packed' ? tli_dispatch_fields() : '', esc_html(TLI_NEXT[$o['status']][1]));
@@ -386,8 +417,8 @@ function tli_page_orders(): void
     }
     echo '</nav>';
     // Printing: tick orders below (checkboxes belong to this form), or print everything waiting to be packed.
-    printf('<form id="tli-print-form" class="tli-printbar" method="get" action="%s" target="_blank"><input type="hidden" name="action" value="tli_print">%s<span class="muted">Warehouse printouts:</span><button class="tli-btn sm" name="what" value="pick">Pick list · ticked orders</button><button class="tli-btn sm" name="what" value="slips">Packing slips · ticked orders</button><button class="tli-btn sm" name="what" value="invoice">GST invoices · ticked orders</button><span class="tli-sep"></span><a class="tli-btn sm primary" target="_blank" href="%s">Pick list · all to pack</a><a class="tli-btn sm" target="_blank" href="%s">Packing slips · all to pack</a></form>',
-        esc_url(admin_url('admin-post.php')), wp_nonce_field('tli_print', '_wpnonce', false, false),
+    printf('<form id="tli-print-form" class="tli-printbar" method="get" action="%s" target="_blank"><input type="hidden" name="action" value="tli_print">%s<span class="muted">Warehouse printouts:</span>%s<button class="tli-btn sm" name="what" value="pick">Pick list · ticked orders</button><button class="tli-btn sm" name="what" value="slips">Packing slips · ticked orders</button><button class="tli-btn sm" name="what" value="invoice">GST invoices · ticked orders</button><span class="tli-sep"></span><a class="tli-btn sm primary" target="_blank" data-print-all href="%s">Pick list · all to pack</a><a class="tli-btn sm" target="_blank" data-print-all href="%s">Packing slips · all to pack</a></form>',
+        esc_url(admin_url('admin-post.php')), wp_nonce_field('tli_print', '_wpnonce', false, false), tli_wh_print_select(),
         esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=pick&all_to_pack=1'), 'tli_print')), esc_url(wp_nonce_url(admin_url('admin-post.php?action=tli_print&what=slips&all_to_pack=1'), 'tli_print')));
     echo '<h2 class="tli-sec">' . esc_html(get_bloginfo('name')) . '</h2><div class="tli-card flush">';
     tli_orders_table(wc_get_orders($args));
@@ -426,17 +457,17 @@ function tli_page_movements(): void
 {
     tli_head('Stock movements', 'Every change to stock: who, when, why. Records cannot be edited or deleted.');
     $rows = tli_movements(200);
-    echo '<div class="tli-card flush"><table class="tli-table"><thead><tr><th>When</th><th>SKU</th><th>What happened</th><th class="num">Change</th><th class="num">Before → after</th><th>Order</th><th>By</th><th>Note</th></tr></thead><tbody>';
+    echo '<div class="tli-card flush"><table class="tli-table"><thead><tr><th>When</th><th>SKU</th><th>What happened</th><th class="num">Change</th><th class="num">Before → after</th><th>Order</th><th>Warehouse</th><th>By</th><th>Note</th></tr></thead><tbody>';
     if (!$rows) {
-        echo '<tr><td colspan="8"><div class="tli-empty">No stock changes recorded yet.</div></td></tr>';
+        echo '<tr><td colspan="9"><div class="tli-empty">No stock changes recorded yet.</div></td></tr>';
     }
     foreach ($rows as $m) {
         $u = $m['user_id'] ? get_userdata((int) $m['user_id']) : null;
-        printf('<tr><td class="nowrap small">%s</td><td class="mono">%s</td><td>%s</td><td class="num"><span class="tli-delta %s">%s%d</span></td><td class="num">%s → %s</td><td>%s</td><td>%s</td><td class="small">%s</td></tr>',
+        printf('<tr><td class="nowrap small">%s</td><td class="mono">%s</td><td>%s</td><td class="num"><span class="tli-delta %s">%s%d</span></td><td class="num">%s → %s</td><td>%s</td><td class="small">%s</td><td>%s</td><td class="small">%s</td></tr>',
             esc_html(wp_date('d M Y, H:i', strtotime($m['created_at'] . ' UTC'))), esc_html($m['sku']), esc_html(tli_reason_label($m['reason'])), $m['qty_change'] >= 0 ? 'up' : 'down', $m['qty_change'] >= 0 ? '+' : '', (int) $m['qty_change'],
             esc_html((string) ($m['qty_before'] ?? '—')), esc_html((string) ($m['qty_after'] ?? '—')),
             $m['order_id'] ? '<a class="tli-link" href="' . esc_url(($o = wc_get_order((int) $m['order_id'])) ? $o->get_edit_order_url() : '#') . '">#' . (int) $m['order_id'] . '</a>' : '—',
-            esc_html($u ? $u->display_name : 'System'), esc_html($m['note']));
+            esc_html(!empty($m['warehouse_id']) && function_exists('tli_wh') && ($mw = tli_wh((int) $m['warehouse_id'])) ? $mw['name'] : '—'), esc_html($u ? $u->display_name : 'System'), esc_html($m['note']));
     }
     echo '</tbody></table></div>';
     tli_foot();
@@ -475,3 +506,17 @@ function tli_page_settings(): void
     echo '<div class="tli-card"><h2>How it works</h2><ul class="tli-help"><li>The hub site holds the central stock (WooCommerce stock on the hub). Storefronts connected on the Stores page send their paid orders to the hub, which takes the stock once, and read stock back every 5 minutes.</li><li>Every change is written to Stock movements with who, when and why: adjustments here, orders (sold / cancelled) and edits in the WooCommerce product screen.</li><li>Order stages: Paid → Packed → Dispatched → Delivered. Use the Next step button on Orders.</li><li>Sizes marked "Not counted yet" are sold without a limit until you record a count with Adjust → Stocktake.</li></ul></div>';
     tli_foot();
 }
+
+/** Warehouse choice for the Orders page printouts (only when there is more than one warehouse). */
+function tli_wh_print_select(): string
+{
+    if (!function_exists('tli_wh_multi') || !tli_wh_multi()) {
+        return '';
+    }
+    $o = '<option value="">All warehouses</option>';
+    foreach (tli_warehouses() as $w) {
+        $o .= sprintf('<option value="%d">%s</option>', (int) $w['id'], esc_html($w['name']));
+    }
+    return '<select name="wh" class="tli-input sm" aria-label="Warehouse" data-print-wh>' . $o . '</select>';
+}
+

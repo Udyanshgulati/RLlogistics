@@ -61,11 +61,21 @@ $active = count($chips);
       <?php if ($is_coll): ?><p class="eyebrow sx-kicker"><?php esc_html_e('Collection', 'schermo'); ?></p><?php endif; ?>
       <h1 id="sx-title" class="sx-title"><?php echo esc_html($title); ?></h1>
       <p class="sx-line"><?php echo esc_html($line); ?></p>
+      <?php
+      // Schermo Sports and its teams: quick links between the whole collection and each team.
+      $team_nav = $current && in_array($current->slug, ['schermo-sports', 'milan-icons', 'glasgow-cosmic'], true) && function_exists('schermo_teams') ? schermo_teams() : [];
+      if ($team_nav && ($sports_term = get_term_by('slug', 'schermo-sports', 'product_cat'))):
+      ?>
+        <nav class="sx-teams" aria-label="<?php esc_attr_e('Teams', 'schermo'); ?>">
+          <a href="<?php echo esc_url(get_term_link($sports_term)); ?>"<?php echo $current->slug === 'schermo-sports' ? ' aria-current="page"' : ''; ?>><?php esc_html_e('All Schermo Sports', 'schermo'); ?></a>
+          <?php foreach ($team_nav as $t): ?><a href="<?php echo esc_url(get_term_link($t['term'])); ?>"<?php echo $current->slug === $t['slug'] ? ' aria-current="page"' : ''; ?>><img src="<?php echo esc_url($t['crest']); ?>" alt="" width="20" height="20"><?php echo esc_html($t['term']->name); ?></a><?php endforeach; ?>
+        </nav>
+      <?php endif; ?>
       <p class="sx-count" aria-live="polite"><span><?php echo (int) $total; ?></span> <?php echo esc_html(_n('product', 'products', $total, 'schermo')); ?></p>
     </div>
     <?php
     // Editorial photo from the owner's deck for the team collections (photo only, no slide text).
-    $banner = ['milan-icons' => 'banner-milan-icons.webp', 'glasgow-cosmic' => 'banner-glasgow-cosmic.webp'][$current ? $current->slug : ''] ?? '';
+    $banner = ['schermo-sports' => 'banner-milan-icons.webp', 'milan-icons' => 'banner-milan-icons.webp', 'glasgow-cosmic' => 'banner-glasgow-cosmic.webp'][$current ? $current->slug : ''] ?? '';
     if ($banner):
     ?>
     <div class="sx-banner" aria-hidden="true"><img src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/img/' . $banner); ?>" alt="" width="1183" height="1400" fetchpriority="high"></div>

@@ -6,7 +6,7 @@
 
 defined('ABSPATH') || exit;
 get_header();
-$teams = array_values(array_filter(schermo_collections(), static fn ($c) => !empty($c['crest'])));
+$teams = function_exists('schermo_teams') ? schermo_teams() : [];
 $shop = class_exists('WooCommerce') ? wc_get_page_permalink('shop') : home_url('/');
 ?>
 <main id="main" class="ab container">
@@ -32,8 +32,8 @@ $shop = class_exists('WooCommerce') ? wc_get_page_permalink('shop') : home_url('
 
   <?php if ($teams): ?>
   <section class="ab-section" aria-labelledby="teams-title">
-    <h2 id="teams-title"><?php esc_html_e('Team merchandise', 'schermo'); ?></h2>
-    <p><?php esc_html_e('Designed by Schermo: match, practice, travel and off-field ranges for Milan Icons and Glasgow Cosmic.', 'schermo'); ?></p>
+    <h2 id="teams-title"><?php esc_html_e('Schermo Sports', 'schermo'); ?></h2>
+    <p><?php esc_html_e('Team merchandise designed by Schermo: match, practice, travel and off-field ranges for Milan Icons and Glasgow Cosmic.', 'schermo'); ?></p>
     <ul class="ab-crests" role="list">
       <?php foreach ($teams as $t): ?>
         <li><a href="<?php echo esc_url(get_term_link($t['term'])); ?>"><img src="<?php echo esc_url($t['crest']); ?>" alt="" width="64" height="64" loading="lazy"><span><?php echo esc_html($t['term']->name); ?></span></a></li>

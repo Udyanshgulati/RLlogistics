@@ -1310,3 +1310,21 @@ dialog.eg-list { width: min(480px, calc(100vw - 24px)); background: radial-gradi
 .tl-credit a { display: inline; gap: 0; font: 500 clamp(10px, 1vw, 13px)/1.6 var(--font-label); letter-spacing: .24em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
 .tl-credit strong { color: rgba(255, 255, 255, .92); font-weight: 700; }
 .tl-credit a:hover strong { color: #fff; }
+
+/* Schermo Sports: team links on its listing pages and on the Collections page */
+.sx-teams { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
+.sx-teams a { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line-strong); font-size: 13px; }
+.sx-teams a[aria-current="page"] { background: #fff; color: #0a0a0b; border-color: #fff; }
+.sx-teams img { width: 20px; height: 20px; object-fit: contain; }
+.cl-teams { list-style: none; margin: 4px 0 14px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.cl-teams a { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px 6px 8px; border-radius: 999px; border: 1px solid var(--line-strong); font-size: 13px; }
+.cl-teams img { width: 28px; height: 28px; object-fit: contain; }
+/* Three collections on the homepage */
+.hm-colls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 760px) { .hm-colls { grid-template-columns: 1fr 1fr; } .hm-colls > li:last-child:nth-child(odd) { grid-column: 1 / -1; } .hm-colls > li:last-child:nth-child(odd) .hm-coll-media { aspect-ratio: 16 / 9; } }
+.cl-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .cl-grid { grid-template-columns: 1fr; } }
+
+/* Product page: dispatch time line (TL Commerce Hub) */
+.tl-dispatch { margin: 10px 0 0; font-size: 13px; color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+.tl-dispatch::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }

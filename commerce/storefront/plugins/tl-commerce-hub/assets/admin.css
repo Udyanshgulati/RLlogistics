@@ -154,3 +154,7 @@
 .tli-launch .tick { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
 .tli-launch li.ok .tick { background: #e7f6ec; color: #167a3a; }
 .tli-launch li.todo .tick { background: #fdf0e6; color: #b45309; }
+/* Warehouses */
+.tli-whs { display: inline-flex; gap: 6px; margin-left: 8px; font-size: 11px; color: var(--muted); font-weight: 500; }
+.tli-whs span { padding: 1px 6px; border-radius: 6px; background: #f3f2ef; }
+.tli-wh-chip { display: inline-block; margin-top: 3px; font-size: 11px; color: var(--muted); }

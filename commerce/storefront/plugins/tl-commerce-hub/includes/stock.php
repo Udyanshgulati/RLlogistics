@@ -68,8 +68,11 @@ function tli_stock_summary(): array
     return $s;
 }
 
-/** Applies an adjustment and records it. Returns [before, after]. */
-function tli_adjust(int $id, string $reason, int $qty, string $note = '', ?int $order_id = null): array
+/**
+ * Applies an adjustment and records it. Returns [before, after] for the warehouse it was made in (the product's
+ * warehouse when none is given; the whole stock when the site has no warehouses, e.g. a storefront).
+ */
+function tli_adjust(int $id, string $reason, int $qty, string $note = '', ?int $order_id = null, ?int $wh = null): array
 {
     $u = wc_get_product($id);
     if (!$u || !isset(TLI_REASONS[$reason])) {
@@ -80,8 +83,23 @@ function tli_adjust(int $id, string $reason, int $qty, string $note = '', ?int $
         $u->set_stock_quantity(0);
         $u->save();
     }
-    $before = (int) $u->get_stock_quantity();
     $sign = TLI_REASONS[$reason][1];
+    $use_wh = function_exists('tli_warehouses') && tli_mode() === 'hub' && tli_warehouses();
+    if ($use_wh) {
+        tli_wh_reconcile($u);
+        $wh = $wh && tli_wh($wh) ? $wh : tli_wh_for($u);
+        $before = tli_wh_qty($id)[$wh] ?? 0;
+        $after = $sign === 0 ? max(0, $qty) : $before + $sign * abs($qty);
+        if ($after < 0) {
+            throw new InvalidArgumentException(sprintf('Only %d in %s — cannot remove %d.', $before, tli_wh($wh)['name'], abs($qty)));
+        }
+        tli_wh_change($id, $wh, $after - $before);
+        $total = (int) $u->get_stock_quantity() + ($after - $before);
+        tli_without_auto_log(static fn () => wc_update_product_stock($u, $total, 'set'));
+        tli_log($u, $after - $before, $before, $after, $reason, $note, $order_id, $wh);
+        return [$before, $after];
+    }
+    $before = (int) $u->get_stock_quantity();
     $after = $sign === 0 ? max(0, $qty) : $before + $sign * abs($qty);
     if ($after < 0) {
         throw new InvalidArgumentException(sprintf('Only %d in stock — cannot remove %d.', $before, abs($qty)));
@@ -92,7 +110,7 @@ function tli_adjust(int $id, string $reason, int $qty, string $note = '', ?int $
 }
 
 /** Ledger write. */
-function tli_log(WC_Product $u, int $change, ?int $before, ?int $after, string $reason, string $note = '', ?int $order_id = null): void
+function tli_log(WC_Product $u, int $change, ?int $before, ?int $after, string $reason, string $note = '', ?int $order_id = null, ?int $warehouse_id = null): void
 {
     global $wpdb;
     if ($change === 0 && $reason !== 'count') {
@@ -100,7 +118,7 @@ function tli_log(WC_Product $u, int $change, ?int $before, ?int $after, string $
     }
     $wpdb->insert($wpdb->prefix . 'tl_stock_movements', [
         'product_id' => $u->get_id(), 'sku' => (string) $u->get_sku(), 'qty_change' => $change, 'qty_before' => $before, 'qty_after' => $after,
-        'reason' => $reason, 'note' => mb_substr($note, 0, 250), 'order_id' => $order_id, 'user_id' => get_current_user_id() ?: null,
+        'reason' => $reason, 'note' => mb_substr($note, 0, 250), 'order_id' => $order_id, 'warehouse_id' => $warehouse_id, 'user_id' => get_current_user_id() ?: null,
         'created_at' => current_time('mysql', true),
     ]);
 }
@@ -159,5 +177,5 @@ add_action('woocommerce_before_product_object_save', static function (WC_Product
 
 function tli_reason_label(string $r): string
 {
-    return TLI_REASONS[$r][0] ?? ['sold' => 'Sold (order)', 'order_restored' => 'Order cancelled — back in stock', 'edit' => 'Edited in WooCommerce'][$r] ?? ucfirst($r);
+    return TLI_REASONS[$r][0] ?? ['sold' => 'Sold (order)', 'order_restored' => 'Order cancelled — back in stock', 'edit' => 'Edited in WooCommerce', 'transfer' => 'Moved between warehouses'][$r] ?? ucfirst($r);
 }

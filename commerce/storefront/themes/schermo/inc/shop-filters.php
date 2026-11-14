@@ -53,9 +53,25 @@ function schermo_type_pills(?WP_Term $current): array
     return $out;
 }
 
+/**
+ * Collections and teams. Schermo Sports is one collection made of the two teams (Milan Icons, Glasgow Cosmic are its
+ * sub-categories). Teams come before Schermo Sports so a product's context line names its team.
+ */
 function schermo_collection_labels(): array
 {
-    return ['schermo-core' => __('Schermo Core', 'schermo'), 'schermo-atelier' => __('Schermo Atelier', 'schermo'), 'milan-icons' => __('Milan Icons', 'schermo'), 'glasgow-cosmic' => __('Glasgow Cosmic', 'schermo')];
+    return ['schermo-core' => __('Schermo Core', 'schermo'), 'schermo-atelier' => __('Schermo Atelier', 'schermo'), 'milan-icons' => __('Milan Icons', 'schermo'), 'glasgow-cosmic' => __('Glasgow Cosmic', 'schermo'), 'schermo-sports' => __('Schermo Sports', 'schermo')];
+}
+
+/** The three collections shoppers choose between (filter drawer, menus). */
+function schermo_group_labels(): array
+{
+    return ['schermo-core' => __('Schermo Core', 'schermo'), 'schermo-atelier' => __('Schermo Atelier', 'schermo'), 'schermo-sports' => __('Schermo Sports', 'schermo')];
+}
+
+/** The teams inside Schermo Sports. */
+function schermo_team_labels(): array
+{
+    return ['milan-icons' => __('Milan Icons', 'schermo'), 'glasgow-cosmic' => __('Glasgow Cosmic', 'schermo')];
 }
 
 /** Current filter values from the URL, validated against known slugs. */
@@ -174,7 +190,7 @@ function schermo_shop_context(?WP_Term $current): array
         }
     }
     $colls = [];
-    foreach (schermo_collection_labels() as $slug => $label) {
+    foreach (schermo_group_labels() as $slug => $label) {
         $t = get_term_by('slug', $slug, 'product_cat');
         if ($t && $ids && array_intersect($ids, wc_get_products(array_merge($args, ['category' => [$slug]])))) {
             $colls[$slug] = $label;

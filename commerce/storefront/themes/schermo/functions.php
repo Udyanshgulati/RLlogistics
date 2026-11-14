@@ -149,7 +149,7 @@ function schermo_hero_slides(): array
 }
 
 /**
- * The four collections in deck order, with the deck's subtitle and line, a representative product photo and, for
+ * The three collections (Core, Atelier, and Schermo Sports = Milan Icons + Glasgow Cosmic) in deck order, with the deck's subtitle and line, a representative product photo and, for
  * the team collections, the crest. Collections not yet in the store are left out.
  */
 function schermo_collections(): array
@@ -162,8 +162,7 @@ function schermo_collections(): array
     $defs = [
         ['schermo-core', 'core', __('Core', 'schermo'), __('Schermo Essentials', 'schermo'), __('Tees, baggy trousers, caps, backpacks, shorts.', 'schermo'), null],
         ['schermo-atelier', 'atelier', __('Atelier', 'schermo'), __('Limited drops', 'schermo'), __('Embroidery, patchwork and hand stitched detail.', 'schermo'), null],
-        ['milan-icons', 'icons', __('Milan Icons', 'schermo'), __('Team merchandise', 'schermo'), __('Black and gold, drawn from the Duomo.', 'schermo'), $img . 'crest-milan-icons.webp'],
-        ['glasgow-cosmic', 'cosmic', __('Glasgow Cosmic', 'schermo'), __('Team merchandise', 'schermo'), __('Cosmic navy, electric blue, Scottish thistle.', 'schermo'), $img . 'crest-glasgow-cosmic.webp'],
+        ['schermo-sports', 'sports', __('Schermo Sports', 'schermo'), __('Milan Icons · Glasgow Cosmic', 'schermo'), __('Team merchandise designed by Schermo.', 'schermo'), null],
     ];
     $out = [];
     foreach ($defs as [$slug, $key, $label, $sub, $line, $crest]) {
@@ -178,12 +177,29 @@ function schermo_collections(): array
     return $out;
 }
 
+/** The teams inside Schermo Sports, with crest and deck photo. Teams not in the store are left out. */
+function schermo_teams(): array
+{
+    $img = get_stylesheet_directory_uri() . '/assets/img/';
+    $out = [];
+    foreach ([
+        'milan-icons' => [__('Black and gold, drawn from the spires of the Duomo.', 'schermo'), 'crest-milan-icons.webp', 'banner-milan-icons.webp'],
+        'glasgow-cosmic' => [__('Cosmic navy and electric blue, with the Scottish thistle.', 'schermo'), 'crest-glasgow-cosmic.webp', 'banner-glasgow-cosmic.webp'],
+    ] as $slug => [$line, $crest, $banner]) {
+        $t = get_term_by('slug', $slug, 'product_cat');
+        if ($t && !is_wp_error($t) && $t->count) {
+            $out[] = ['slug' => $slug, 'term' => $t, 'line' => $line, 'crest' => $img . $crest, 'banner' => $img . $banner];
+        }
+    }
+    return $out;
+}
+
 /** Category tile image: the category's own thumbnail, else the newest product's photo in it. */
 function schermo_category_image(WP_Term $cat): string
 {
     static $used = [];
     // A representative product per category (full cut-out), else the category's own image, else the newest product.
-    $featured = ['accessories' => 'SC-028', 'clothing' => 'SC-016', 'fan-merch' => 'GC-026', 'sportswear' => 'MI-014', 'schermo-core' => 'SC-001', 'schermo-atelier' => 'SA-003', 'milan-icons' => 'MI-001', 'glasgow-cosmic' => 'GC-001'];
+    $featured = ['accessories' => 'SC-028', 'clothing' => 'SC-016', 'fan-merch' => 'GC-024', 'sportswear' => 'MI-014', 'schermo-core' => 'SC-001', 'schermo-atelier' => 'SA-003', 'schermo-sports' => 'MI-001', 'milan-icons' => 'MI-001', 'glasgow-cosmic' => 'GC-001'];
     $thumb = 0;
     if (isset($featured[$cat->slug]) && ($fid = wc_get_product_id_by_sku($featured[$cat->slug])) && get_post_status($fid) === 'publish') {
         $thumb = (int) get_post_thumbnail_id($fid);
@@ -261,10 +277,11 @@ function schermo_menu_media(): array
         'schermo-atelier' => ['img' => $cut('SA-003'), 'line' => __('Limited drops', 'schermo'), 'kind' => 'cut'],
         'milan-icons' => ['img' => $img . 'banner-milan-icons.webp', 'line' => __('Black and gold, from the Duomo', 'schermo'), 'kind' => 'photo'],
         'glasgow-cosmic' => ['img' => $img . 'banner-glasgow-cosmic.webp', 'line' => __('Cosmic navy, electric blue', 'schermo'), 'kind' => 'photo'],
+        'schermo-sports' => ['img' => $cut('MI-001'), 'line' => __('Milan Icons · Glasgow Cosmic', 'schermo'), 'kind' => 'cut'],
         'clothing' => ['img' => $cut('SC-001'), 'line' => '', 'kind' => 'cut'],
         'accessories' => ['img' => $cut('SC-029'), 'line' => '', 'kind' => 'cut'],
         'sportswear' => ['img' => $cut('MI-001'), 'line' => '', 'kind' => 'cut', 'by_collection' => true],
-        'fan-merch' => ['img' => $cut('GC-026'), 'line' => '', 'kind' => 'photo', 'by_collection' => true],
+        'fan-merch' => ['img' => $cut('GC-024'), 'line' => '', 'kind' => 'photo', 'by_collection' => true],
     ];
     if (function_exists('schermo_collections')) {
         foreach (schermo_collections() as $c) {
@@ -293,7 +310,7 @@ add_filter('walker_nav_menu_start_el', static function (string $html, $item, int
     if (!empty($m['by_collection']) && $t instanceof WP_Term) {
         $ids = wc_get_products(['status' => 'publish', 'limit' => -1, 'return' => 'ids', 'category' => [$t->slug]]);
         $links = '';
-        foreach (schermo_collection_labels() as $slug => $label) {
+        foreach (array_diff_key(schermo_collection_labels(), ['schermo-sports' => 1]) as $slug => $label) {
             if ($ids && array_intersect($ids, wc_get_products(['status' => 'publish', 'limit' => -1, 'return' => 'ids', 'category' => [$slug]]))) {
                 $links .= '<li class="menu-item"><a href="' . esc_url(add_query_arg('collection', $slug, get_term_link($t))) . '">' . esc_html($label) . '</a></li>';
             }

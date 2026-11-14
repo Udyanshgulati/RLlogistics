@@ -21,7 +21,7 @@ function tli_print_orders(array $keys): array
             $lines = [];
             foreach ($o->get_items() as $item) {
                 $p = $item->get_product();
-                $lines[] = ['sku' => $p ? (string) $p->get_sku() : '', 'qty' => (int) $item->get_quantity(), 'name' => $item->get_name()];
+                $lines[] = ['sku' => $p ? (string) $p->get_sku() : '', 'qty' => (int) $item->get_quantity(), 'name' => $item->get_name(), 'alloc' => array_map('intval', (array) $item->get_meta('_tl_alloc'))];
             }
             $out[] = ['store' => get_bloginfo('name'), 'number' => $o->get_order_number(), 'date' => $o->get_date_created() ? $o->get_date_created()->getTimestamp() : time(),
                 'customer' => trim($o->get_formatted_billing_full_name()), 'ship_to' => wp_strip_all_tags(str_replace(['<br/>', '<br>'], "\n", (string) ($o->get_formatted_shipping_address() ?: $o->get_formatted_billing_address()))),
@@ -29,10 +29,43 @@ function tli_print_orders(array $keys): array
         } elseif ($type === 'R' && tli_mode() === 'hub') {
             $r = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}tl_remote_orders WHERE id = %d", $id), ARRAY_A);
             if ($r) {
+                $ra = json_decode((string) ($r['alloc_json'] ?? ''), true) ?: [];
+                $rl = array_map(static fn ($l) => $l + ['alloc' => array_map('intval', (array) ($ra[$l['sku']] ?? []))], json_decode($r['lines_json'], true) ?: []);
+                $r['lines_json'] = wp_json_encode($rl);
                 $out[] = ['store' => $names[$r['store_id']] ?? $r['store_id'], 'number' => $r['number'], 'date' => strtotime($r['placed_at'] . ' UTC'), 'customer' => $r['customer'],
                     'ship_to' => (string) ($r['ship_to'] ?? ''), 'phone' => (string) ($r['phone'] ?? ''), 'note' => (string) ($r['note'] ?? ''), 'lines' => json_decode($r['lines_json'], true) ?: [], 'shipping' => ''];
             }
         }
+    }
+    // One warehouse only (?wh=): each line keeps just the quantity taken from that warehouse; lines without a split
+    // (sizes not counted yet) belong to the default warehouse; orders with nothing from it are left out.
+    $wh = absint($_REQUEST['wh'] ?? 0); // phpcs:ignore WordPress.Security.NonceVerification -- nonce checked by the caller
+    if ($wh && function_exists('tli_wh_default')) {
+        foreach ($out as $i => $o) {
+            $keep = [];
+            foreach ($o['lines'] as $l) {
+                $a = array_filter((array) ($l['alloc'] ?? []));
+                $q = $a ? (int) ($a[$wh] ?? 0) : ($wh === tli_wh_default() ? (int) $l['qty'] : 0);
+                if ($q > 0) {
+                    $keep[] = ['qty' => $q] + $l;
+                }
+            }
+            if ($keep) {
+                $out[$i]['lines'] = $keep;
+            } else {
+                unset($out[$i]);
+            }
+        }
+        $out = array_values($out);
+    }
+    foreach ($out as $i => $o) {
+        $ids = [];
+        foreach ($o['lines'] as $l) {
+            foreach (array_keys(array_filter((array) ($l['alloc'] ?? []))) as $w) {
+                $ids[(int) $w] = true;
+            }
+        }
+        $out[$i]['from'] = $wh ? [$wh] : array_keys($ids);
     }
     return $out;
 }
@@ -118,7 +151,8 @@ function tli_render_pick(array $orders): void
         }
     }
     ksort($items, SORT_NATURAL);
-    printf('<header class="doc-head"><div><h1>Pick list</h1><p>%s · Delhi warehouse · %s</p></div><div class="mark">TL</div></header>', esc_html(get_bloginfo('name')), esc_html(wp_date('d M Y, H:i')));
+    $wh = absint($_REQUEST['wh'] ?? 0); // phpcs:ignore WordPress.Security.NonceVerification
+    printf('<header class="doc-head"><div><h1>Pick list</h1><p>%s · %s · %s</p></div><div class="mark">TL</div></header>', esc_html(get_bloginfo('name')), esc_html($wh && function_exists('tli_wh') && tli_wh($wh) ? tli_wh($wh)['name'] : (function_exists('tli_wh_multi') && tli_wh_multi() ? __('All warehouses', 'tl-commerce-hub') : __('Warehouse', 'tl-commerce-hub'))), esc_html(wp_date('d M Y, H:i')));
     printf('<p class="sum"><b>%d</b> orders · <b>%d</b> different items · <b>%d</b> pieces in total</p>', count($orders), count($items), array_sum(array_column($items, 'qty')));
     echo '<table><thead><tr><th class="chk">✓</th><th>SKU</th><th>Product</th><th class="n">Qty</th><th>For orders</th></tr></thead><tbody>';
     foreach ($items as $i) {
@@ -137,9 +171,9 @@ function tli_render_slips(array $orders): void
         echo '<section class="slip">';
         printf('<header class="doc-head"><div><img class="logo" src="%s" alt=""><p class="muted">%s</p></div><div class="right"><h1>Packing slip</h1><p>Order <b>#%s</b><br>%s</p></div></header>',
             esc_url($logo), esc_html($o['store']), esc_html($o['number']), esc_html(wp_date('d M Y', (int) $o['date'])));
-        printf('<div class="cols"><div><h2>Ship to</h2><p class="addr">%s</p>%s</div><div><h2>Ships from</h2><p class="addr">%s<br>India</p>%s</div></div>',
+        printf('<div class="cols"><div><h2>Ship to</h2><p class="addr">%s</p>%s</div><div><h2>Ships from</h2><p class="addr">%s<br>%s</p>%s</div></div>',
             nl2br(esc_html($o['ship_to'] !== '' ? $o['ship_to'] : $o['customer'])), $o['phone'] !== '' ? '<p>Phone: ' . esc_html($o['phone']) . '</p>' : '',
-            esc_html($o['store']), $o['shipping'] ? '<p>Service: ' . esc_html($o['shipping']) . '</p>' : '');
+            esc_html($o['store']), esc_html(tli_print_from($o['from'] ?? [])), $o['shipping'] ? '<p>Service: ' . esc_html($o['shipping']) . '</p>' : '');
         echo '<table><thead><tr><th class="chk">✓</th><th>Item</th><th>SKU</th><th class="n">Qty</th></tr></thead><tbody>';
         foreach ($o['lines'] as $l) {
             printf('<tr><td class="chk"><span class="box"></span></td><td>%s</td><td class="mono">%s</td><td class="n big">%d</td></tr>', esc_html($l['name']), esc_html($l['sku']), (int) $l['qty']);
@@ -167,3 +201,17 @@ td{border-bottom:1px solid #ddd;padding:9px 6px;vertical-align:top}.n{text-align
 .foot{margin-top:18px;font-size:11.5px;color:#555}.slip{page-break-after:always;padding-bottom:20px}.slip:last-child{page-break-after:auto}.empty{padding:40px;text-align:center;color:#666}
 @media print{.no-print{display:none}body{padding:0}@page{margin:14mm}}';
 }
+
+/** "Ships from" text for a slip: the warehouse(s) the order's lines come from (name and address), or the country. */
+function tli_print_from(array $ids): string
+{
+    $out = [];
+    foreach ($ids as $id) {
+        $w = function_exists('tli_wh') ? tli_wh((int) $id) : null;
+        if ($w) {
+            $out[] = $w['address'] !== '' ? $w['address'] : trim($w['name'] . ($w['city'] !== '' ? ', ' . $w['city'] : ''));
+        }
+    }
+    return $out ? implode("\n", $out) : __('India', 'tl-commerce-hub');
+}
+

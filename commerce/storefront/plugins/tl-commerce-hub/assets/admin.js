@@ -20,21 +20,37 @@
       lines.appendChild(row); row.querySelector('input').focus();
     });
   }
+  // "All to pack" printouts follow the warehouse chosen in the print bar.
+  document.querySelectorAll('[data-print-all]').forEach((a) => a.addEventListener('click', () => {
+    const sel = document.querySelector('[data-print-wh]'); const u = new URL(a.href);
+    if (sel && sel.value) u.searchParams.set('wh', sel.value); else u.searchParams.delete('wh');
+    a.href = u.toString();
+  }));
   const panel = document.getElementById('tli-adjust');
   if (!panel) return;
   const f = (k) => panel.querySelector(`[data-f="${k}"]`);
   const qty = panel.querySelector('input[name=qty]');
-  let before = null;
+  let before = null; let whMap = null; let total = null;
+  const whSel = panel.querySelector('select[name=wh]'); const toWrap = panel.querySelector('[data-to]');
   const preview = () => {
     const r = panel.querySelector('input[name=reason]:checked'); const sign = Number(r.dataset.sign); const n = Math.abs(parseInt(qty.value || '0', 10));
+    // With warehouses, the preview is for the chosen warehouse.
+    before = whMap && whSel ? (total === null ? null : Number(whMap[whSel.value] || 0)) : total;
     const b = before ?? 0; const after = sign === 0 ? n : b + sign * n;
-    panel.querySelector('[data-qlabel]').textContent = sign === 0 ? 'Exact count after the stocktake' : sign > 0 ? 'Quantity to add' : 'Quantity to remove';
+    if (toWrap) {
+      toWrap.hidden = r.value !== 'transfer';
+      const to = toWrap.querySelector('select');
+      if (r.value === 'transfer' && to.value === whSel.value) { const o = [...to.options].find((x) => x.value !== whSel.value); if (o) to.value = o.value; }
+    }
+    panel.querySelector('[data-qlabel]').textContent = r.value === 'transfer' ? 'Quantity to move' : sign === 0 ? 'Exact count after the stocktake' : sign > 0 ? 'Quantity to add' : 'Quantity to remove';
     f('before').textContent = before === null ? '0 (not counted yet)' : String(b); f('after').textContent = String(after);
     panel.querySelector('[data-preview]').classList.toggle('bad', after < 0);
   };
   document.querySelectorAll('[data-adjust]').forEach((btn) => btn.addEventListener('click', () => {
     f('id').value = btn.dataset.id; f('name').textContent = btn.dataset.name;
-    before = btn.dataset.qty === '' ? null : Number(btn.dataset.qty); qty.value = ''; preview(); panel.showModal(); qty.focus();
+    total = btn.dataset.qty === '' ? null : Number(btn.dataset.qty);
+    try { whMap = btn.dataset.wh ? JSON.parse(btn.dataset.wh) : null; } catch (e) { whMap = null; }
+    qty.value = ''; preview(); panel.showModal(); qty.focus();
   }));
   panel.addEventListener('input', preview); panel.addEventListener('change', preview);
   panel.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => panel.close()));

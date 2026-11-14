@@ -33,6 +33,7 @@ function tli_install_purchasing(): void
         reference varchar(100) NOT NULL DEFAULT '',
         status varchar(16) NOT NULL DEFAULT 'draft',
         expected_date date NULL,
+        warehouse_id bigint unsigned NOT NULL DEFAULT 0,
         note text NULL,
         created_by bigint unsigned NULL,
         created_at datetime NOT NULL,
@@ -154,7 +155,8 @@ add_action('admin_post_tli_po_save', static function (): void {
     $now = current_time('mysql', true);
     $expected = sanitize_text_field(wp_unslash($_POST['expected'] ?? ''));
     $data = ['supplier' => $supplier, 'reference' => sanitize_text_field(wp_unslash($_POST['reference'] ?? '')), 'expected_date' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $expected) ? $expected : null,
-        'note' => sanitize_textarea_field(wp_unslash($_POST['note'] ?? '')), 'status' => isset($_POST['send']) ? 'ordered' : 'draft', 'updated_at' => $now];
+        'note' => sanitize_textarea_field(wp_unslash($_POST['note'] ?? '')), 'status' => isset($_POST['send']) ? 'ordered' : 'draft', 'updated_at' => $now,
+        'warehouse_id' => function_exists('tli_wh') && tli_wh(absint($_POST['warehouse'] ?? 0)) ? absint($_POST['warehouse']) : (function_exists('tli_wh_default') ? tli_wh_default() : 0)];
     if ($id) {
         $wpdb->update($po, $data, ['id' => $id]);
         $wpdb->delete($ln, ['po_id' => $id]);
@@ -208,7 +210,7 @@ add_action('admin_post_tli_po_receive', static function (): void {
         $pid = (int) $l['product_id'] ?: (int) wc_get_product_id_by_sku($l['sku']);
         if ($good) {
             try {
-                tli_adjust($pid, 'received', $good, mb_substr(sprintf('PO #%d · %s%s', $id, $cur['supplier'], $note_extra !== '' ? ' · ' . $note_extra : ''), 0, 200));
+                tli_adjust($pid, 'received', $good, mb_substr(sprintf('PO #%d · %s%s', $id, $cur['supplier'], $note_extra !== '' ? ' · ' . $note_extra : ''), 0, 200), null, (int) ($cur['warehouse_id'] ?? 0) ?: null);
             } catch (Throwable $e) {
                 $errors[] = $l['sku'] . ': ' . $e->getMessage();
                 continue;
@@ -248,10 +250,10 @@ add_action('admin_post_tli_po_print', static function (): void {
     header('Content-Type: text/html; charset=utf-8');
     echo '<!doctype html><html><head><meta charset="utf-8"><title>PO #' . (int) $po['id'] . ' · ' . esc_html(get_bloginfo('name')) . '</title><style>' . tli_print_css() . '</style></head><body>';
     echo '<div class="bar no-print"><b>Purchase order #' . (int) $po['id'] . '</b><button onclick="window.print()">Print</button></div>';
-    printf('<header class="doc-head"><div><img class="logo" src="%s" alt=""><p class="muted">%s · Delhi warehouse, India</p></div><div class="right"><h1>Purchase order</h1><p><b>#%d</b>%s<br>%s</p></div></header>',
+    printf('<header class="doc-head"><div><img class="logo" src="%s" alt=""><p class="muted">%s</p></div><div class="right"><h1>Purchase order</h1><p><b>#%d</b>%s<br>%s</p></div></header>',
         esc_url(get_stylesheet_directory_uri() . '/assets/img/email-logo.png'), esc_html(get_bloginfo('name')), (int) $po['id'], $po['reference'] !== '' ? ' · Ref ' . esc_html($po['reference']) : '', esc_html(wp_date('d M Y', strtotime($po['created_at'] . ' UTC'))));
-    printf('<div class="cols"><div><h2>Supplier</h2><p class="addr">%s</p></div><div><h2>Deliver to</h2><p class="addr">%s<br>Delhi warehouse, India</p>%s</div></div>',
-        esc_html($po['supplier']), esc_html(get_bloginfo('name')), $po['expected_date'] ? '<p>Expected by: <b>' . esc_html(wp_date('d M Y', strtotime($po['expected_date']))) . '</b></p>' : '');
+    printf('<div class="cols"><div><h2>Supplier</h2><p class="addr">%s</p></div><div><h2>Deliver to</h2><p class="addr">%s<br>%s</p>%s</div></div>',
+        esc_html($po['supplier']), esc_html(get_bloginfo('name')), nl2br(esc_html(($pw = function_exists('tli_wh') ? tli_wh((int) ($po['warehouse_id'] ?? 0)) : null) ? trim($pw['name'] . "\n" . ($pw['address'] ?: trim($pw['city'] . ', ' . $pw['country'], ', '))) : '')), $po['expected_date'] ? '<p>Expected by: <b>' . esc_html(wp_date('d M Y', strtotime($po['expected_date']))) . '</b></p>' : '');
     echo '<table><thead><tr><th>SKU</th><th>Item</th><th class="n">Qty</th><th class="n">Unit cost</th><th class="n">Line total</th></tr></thead><tbody>';
     $total = 0.0;
     $costed = true;
@@ -293,7 +295,7 @@ function tli_po_list(): void
     $rows = $wpdb->get_results("SELECT p.*, COALESCE(SUM(l.qty_ordered),0) AS ordered, COALESCE(SUM(l.qty_received),0) AS received, COALESCE(SUM(l.qty_damaged),0) AS damaged, COUNT(l.id) AS items
         FROM {$po} p LEFT JOIN {$ln} l ON l.po_id = p.id WHERE {$where} GROUP BY p.id ORDER BY p.id DESC LIMIT 200", ARRAY_A) ?: [];
     $base = admin_url('admin.php?page=tl-purchasing');
-    tli_head('Purchasing', 'Purchase orders to suppliers and the stock on its way to the Delhi warehouse.',
+    tli_head('Purchasing', 'Purchase orders to suppliers and the stock on its way to your warehouses.',
         '<a class="tli-btn" href="' . esc_url($base . '&po=new&prefill=low') . '">Reorder low stock</a><a class="tli-btn primary" href="' . esc_url($base . '&po=new') . '">New purchase order</a>');
 
     $incoming = tli_incoming_map();
@@ -369,6 +371,13 @@ function tli_po_form(?array $po): void
     printf('<input type="hidden" name="action" value="tli_po_save"><input type="hidden" name="po" value="%d">', (int) ($po['id'] ?? 0));
     printf('<div class="tli-card"><div class="tli-po-head"><label class="tli-field"><span>Supplier *</span><input class="tli-input" name="supplier" required maxlength="150" value="%s" placeholder="Supplier or factory name"></label><label class="tli-field"><span>Supplier reference</span><input class="tli-input" name="reference" maxlength="100" value="%s" placeholder="Quotation / proforma no. (optional)"></label><label class="tli-field"><span>Expected delivery</span><input class="tli-input" type="date" name="expected" value="%s"></label></div><label class="tli-field"><span>Note for the supplier (optional)</span><textarea class="tli-input tli-textarea" name="note" rows="2" maxlength="1000">%s</textarea></label></div>',
         esc_attr($po['supplier'] ?? ''), esc_attr($po['reference'] ?? ''), esc_attr($po['expected_date'] ?? ''), esc_textarea($po['note'] ?? ''));
+    if (function_exists('tli_wh_multi') && tli_wh_multi()) {
+        $opts = '';
+        foreach (tli_warehouses() as $w) {
+            $opts .= sprintf('<option value="%d"%s>%s</option>', (int) $w['id'], selected((int) ($po['warehouse_id'] ?? tli_wh_default()), (int) $w['id'], false), esc_html($w['name']));
+        }
+        echo '<div class="tli-card"><label class="tli-field"><span>Deliver to warehouse</span><select class="tli-input" name="warehouse">' . $opts . '</select></label></div>';
+    }
     echo '<datalist id="tli-skus">';
     foreach (tli_sku_options() as $sku => $label) {
         printf('<option value="%s">%s</option>', esc_attr($sku), esc_html($label));
