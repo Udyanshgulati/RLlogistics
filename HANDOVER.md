@@ -271,3 +271,18 @@ Owner inputs still needed (blocking sales): Razorpay keys (live checkout has NO 
 prices/stock for Core, Atelier and Glasgow Cosmic, SMTP credentials, WhatsApp Cloud API + approved templates,
 Google OAuth client. Decisions: "Schermo Atelier" name, Made in Milan claim, Matthew M. Williams line, founders'
 names, Cosmic helmet/pads/gloves, Milan Icons bag tag category. Security: rotate the credentials shared in chat.
+
+## Update 14 Nov 2026 — Schermo Sports, warehouses, dispatch times (TL Commerce Hub 1.6.0)
+- **Catalogue:** Glasgow Cosmic Keychain, Lanyard, Sneakers, Travel Bag 02 removed (`removed` in
+  `catalog/glasgow-cosmic/products.json`, trashed on deploy, restorable). Live: 110 products.
+- **Schermo Sports** (`schermo-sports`): one collection for Milan Icons + Glasgow Cosmic; the teams are its
+  sub-categories (`/product-category/schermo-sports/milan-icons/`, old URLs still work). One-time migration
+  `schermo_sports_v` in `docker/import-catalog.php` (term, parents, products, Collections menu). Theme: three
+  collections everywhere; `schermo_group_labels()`, `schermo_team_labels()`, `schermo_teams()`.
+- **Warehouses** (`plugins/tl-commerce-hub/includes/warehouses.php`, hub only): TL Commerce Hub → Warehouses.
+  Tables `tl_warehouses`, `tl_wh_stock`; WooCommerce stock = sum of warehouses. Orders split per line
+  (`_tl_alloc` on the order line; `alloc_json` on other stores' orders); cancel restores to the same warehouse.
+  Adjust per warehouse, Move to another warehouse, pick lists/slips per warehouse, POs deliver into a warehouse.
+  Live starts with one "Main warehouse" holding all stock — owner renames it and adds the others.
+- **Dispatch time:** product screen → TL Commerce Hub box (Ships from, Dispatch time). Shown on the product page
+  and bag/checkout lines, saved on order lines. Fallback: warehouse dispatch time → Settings "Dispatch time".
