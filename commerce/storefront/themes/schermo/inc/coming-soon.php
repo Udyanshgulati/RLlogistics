@@ -1,8 +1,8 @@
 <?php
 /**
- * Coming soon (schermo.co). A standalone page: a private dressing room at night — velvet, warm spotlights, a polished
- * floor — with every Schermo piece hanging on brass rails in a new shuffled order on each visit, and "Coming soon"
- * in the middle with a notify-me sign-up (the Schermo list, with consent).
+ * Coming soon (schermo.co). A standalone page: a bright studio with one long rail — every Schermo piece hanging
+ * side-on, shuffled on each visit; a piece turns to face you on hover and opens large on click — "Coming soon"
+ * above and a notify-me sign-up (the Schermo list, with consent).
  *
  * Served for every front-end request on the hosts in SCHERMO_SOON_HOSTS (schermo.co once the domain points here),
  * and at /coming-soon/ on any host as a preview. wp-admin, login, REST and cron are never affected.
@@ -45,7 +45,7 @@ function schermo_soon_is_cutout(int $attachment_id): bool
 /** Every published piece with a cut-out photo: [name, image url]. Cached for an hour. */
 function schermo_soon_pieces(): array
 {
-    $cached = get_transient('schermo_soon_pieces');
+    $cached = get_transient('schermo_soon_pieces_v2');
     if (is_array($cached)) {
         return $cached;
     }
@@ -54,13 +54,17 @@ function schermo_soon_pieces(): array
         $p = wc_get_product($pid);
         $img = $p ? (int) $p->get_image_id() : 0;
         if ($img && schermo_soon_is_cutout($img)) {
-            $out[] = [$p->get_name(), (string) wp_get_attachment_image_url($img, 'medium_large')];
+            $coll = '';
+            foreach (wp_get_post_terms($pid, 'product_cat', ['fields' => 'slugs']) as $slug) {
+                $coll = ['schermo-core' => 'Schermo Core', 'schermo-atelier' => 'Schermo Atelier', 'schermo-sports' => 'Schermo Sports'][$slug] ?? $coll;
+            }
+            $out[] = [$p->get_name(), (string) wp_get_attachment_image_url($img, 'medium_large'), $coll];
         }
     }
-    set_transient('schermo_soon_pieces', $out, HOUR_IN_SECONDS);
+    set_transient('schermo_soon_pieces_v2', $out, HOUR_IN_SECONDS);
     return $out;
 }
-add_action('save_post_product', static fn () => delete_transient('schermo_soon_pieces'));
+add_action('save_post_product', static fn () => delete_transient('schermo_soon_pieces_v2'));
 
 // Before WordPress's canonical redirect (priority 10), so schermo.co is never sent to the shop's own domain.
 add_action('template_redirect', static function (): void {
