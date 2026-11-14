@@ -1,7 +1,7 @@
 <?php
 /**
- * Coming soon (schermo.co). A standalone page: a bright studio with one long rail — every Schermo piece hanging
- * side-on, shuffled on each visit; a piece turns to face you on hover and opens large on click — "Coming soon"
+ * Coming soon (schermo.co). A standalone page: a bright boutique rail — every Schermo garment on its own hanger,
+ * facing out, evenly spaced and shuffled on each visit; hover names a piece and click opens it large — "Coming soon"
  * above and a notify-me sign-up (the Schermo list, with consent).
  *
  * Served for every front-end request on the hosts in SCHERMO_SOON_HOSTS (schermo.co once the domain points here),
@@ -42,29 +42,107 @@ function schermo_soon_is_cutout(int $attachment_id): bool
     return false;
 }
 
-/** Every published piece with a cut-out photo: [name, image url]. Cached for an hour. */
+/**
+ * Where the garment sits inside its photo: [left, top, right, bottom] as fractions of the image (transparent margins
+ * trimmed), so every piece can be hung at the same height and scaled to a true-to-life width; plus 1 when the photo
+ * cuts the garment off at a side (a straight edge down most of it), else 0. Kept on the attachment.
+ */
+function schermo_soon_box(int $attachment_id): array
+{
+    $file = (string) get_attached_file($attachment_id);
+    $key = '_scm_box2_' . (int) @filemtime($file);
+    $box = get_post_meta($attachment_id, $key, true);
+    if (is_array($box) && count($box) === 5) {
+        return $box;
+    }
+    $box = [0.0, 0.0, 1.0, 1.0, 0];
+    $src = function_exists('imagecreatefromstring') && is_readable($file) ? @imagecreatefromstring((string) file_get_contents($file)) : false;
+    if ($src) {
+        $w = imagesx($src);
+        $h = imagesy($src);
+        $sw = 160;
+        $sh = max(1, (int) round($h * $sw / $w));
+        $sm = imagecreatetruecolor($sw, $sh);
+        imagealphablending($sm, false);
+        imagesavealpha($sm, true);
+        imagefill($sm, 0, 0, imagecolorallocatealpha($sm, 0, 0, 0, 127));
+        imagecopyresampled($sm, $src, 0, 0, 0, 0, $sw, $sh, $w, $h);
+        [$x0, $y0, $x1, $y1] = [$sw, $sh, -1, -1];
+        for ($y = 0; $y < $sh; $y++) {
+            for ($x = 0; $x < $sw; $x++) {
+                if (((imagecolorat($sm, $x, $y) >> 24) & 0x7f) < 90) { // visibly opaque
+                    $x0 = min($x0, $x);
+                    $x1 = max($x1, $x);
+                    $y0 = min($y0, $y);
+                    $y1 = max($y1, $y);
+                }
+            }
+        }
+        if ($x1 > $x0 && $y1 > $y0) {
+            $side = static function (int $x) use ($sm, $y0, $y1): float {
+                $n = 0;
+                for ($y = $y0; $y <= $y1; $y++) {
+                    $n += ((imagecolorat($sm, $x, $y) >> 24) & 0x7f) < 90 ? 1 : 0;
+                }
+                return $n / ($y1 - $y0 + 1);
+            };
+            $cut = max($side($x0), $side($x1)) > .45 ? 1 : 0;
+            $box = [round($x0 / $sw, 4), round($y0 / $sh, 4), round(($x1 + 1) / $sw, 4), round(($y1 + 1) / $sh, 4), $cut];
+        }
+        imagedestroy($sm);
+        imagedestroy($src);
+    }
+    update_post_meta($attachment_id, $key, $box);
+    return $box;
+}
+
+/**
+ * The garments for the rail: every published clothing or sportswear piece with a cut-out photo (caps, bags and other
+ * accessories don't go on hangers). Each: n name, u image, c collection, k 'top' or 'bottom' (clip hanger),
+ * b garment box in the photo, r photo height / width. Cached for an hour.
+ */
 function schermo_soon_pieces(): array
 {
-    $cached = get_transient('schermo_soon_pieces_v2');
+    $cached = get_transient('schermo_soon_pieces_v3');
     if (is_array($cached)) {
         return $cached;
     }
+    $colls = ['schermo-core' => 'Schermo Core', 'schermo-atelier' => 'Schermo Atelier', 'schermo-sports' => 'Schermo Sports'];
     $out = [];
-    foreach (wc_get_products(['status' => 'publish', 'limit' => -1, 'return' => 'ids']) as $pid) {
+    foreach (wc_get_products(['status' => 'publish', 'limit' => -1, 'return' => 'ids', 'category' => ['clothing', 'sportswear']]) as $pid) {
         $p = wc_get_product($pid);
         $img = $p ? (int) $p->get_image_id() : 0;
-        if ($img && schermo_soon_is_cutout($img)) {
-            $coll = '';
-            foreach (wp_get_post_terms($pid, 'product_cat', ['fields' => 'slugs']) as $slug) {
-                $coll = ['schermo-core' => 'Schermo Core', 'schermo-atelier' => 'Schermo Atelier', 'schermo-sports' => 'Schermo Sports'][$slug] ?? $coll;
-            }
-            $out[] = [$p->get_name(), (string) wp_get_attachment_image_url($img, 'medium_large'), $coll];
+        if (!$img || !schermo_soon_is_cutout($img)) {
+            continue;
         }
+        $slugs = wp_get_post_terms($pid, 'product_cat', ['fields' => 'slugs']);
+        if (array_intersect($slugs, ['accessories', 'fan-merch', 'caps-hats', 'bags-backpacks', 'other-accessories'])
+            || preg_match('/\\b(gloves?|helmets?|pads?|guards?|bats?|balls?|socks?|shoes?|sneakers?)\\b/i', $p->get_name())) { // kit, not garments
+            continue;
+        }
+        $coll = '';
+        foreach ($slugs as $slug) {
+            $coll = $colls[$slug] ?? $coll;
+        }
+        $bottom = array_intersect($slugs, ['trousers', 'shorts']) || preg_match('/\\b(shorts?|trousers?|pants|jeans|joggers?|cargos?|denims?|bottoms?|skirt)\\b/i', $p->get_name());
+        $src = wp_get_attachment_image_src($img, 'medium_large');
+        $box = schermo_soon_box($img);
+        if (!$src || $box[4]) { // a photo that cuts the garment off would look wrong on a hanger
+            continue;
+        }
+        $out[] = [
+            'n' => $p->get_name(),
+            'u' => wp_make_link_relative((string) $src[0]),
+            'c' => $coll,
+            'k' => $bottom ? 'bottom' : 'top',
+            'b' => array_slice($box, 0, 4),
+            'r' => $src[1] ? round($src[2] / $src[1], 4) : 1.25,
+        ];
     }
-    set_transient('schermo_soon_pieces_v2', $out, HOUR_IN_SECONDS);
+    set_transient('schermo_soon_pieces_v3', $out, HOUR_IN_SECONDS);
     return $out;
 }
-add_action('save_post_product', static fn () => delete_transient('schermo_soon_pieces_v2'));
+add_action('save_post_product', static fn () => delete_transient('schermo_soon_pieces_v3'));
 
 // Before WordPress's canonical redirect (priority 10), so schermo.co is never sent to the shop's own domain.
 add_action('template_redirect', static function (): void {

@@ -2,11 +2,11 @@
 /**
  * Schermo — Coming soon. Standalone page (no shop header/footer). See inc/coming-soon.php.
  *
- * A bright studio, editorial poster typography in the corners, "COMING SOON" above one long steel rail. Every
- * Schermo piece with a cut-out photo hangs side-on, shoulder to shoulder, in a new shuffled order on each visit.
- * Hover (or keyboard focus) turns a piece to face you and names it; click opens it large with its collection and
- * previous/next. The rail drifts slowly and can be dragged, swiped or scrolled. A ticker runs along the bottom.
- * Reduced motion: no drift, no swing.
+ * A bright studio, editorial poster typography in the corners, "COMING SOON" above one long steel rail, like a
+ * boutique: every Schermo garment on its own black hanger (trousers and shorts on clip hangers), facing out, at the
+ * same scale and evenly spaced, in a new shuffled order on each visit. Hover (or keyboard focus) lifts a piece and
+ * names it; click opens it large with its collection and previous/next. The rail drifts slowly and can be dragged,
+ * swiped or scrolled. A ticker runs along the bottom. Reduced motion: no drift, no sway.
  */
 
 defined('ABSPATH') || exit;
@@ -38,7 +38,7 @@ $ticker = ['Coming soon', 'The art of dressing', 'Schermo Core', 'Schermo Atelie
 @font-face { font-family: "Syncopate"; font-weight: 400; font-display: swap; src: url("<?php echo esc_url($rel($dir . '/assets/fonts/syncopate-400-latin.woff2')); ?>") format("woff2"); }
 @font-face { font-family: "Inter"; font-weight: 100 900; font-display: swap; src: url("<?php echo esc_url($rel($dir . '/assets/fonts/inter-var-latin.woff2')); ?>") format("woff2"); }
 :root { --ink: #111112; --ink-2: #3b3b3d; --muted: #77767a; --paper: #ecebe7; --paper-2: #f6f5f2; --ox: #8e0f1d; --gold: #b08a3a; --line: rgba(17, 17, 18, .12);
-  --slot: clamp(30px, 2.6vw, 42px); --gw: clamp(150px, 15vw, 230px); --open: calc(var(--gw) * .96); }
+  --tw: clamp(118px, min(12vw, 19vh), 200px); --hang: #1c1a19; }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 body { background: radial-gradient(70% 60% at 50% 42%, var(--paper-2), var(--paper) 70%, #e2e0db 100%); color: var(--ink); font: 400 14px/1.55 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
@@ -56,23 +56,28 @@ body { background: radial-gradient(70% 60% at 50% 42%, var(--paper-2), var(--pap
 h1 { margin: 0; font: 700 clamp(34px, 7.2vw, 104px)/.95 Syncopate, sans-serif; letter-spacing: -.01em; text-transform: uppercase; }
 .lede { margin: clamp(10px, 1.6vh, 18px) auto 0; max-width: 46ch; font-size: clamp(13px, 1.15vw, 16px); color: var(--ink-2); }
 
-/* Rail */
+/* Rail: R is the rod's centre line; every hanger hooks over it. */
 .stage { position: relative; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
-.rail { position: relative; height: calc(var(--gw) * 1.42); overflow: hidden; cursor: grab; touch-action: pan-y; -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+.rail { position: relative; overflow: hidden; cursor: grab; touch-action: pan-y; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
 .rail.dragging { cursor: grabbing; }
-.rod { position: absolute; left: 0; right: 0; top: 14px; height: 6px; border-radius: 3px; z-index: 3;
-  background: linear-gradient(180deg, #fbfbfa 0%, #c9c8c4 35%, #8e8d89 70%, #5f5e5b 100%); box-shadow: 0 3px 6px rgba(0, 0, 0, .18); }
-.track { position: absolute; top: 0; left: 0; height: 100%; display: flex; align-items: flex-start; will-change: transform; }
-.slot { position: relative; flex: 0 0 var(--slot); height: 100%; transition: flex-basis .55s cubic-bezier(.2, .8, .2, 1); outline: none; perspective: 900px; }
-.slot.on { flex-basis: var(--open); z-index: 5; }
-.hook { position: absolute; left: 50%; top: 4px; width: 14px; height: 18px; margin-left: -7px; z-index: 4; border: 2px solid #3a2a26; border-bottom: 0; border-radius: 9px 9px 0 0; }
-.hook::after { content: ""; position: absolute; left: 50%; top: 14px; width: 2px; height: 22px; margin-left: -1px; background: #3a2a26; }
-.g { position: absolute; left: 50%; top: 22px; width: var(--gw); margin-left: calc(var(--gw) / -2); transform-origin: 50% 0; transform: rotateY(var(--ry, 74deg)) rotate(var(--tilt, 0deg)); transition: transform .65s cubic-bezier(.2, .8, .2, 1), filter .4s; filter: brightness(.94) saturate(.95); }
-.slot.on .g { --ry: 0deg; --tilt: 0deg; filter: none; }
-.g img { display: block; width: 100%; height: auto; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .18)); }
-.shadow { position: absolute; left: 6%; right: 6%; bottom: -2px; height: 26px; border-radius: 50%; background: radial-gradient(closest-side, rgba(0, 0, 0, .28), transparent); filter: blur(10px); pointer-events: none; }
-.caption { text-align: center; min-height: 20px; margin-top: 4px; font-size: 12px; color: var(--muted); letter-spacing: .02em; transition: opacity .3s; }
+.rod { position: absolute; left: 0; right: 0; top: 23px; height: 7px; border-radius: 4px; z-index: 1;
+  background: linear-gradient(180deg, #fdfdfc 0%, #d4d3cf 30%, #9a9995 65%, #62615e 100%); box-shadow: 0 4px 8px rgba(0, 0, 0, .16); }
+.track { position: absolute; top: 0; left: 0; height: 100%; display: flex; align-items: flex-start; will-change: transform; z-index: 2; }
+.slot { position: relative; flex: none; height: 100%; outline: none; }
+.hang { position: absolute; left: 50%; top: 0; transform-origin: 50% 26px; transition: transform .7s cubic-bezier(.2, .8, .2, 1); }
+.hanger { position: absolute; top: 0; overflow: visible; }
+.hanger path, .hanger rect { fill: none; stroke: var(--hang); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.hanger rect { fill: var(--hang); stroke: none; }
+.g { position: absolute; overflow: hidden; filter: drop-shadow(0 16px 14px rgba(40, 30, 25, .16)) drop-shadow(0 2px 3px rgba(40, 30, 25, .12)); transition: filter .5s; }
+.g img { position: absolute; max-width: none; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.slot.on .hang { transform: translateY(-5px); }
+.slot.on .g { filter: drop-shadow(0 26px 22px rgba(40, 30, 25, .22)) drop-shadow(0 2px 3px rgba(40, 30, 25, .12)); }
+.rail.hovering .slot:not(.on) .g { opacity: .72; }
+.g { transition: filter .5s, opacity .5s; }
+.shadow { position: absolute; left: 4%; right: 4%; bottom: 0; height: 30px; border-radius: 50%; background: radial-gradient(closest-side, rgba(0, 0, 0, .14), transparent); filter: blur(12px); pointer-events: none; }
+.caption { text-align: center; min-height: 20px; margin-top: 6px; font-size: 12px; color: var(--muted); letter-spacing: .02em; }
 .caption b { color: var(--ink); font-weight: 600; }
+.probe { position: absolute; visibility: hidden; width: var(--tw); height: 0; }
 
 /* Bottom */
 .bottom { align-items: flex-end; padding-bottom: clamp(12px, 2vh, 22px); }
@@ -108,7 +113,7 @@ h1 { margin: 0; font: 700 clamp(34px, 7.2vw, 104px)/.95 Syncopate, sans-serif; l
 :focus-visible { outline: 2px solid var(--ox); outline-offset: 3px; }
 
 @media (max-width: 760px) {
-  :root { --slot: 26px; --gw: 150px; }
+  :root { --tw: clamp(104px, 30vw, 132px); }
   .top { padding-top: 16px; } .top .right { font-size: 9px; }
   h1 { font-size: clamp(30px, 10.5vw, 46px); }
   .bottom { flex-direction: column; align-items: stretch; gap: 10px; }
@@ -138,6 +143,7 @@ h1 { margin: 0; font: 700 clamp(34px, 7.2vw, 104px)/.95 Syncopate, sans-serif; l
       <div class="rod"></div>
       <div class="track" role="list"></div>
       <div class="shadow"></div>
+      <span class="probe" data-probe></span>
     </div>
     <p class="caption" aria-live="polite" data-caption>Hover a piece · drag the rail</p>
   </section>
@@ -176,26 +182,58 @@ h1 { margin: 0; font: 700 clamp(34px, 7.2vw, 104px)/.95 Syncopate, sans-serif; l
 <script>
 (() => {
   'use strict';
-  const all = <?php echo wp_json_encode(array_map(static fn ($p) => ['n' => $p[0], 'u' => wp_make_link_relative($p[1]), 'c' => $p[2] ?? ''], $pieces)); ?>;
+  const all = <?php echo wp_json_encode(array_values($pieces)); ?>;
+  // Shuffled, but never two trousers/shorts side by side when it can be helped.
   const list = all.slice();
   for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+  for (let i = 1; i < list.length; i++) {
+    if (list[i].k === 'bottom' && list[i - 1].k === 'bottom') { const j = list.findIndex((p, k) => k > i && p.k === 'top'); if (j > 0) [list[i], list[j]] = [list[j], list[i]]; }
+  }
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const rail = document.querySelector('[data-rail]'), track = rail.querySelector('.track'), cap = document.querySelector('[data-caption]');
 
-  // Twice over, so the rail loops without a seam.
-  const items = [...list, ...list];
-  items.forEach((p, k) => {
-    const s = document.createElement('div');
-    s.className = 'slot'; s.setAttribute('role', 'listitem'); s.tabIndex = k < list.length ? 0 : -1; s.dataset.i = k % list.length;
-    s.setAttribute('aria-label', p.n + (p.c ? ', ' + p.c : ''));
-    s.innerHTML = `<span class="hook" aria-hidden="true"></span><div class="g" style="--tilt:${(Math.random() * 2 - 1).toFixed(2)}deg"><img src="${p.u}" alt="" decoding="async" loading="${k < 30 ? 'eager' : 'lazy'}" width="768" height="960"></div>`;
-    track.appendChild(s);
-  });
+  // Hang every piece: tops on a hanger (only hook and neck show above the collar), trousers and shorts on a clip
+  // hanger. Sizes come from the garment's own box in its photo, so all pieces share one scale and one hanging line.
+  const R = 26, NECK = 34, CLIP = 44, esc = (t) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const probe = document.querySelector('[data-probe]');
+  let tw = 0;
+  const build = () => {
+    const w = probe.getBoundingClientRect().width;
+    if (Math.abs(w - tw) < 1 && track.children.length) return;
+    tw = w; track.textContent = '';
+    const gap = Math.round(tw * .2), tallest = tw * 1.45;
+    rail.style.height = Math.round(R + CLIP + tallest + 36) + 'px';
+    [...list, ...list].forEach((p, k) => { // twice over, so the rail loops without a seam
+      const [x0, y0, x1, y1] = p.b, bw = x1 - x0, bh = y1 - y0, a = (bh * p.r) / bw, bottom = p.k === 'bottom';
+      // Tops share one width; trousers one length; shorts one waist width.
+      let gw = tw, gh;
+      if (bottom && !/short/i.test(p.n)) { gh = tallest; gw = Math.min(gh / a, tw * .85); gh = gw * a; }
+      else { gw = bottom ? tw * .62 : tw; gh = gw * a; if (gh > tw * 1.4) { gh = tw * 1.4; gw = gh / a; } }
+      const iw = gw / bw, ih = iw * p.r, sw = Math.max(48, gw + 26), cx = sw / 2, top = bottom ? R + CLIP : R + NECK;
+      let hanger;
+      if (bottom) {
+        const bar = R + 30, half = gw / 2 + 6, cl = gw / 2 - Math.min(14, gw * .12);
+        hanger = `<path d="M${cx} ${bar} L${cx} ${R + 2} A7 7 0 1 1 ${cx + 14} ${R + 2}"/><path d="M${cx - half} ${bar} L${cx + half} ${bar}"/>`
+          + `<rect x="${cx - cl - 4}" y="${bar - 2}" width="8" height="${top - bar + 8}" rx="1.5"/><rect x="${cx + cl - 4}" y="${bar - 2}" width="8" height="${top - bar + 8}" rx="1.5"/>`;
+      } else {
+        hanger = `<path d="M${cx} ${top + 6} L${cx} ${R + 2} A7 7 0 1 1 ${cx + 14} ${R + 2}"/>`;
+      }
+      const s = document.createElement('div');
+      s.className = 'slot'; s.setAttribute('role', 'listitem'); s.tabIndex = k < list.length ? 0 : -1; s.dataset.i = k % list.length;
+      s.setAttribute('aria-label', p.n + (p.c ? ', ' + p.c : ''));
+      s.style.width = Math.round(gw + gap) + 'px';
+      s.innerHTML = `<div class="hang"><svg class="hanger" aria-hidden="true" width="${sw}" height="${top + 10}" style="left:${-cx}px">${hanger}</svg>`
+        + `<div class="g" style="left:${-gw / 2}px;top:${top}px;width:${gw}px;height:${gh}px"><img src="${esc(p.u)}" alt="" decoding="async" loading="${k < 24 ? 'eager' : 'lazy'}" style="width:${iw}px;height:${ih}px;left:${-x0 * iw}px;top:${-y0 * ih}px"></div></div>`;
+      if (bottom) s.querySelector('.g').after(s.querySelector('.hanger')); // clips sit over the waistband
+      track.appendChild(s);
+    });
+    measure();
+  };
 
   // Drift + drag (pointer), wheel, keyboard
   let x = 0, v = still ? 0 : -0.25, dragging = false, startX = 0, startOff = 0, moved = 0, half = 0, paused = false;
-  const measure = () => { half = track.scrollWidth / 2; };
-  measure(); addEventListener('resize', measure);
+  function measure() { half = track.scrollWidth / 2; }
+  build(); let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { build(); measure(); }, 150); });
   const wrap = () => { if (half) { while (x <= -half) x += half; while (x > 0) x -= half; } };
   const frame = () => { if (!dragging && !paused) x += v; wrap(); track.style.transform = `translate3d(${x}px,0,0)`; requestAnimationFrame(frame); };
   requestAnimationFrame(frame);
@@ -214,7 +252,8 @@ h1 { margin: 0; font: 700 clamp(34px, 7.2vw, 104px)/.95 Syncopate, sans-serif; l
     if (on === s) return;
     if (on) on.classList.remove('on');
     on = s;
-    if (s) { s.classList.add('on'); const p = list[+s.dataset.i]; cap.innerHTML = `<b>${p.n.replace(/</g, '&lt;')}</b>${p.c ? ' — ' + p.c : ''}`; }
+    rail.classList.toggle('hovering', !!s);
+    if (s) { s.classList.add('on'); const p = list[+s.dataset.i]; cap.innerHTML = `<b>${esc(p.n)}</b>${p.c ? ' — ' + esc(p.c) : ''}`; }
     else cap.textContent = 'Hover a piece · drag the rail';
   };
   track.addEventListener('pointerover', (e) => { const s = e.target.closest('.slot'); if (s && !dragging) { show(s); paused = true; } });
