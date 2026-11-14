@@ -496,6 +496,7 @@ function tli_page_settings(): void
     printf('<label class="tli-field"><span>Send daily alerts to</span><input class="tli-input" type="email" name="tli_alert_email" value="%s" placeholder="%s" style="max-width:320px"></label>', esc_attr((string) get_option('tli_alert_email', '')), esc_attr(get_option('admin_email')));
     echo '<p class="muted small">A size at or below the low stock level shows as Low stock. Every morning an email lists low and out-of-stock sizes and orders waiting more than 24 hours to be packed (only when there is something to report).</p><p><button class="tli-btn primary">Save</button></p></form></div>';
     tli_settings_invoice_card();
+    tli_settings_sheet_card();
     $bk = tli_last_backup();
     $mail = function_exists('schermo_mail_ready') && schermo_mail_ready();
     $me = get_option('schermo_mail_error');
