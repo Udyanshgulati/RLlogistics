@@ -103,7 +103,7 @@ function schermo_soon_box(int $attachment_id): array
  */
 function schermo_soon_pieces(): array
 {
-    $cached = get_transient('schermo_soon_pieces_v3');
+    $cached = get_transient('schermo_soon_pieces_v4');
     if (is_array($cached)) {
         return $cached;
     }
@@ -116,7 +116,7 @@ function schermo_soon_pieces(): array
             continue;
         }
         $slugs = wp_get_post_terms($pid, 'product_cat', ['fields' => 'slugs']);
-        if (array_intersect($slugs, ['accessories', 'fan-merch', 'caps-hats', 'bags-backpacks', 'other-accessories'])
+        if (array_intersect($slugs, ['accessories', 'fan-merch', 'caps-hats', 'bags-backpacks', 'other-accessories', 'glasgow-cosmic']) // Glasgow Cosmic: not on the rail for now (owner)
             || preg_match('/\\b(gloves?|helmets?|pads?|guards?|bats?|balls?|socks?|shoes?|sneakers?)\\b/i', $p->get_name())) { // kit, not garments
             continue;
         }
@@ -139,10 +139,10 @@ function schermo_soon_pieces(): array
             'r' => $src[1] ? round($src[2] / $src[1], 4) : 1.25,
         ];
     }
-    set_transient('schermo_soon_pieces_v3', $out, HOUR_IN_SECONDS);
+    set_transient('schermo_soon_pieces_v4', $out, HOUR_IN_SECONDS);
     return $out;
 }
-add_action('save_post_product', static fn () => delete_transient('schermo_soon_pieces_v3'));
+add_action('save_post_product', static fn () => delete_transient('schermo_soon_pieces_v4'));
 
 // Before WordPress's canonical redirect (priority 10), so schermo.co is never sent to the shop's own domain.
 add_action('template_redirect', static function (): void {
