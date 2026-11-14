@@ -60,6 +60,9 @@ wp option update woocommerce_default_customer_address base >/dev/null 2>&1 || tr
 if [ "$(wp option get schermo_migr_decimals 2>/dev/null)" != "1" ]; then wp option update woocommerce_price_num_decimals 0 >/dev/null && wp option update schermo_migr_decimals 1 >/dev/null; fi
 wp plugin is-active woo-razorpay || wp plugin activate woo-razorpay
 wp plugin is-active tl-commerce-hub || wp plugin activate tl-commerce-hub
+# Old plugin names (e.g. tl-inventory, renamed to tl-commerce-hub) are dropped from the active list, so WordPress
+# never shows "deactivated due to an error: Plugin file does not exist".
+wp eval '$a = (array) get_option("active_plugins", []); $k = array_values(array_filter($a, static fn ($p) => file_exists(WP_PLUGIN_DIR . "/" . $p))); if ($k !== $a) { update_option("active_plugins", $k); echo "removed missing plugins from the active list\n"; }' || true
 # Messages & reviews: starts in dry-run (nothing is sent) until the owner connects providers and switches to live.
 wp plugin is-active schermo-comms || wp plugin activate schermo-comms
 wp eval-file /opt/schermo/store-setup.php
